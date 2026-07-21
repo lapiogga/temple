@@ -1,0 +1,376 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#23211E; --ink-soft:#6B6258; --hanji:#FAF6EE; --surface:#FFFFFF;
+    --line:#E7DECF; --accent:#9E3B2F; --accent-2:#2E7D74; --gold:#C8A24B;
+    --font-body:'Pretendard',system-ui,-apple-system,sans-serif;
+    --font-title:'Noto Serif KR',serif;
+    --maxw:1080px; --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--hanji);color:var(--ink);font-family:var(--font-body);
+    line-height:1.7;-webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(var(--ink) .6px,transparent .6px);
+    background-size:20px 20px;background-blend-mode:normal;
+  }
+  body::before{content:"";position:fixed;inset:0;background:var(--hanji);opacity:.94;z-index:-1;}
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px;}
+  .serif{font-family:var(--font-title);}
+
+  /* ---------- Nav ---------- */
+  header.nav{position:sticky;top:0;z-index:50;background:rgba(250,246,238,.82);
+    backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  .nav .row{display:flex;align-items:center;justify-content:space-between;height:64px;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand .name{font-family:var(--font-title);font-weight:700;font-size:19px;letter-spacing:-.01em;}
+  .brand .name small{display:block;font-family:var(--font-body);font-weight:500;font-size:11px;color:var(--ink-soft);letter-spacing:.04em;}
+  .menu{display:flex;gap:26px;align-items:center;}
+  .menu a{font-size:15px;font-weight:500;position:relative;padding:4px 0;color:var(--ink);}
+  .menu a::after{content:"";position:absolute;left:0;bottom:-2px;width:0;height:2px;background:var(--accent);transition:width .25s ease;}
+  .menu a:hover::after{width:100%;}
+  .hmb{display:none;background:none;border:0;cursor:pointer;padding:6px;}
+  .hmb span{display:block;width:22px;height:2px;background:var(--ink);margin:4px 0;transition:.25s;}
+
+  /* ---------- Hero ---------- */
+  .hero{position:relative;overflow:hidden;}
+  .hero .inner{position:relative;z-index:2;padding:clamp(48px,9vw,104px) 0 clamp(60px,10vw,120px);max-width:640px;}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;
+    letter-spacing:.14em;color:var(--accent);text-transform:uppercase;margin-bottom:18px;}
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--gold);}
+  .hero h1{font-family:var(--font-title);font-weight:700;font-size:clamp(32px,7vw,58px);
+    line-height:1.18;letter-spacing:-.015em;margin-bottom:18px;}
+  .hero h1 em{font-style:normal;color:var(--accent);}
+  .hero p.lede{font-size:clamp(15px,2.4vw,18px);color:var(--ink-soft);max-width:44ch;margin-bottom:30px;}
+  .btns{display:flex;gap:12px;flex-wrap:wrap;}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 22px;border-radius:999px;font-weight:600;font-size:15px;transition:transform .18s ease,box-shadow .18s ease;}
+  .btn-primary{background:var(--accent);color:#fff;}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 24px -12px rgba(158,59,47,.6);}
+  .btn-ghost{border:1.5px solid var(--line);color:var(--ink);background:var(--surface);}
+  .btn-ghost:hover{border-color:var(--accent);transform:translateY(-2px);}
+  .hero-lotus{position:absolute;right:-60px;top:20px;z-index:1;opacity:.10;pointer-events:none;}
+  .hero-ridge{position:absolute;left:0;right:0;bottom:0;z-index:1;width:100%;opacity:.5;}
+  .dancheong-rule{width:100%;display:block;}
+
+  /* ---------- Section base ---------- */
+  section.blk{padding:clamp(44px,7vw,80px) 0;}
+  .sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:26px;}
+  .sec-head h2{font-family:var(--font-title);font-weight:700;font-size:clamp(22px,4vw,32px);letter-spacing:-.01em;}
+  .sec-head .ki{font-size:13px;font-weight:700;letter-spacing:.14em;color:var(--accent-2);text-transform:uppercase;margin-bottom:6px;}
+  .more{font-size:14px;font-weight:600;color:var(--accent);white-space:nowrap;}
+  .more:hover{text-decoration:underline;}
+
+  /* ---------- 다음 법회 / 공지 strip ---------- */
+  .highlight{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;margin-top:-34px;position:relative;z-index:5;}
+  .hcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px 24px;
+    box-shadow:0 18px 40px -30px rgba(35,33,30,.5);}
+  .hcard.accent{background:linear-gradient(180deg,#fff, #fbf4f2);border-color:#e6cfc9;}
+  .hcard .tag{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:var(--accent);letter-spacing:.06em;margin-bottom:10px;}
+  .hcard.teal .tag{color:var(--accent-2);}
+  .hcard h3{font-family:var(--font-title);font-size:21px;font-weight:700;margin-bottom:4px;}
+  .hcard .when{font-size:15px;color:var(--ink);font-weight:600;}
+  .hcard .desc{font-size:14px;color:var(--ink-soft);margin-top:8px;}
+
+  /* ---------- 소식 cards ---------- */
+  .news{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .ncard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+    transition:transform .2s ease,box-shadow .2s ease;}
+  .ncard:hover{transform:translateY(-4px);box-shadow:0 20px 40px -28px rgba(35,33,30,.45);}
+  .ncard .ph{aspect-ratio:16/10;background:var(--hanji);display:grid;place-items:center;border-bottom:1px solid var(--line);}
+  .ncard .body{padding:18px 20px 20px;}
+  .ncard .date{font-size:12.5px;color:var(--accent);font-weight:700;letter-spacing:.04em;}
+  .ncard h3{font-size:17px;font-weight:700;margin:6px 0 8px;line-height:1.4;}
+  .ncard p{font-size:14px;color:var(--ink-soft);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+
+  /* ---------- 법회 안내 ---------- */
+  .schedule{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px 26px;}
+  .panel h3{font-family:var(--font-title);font-size:19px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+  .plist{list-style:none;}
+  .plist li{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px dashed var(--line);font-size:15px;}
+  .plist li:last-child{border-bottom:0;}
+  .plist .t{font-weight:600;}
+  .plist .v{color:var(--accent);font-weight:600;white-space:nowrap;}
+
+  /* ---------- 중창기 preview ---------- */
+  .timeline{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:8px;}
+  .timeline::before{content:"";position:absolute;left:0;right:0;top:11px;height:2px;background:var(--gold);opacity:.7;}
+  .tnode{position:relative;padding-top:34px;}
+  .tnode::before{content:"";position:absolute;top:4px;left:0;width:16px;height:16px;border-radius:50%;background:var(--hanji);border:3px solid var(--accent);}
+  .tnode:nth-child(2)::before{border-color:var(--accent-2);}
+  .tnode .yr{font-family:var(--font-title);font-weight:700;color:var(--accent);font-size:17px;}
+  .tnode:nth-child(2) .yr{color:var(--accent-2);}
+  .tnode h4{font-size:16px;font-weight:700;margin:2px 0 6px;}
+  .tnode p{font-size:14px;color:var(--ink-soft);}
+
+  /* ---------- 오시는길 / 후원 ---------- */
+  .foot-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:20px;}
+  .mapbox{aspect-ratio:16/9;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);display:grid;place-items:center;}
+  .info-lines{margin-top:14px;font-size:14.5px;color:var(--ink);}
+  .info-lines div{padding:4px 0;color:var(--ink-soft);}
+  .info-lines b{color:var(--ink);}
+  .donate{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px 26px;}
+  .donate .acct{margin-top:12px;font-size:15px;background:var(--hanji);border:1px dashed var(--line);border-radius:12px;padding:12px 16px;}
+
+  /* ---------- Footer ---------- */
+  footer.site{margin-top:20px;}
+  .foot-main{background:#2a2723;color:#e9e2d5;}
+  .foot-main .cols{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:24px;padding:40px 0 30px;}
+  .foot-main .name{font-family:var(--font-title);font-size:18px;font-weight:700;color:#fff;margin-bottom:8px;}
+  .foot-main p,.foot-main a{font-size:13.5px;color:#c9c0b0;line-height:1.9;}
+  .foot-main h5{font-size:13px;letter-spacing:.1em;color:#a79c88;margin-bottom:8px;text-transform:uppercase;}
+  .foot-bar{border-top:1px solid #423d36;padding:14px 0;font-size:12px;color:#9a9080;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+
+  /* ---------- reveal motion ---------- */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease;}
+  .reveal.in{opacity:1;transform:none;}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none;}html{scroll-behavior:auto;}}
+
+  /* ---------- responsive ---------- */
+  @media(max-width:860px){
+    .news{grid-template-columns:1fr 1fr;}
+  }
+  @media(max-width:720px){
+    .menu{display:none;position:absolute;top:64px;left:0;right:0;flex-direction:column;gap:0;
+      background:var(--hanji);border-bottom:1px solid var(--line);padding:8px 0;}
+    .menu.open{display:flex;}
+    .menu a{padding:13px 22px;width:100%;}
+    .menu a::after{display:none;}
+    .hmb{display:block;}
+    .highlight{grid-template-columns:1fr;margin-top:-24px;}
+    .news{grid-template-columns:1fr;}
+    .schedule{grid-template-columns:1fr;}
+    .timeline{grid-template-columns:1fr;}
+    .timeline::before{left:7px;right:auto;top:0;bottom:0;width:2px;height:auto;}
+    .tnode{padding-top:0;padding-left:34px;}
+    .tnode::before{top:2px;left:0;}
+    .foot-grid{grid-template-columns:1fr;}
+    .foot-main .cols{grid-template-columns:1fr;gap:20px;}
+  }
+</style>
+
+<!-- shared SVG defs -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <pattern id="dc" width="40" height="26" patternUnits="userSpaceOnUse">
+    <path d="M2 24 A18 18 0 0 1 38 24Z" fill="#9E3B2F"/>
+    <path d="M8 24 A12 12 0 0 1 32 24Z" fill="#C8A24B"/>
+    <path d="M14 24 A6 6 0 0 1 26 24Z" fill="#2E7D74"/>
+  </pattern>
+</defs></svg>
+
+<!-- ============ NAV ============ -->
+<header class="nav">
+  <div class="wrap row">
+    <a class="brand" href="#">
+      <svg width="34" height="34" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <circle cx="24" cy="24" r="19" stroke="#9E3B2F" stroke-width="1.7"/><circle cx="24" cy="24" r="15.5" stroke="#9E3B2F" stroke-width="1.1"/>
+        <circle cx="24" cy="24" r="4.4" stroke="#9E3B2F" stroke-width="1.7"/><circle cx="24" cy="24" r="1.7" fill="#9E3B2F"/>
+        <g stroke="#9E3B2F" stroke-width="1.5" stroke-linecap="round"><line x1="28.4" y1="24" x2="39.5" y2="24"/><line x1="19.6" y1="24" x2="8.5" y2="24"/><line x1="24" y1="28.4" x2="24" y2="39.5"/><line x1="24" y1="19.6" x2="24" y2="8.5"/><line x1="27.1" y1="27.1" x2="35" y2="35"/><line x1="20.9" y1="20.9" x2="13" y2="13"/><line x1="27.1" y1="20.9" x2="35" y2="13"/><line x1="20.9" y1="27.1" x2="13" y2="35"/></g>
+      </svg>
+      <span class="name">○○사 <small>○○산 · 大韓佛敎</small></span>
+    </a>
+    <nav class="menu" id="menu">
+      <a href="#news">소식</a><a href="#schedule">법회·행사</a><a href="#history">중창기</a><a href="#visit">오시는 길</a><a href="#" class="serif" style="color:var(--accent);font-weight:700">후원</a>
+    </nav>
+    <button class="hmb" id="hmb" aria-label="메뉴"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="wrap">
+    <!-- 대형 연꽃 워터마크 -->
+    <svg class="hero-lotus" width="440" height="440" viewBox="0 0 120 120" fill="#9E3B2F" aria-hidden="true">
+      <g transform="translate(60,60)"><g id="hp"><path d="M0 -6 C-8 -26 -8 -44 0 -60 C8 -44 8 -26 0 -6Z"/></g>
+      <use href="#hp" transform="rotate(40)"/><use href="#hp" transform="rotate(80)"/><use href="#hp" transform="rotate(120)"/><use href="#hp" transform="rotate(160)"/><use href="#hp" transform="rotate(200)"/><use href="#hp" transform="rotate(240)"/><use href="#hp" transform="rotate(280)"/><use href="#hp" transform="rotate(320)"/></g>
+    </svg>
+    <div class="inner">
+      <span class="eyebrow">마음을 쉬어가는 곳</span>
+      <h1>산자락에 깃든<br>천년의 <em>고요</em>,<br>○○사에 오신 것을 환영합니다</h1>
+      <p class="lede">계절마다 다른 얼굴로 맞이하는 도량입니다. 정기 법회와 사찰 소식, 그리고 오랜 중창의 발자취를 함께 나눕니다.</p>
+      <div class="btns">
+        <a class="btn btn-primary" href="#schedule">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.4v1.6"/><path d="M12 4.4C6.6 6 6.6 17 12 19c5.4-2 5.4-13 0-14.6Z"/><path d="M7.2 9.2h9.6M7.2 14h9.6"/><path d="M12 19v2.4M10.4 21.6h3.2"/></svg>
+          법회 안내
+        </a>
+        <a class="btn btn-ghost" href="#visit">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4.4-5-6.5-7.6-6.5-10.6a6.5 6.5 0 0 1 13 0C18.5 13.4 16.4 16 12 21Z"/><circle cx="12" cy="10.5" r="2.4"/></svg>
+          오시는 길
+        </a>
+      </div>
+    </div>
+  </div>
+  <!-- 산 능선 + 사찰 실루엣 -->
+  <svg class="hero-ridge" viewBox="0 0 1200 150" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <g stroke="#2E7D74" stroke-width="2" fill="none" opacity=".55">
+      <path d="M0 120 C200 92 330 100 480 120 C630 140 760 128 1200 100"/>
+      <path d="M0 140 C230 118 400 122 620 136 C820 148 1000 138 1200 126" opacity=".7"/>
+    </g>
+    <g fill="#9E3B2F" opacity=".28"><path d="M748 104 l-8 -12 h16Z"/><rect x="742" y="104" width="12" height="10"/></g>
+    <path d="M700 106 q48 -36 96 0" stroke="#9E3B2F" stroke-width="1.6" fill="none" opacity=".3"/>
+  </svg>
+</section>
+<svg class="dancheong-rule" viewBox="0 0 1200 26" preserveAspectRatio="none" aria-hidden="true" style="height:14px">
+  <rect width="1200" height="26" fill="url(#dc)"/>
+</svg>
+
+<!-- ============ 다음 법회 / 공지 ============ -->
+<div class="wrap">
+  <div class="highlight">
+    <div class="hcard accent reveal">
+      <span class="tag">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9E3B2F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.4C6.6 6 6.6 17 12 19c5.4-2 5.4-13 0-14.6Z"/><path d="M7.2 9.2h9.6M7.2 14h9.6"/><path d="M12 19v2.4"/></svg>
+        다음 정기법회
+      </span>
+      <h3>일요 가족법회</h3>
+      <div class="when">매주 일요일 오전 10:00 · 대웅전</div>
+      <p class="desc">사시예불과 법문, 공양이 이어집니다. 처음 오시는 분도 편안히 함께하실 수 있습니다.</p>
+    </div>
+    <div class="hcard teal reveal">
+      <span class="tag">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2E7D74" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17c0-7 2.2-9.8 5-9.8S17 10 17 17"/><path d="M4.8 17h14.4"/><path d="M10.2 20a1.9 1.9 0 0 0 3.6 0"/><path d="M12 4.6v2.6"/></svg>
+        공지
+      </span>
+      <h3 style="font-size:18px">여름 안거 회향 안내</h3>
+      <div class="when" style="font-weight:500;color:var(--ink-soft);font-size:14px">2026. 8. 15. 오전 10시 · 회향 법회 및 대중공양</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 소식 ============ -->
+<section class="blk" id="news">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div><div class="ki">Notice</div><h2>사찰 소식</h2></div>
+      <a class="more" href="#">소식 전체 보기 →</a>
+    </div>
+    <div class="news">
+      <article class="ncard reveal">
+        <div class="ph"><svg width="60" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--line)" stroke-width="1.4"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 16l4-4 3 3 4-5 5 6"/><circle cx="8" cy="9.5" r="1.2"/></svg></div>
+        <div class="body"><div class="date">2026. 07. 20.</div><h3>여름 산사 음악회 회향</h3><p>경내에서 열린 산사 음악회가 많은 신도님과 함께 원만히 회향되었습니다. 함께해 주셔서 감사합니다.</p></div>
+      </article>
+      <article class="ncard reveal">
+        <div class="ph"><svg width="56" height="56" viewBox="0 0 48 48" fill="#9E3B2F" fill-opacity=".16"><g transform="translate(24,24)"><g id="np"><path d="M0 -3 C-3 -10 -3 -17 0 -23 C3 -17 3 -10 0 -3Z"/></g><use href="#np" transform="rotate(45)"/><use href="#np" transform="rotate(90)"/><use href="#np" transform="rotate(135)"/><use href="#np" transform="rotate(180)"/><use href="#np" transform="rotate(225)"/><use href="#np" transform="rotate(270)"/><use href="#np" transform="rotate(315)"/></g></svg></div>
+        <div class="body"><div class="date">2026. 07. 08.</div><h3>백중 우란분재 봉행 안내</h3><p>조상 천도와 효를 기리는 백중 우란분재를 봉행합니다. 위패 접수 일정과 절차를 안내드립니다.</p></div>
+      </article>
+      <article class="ncard reveal">
+        <div class="ph"><svg width="56" height="56" viewBox="0 0 48 48" fill="none" stroke="var(--accent-2)" stroke-width="1.4"><circle cx="24" cy="25" r="12" fill="#2E7D74" fill-opacity=".1"/><path d="M17 30 q7 5 14 0M20 20 h8" stroke-linecap="round"/><path d="M31 16 l6 -5" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+        <div class="body"><div class="date">2026. 06. 30.</div><h3>초하루 법회 및 방생 법회</h3><p>매월 음력 초하루 법회와 함께 생명 존중의 방생 법회를 봉행합니다. 많은 동참 바랍니다.</p></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 법회·행사 ============ -->
+<section class="blk" id="schedule" style="background:linear-gradient(180deg,transparent,#f4eee2 40%,transparent)">
+  <div class="wrap">
+    <div class="sec-head reveal"><div><div class="ki">Dharma</div><h2>법회 · 행사 안내</h2></div></div>
+    <div class="schedule">
+      <div class="panel reveal">
+        <h3><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.4C6.6 6 6.6 17 12 19c5.4-2 5.4-13 0-14.6Z"/><path d="M7.2 9.2h9.6M7.2 14h9.6"/><path d="M12 19v2.4"/></svg>정기 법회</h3>
+        <ul class="plist">
+          <li><span class="t">일요 가족법회</span><span class="v">일요일 10:00</span></li>
+          <li><span class="t">초하루 법회</span><span class="v">음력 매월 1일</span></li>
+          <li><span class="t">지장재일 법회</span><span class="v">음력 매월 18일</span></li>
+          <li><span class="t">관음재일 법회</span><span class="v">음력 매월 24일</span></li>
+        </ul>
+      </div>
+      <div class="panel reveal">
+        <h3><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-2)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.4v1.6"/><path d="M12 4.4C6.6 6 6.6 17 12 19c5.4-2 5.4-13 0-14.6Z"/><path d="M12 19v2.4"/></svg>다가오는 행사</h3>
+        <ul class="plist">
+          <li><span class="t">백중 우란분재</span><span class="v">음력 7. 15.</span></li>
+          <li><span class="t">여름 안거 회향</span><span class="v">8. 15.</span></li>
+          <li><span class="t">동지 팥죽 나눔</span><span class="v">12. 21.</span></li>
+          <li><span class="t">성도재일 철야정진</span><span class="v">음력 12. 8.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 중창기 ============ -->
+<section class="blk" id="history">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div><div class="ki">History</div><h2>가람 중창기</h2></div>
+      <a class="more" href="#">중창기 전체 보기 →</a>
+    </div>
+    <p class="reveal" style="color:var(--ink-soft);max-width:60ch;margin-bottom:22px;font-size:15.5px">여러 대에 걸친 불사와 중창의 발자취입니다. 옛 사진과 기록으로 도량이 지나온 길을 담았습니다.</p>
+    <div class="timeline">
+      <div class="tnode reveal"><div class="yr">1925 · 창건</div><h4>대웅전 초창</h4><p>산자락에 처음 법당을 세워 도량의 기틀을 마련하였습니다.</p></div>
+      <div class="tnode reveal"><div class="yr">1978 · 중창</div><h4>요사채·범종각 증축</h4><p>신도의 정성을 모아 전각을 늘리고 범종을 봉안하였습니다.</p></div>
+      <div class="tnode reveal"><div class="yr">2015 · 중수</div><h4>단청 보수·경내 정비</h4><p>퇴락한 단청을 보수하고 경내를 오늘의 모습으로 가꾸었습니다.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 오시는 길 / 후원 ============ -->
+<section class="blk" id="visit" style="background:linear-gradient(180deg,transparent,#f4eee2 50%,transparent)">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="reveal">
+        <div class="sec-head"><div><div class="ki">Visit</div><h2>오시는 길</h2></div></div>
+        <div class="mapbox">
+          <div style="text-align:center;color:var(--ink-soft)">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--line)" stroke-width="1.4"><path d="M12 21c-4.4-5-6.5-7.6-6.5-10.6a6.5 6.5 0 0 1 13 0C18.5 13.4 16.4 16 12 21Z"/><circle cx="12" cy="10.5" r="2.4"/></svg>
+            <div style="font-size:13px;margin-top:6px">카카오맵 임베드 영역</div>
+          </div>
+        </div>
+        <div class="info-lines">
+          <div><b>주소</b>　○○시 ○○구 ○○로 00 (○○동)</div>
+          <div><b>대중교통</b>　○○역 3번 출구 · 마을버스 00번 종점 하차</div>
+          <div><b>주차</b>　경내 소형 30대 · 법회일 혼잡</div>
+        </div>
+      </div>
+      <div class="donate reveal">
+        <div class="sec-head"><div><div class="ki">Donation</div><h2 style="font-size:24px">후원 안내</h2></div></div>
+        <p style="font-size:14.5px;color:var(--ink-soft)">여러분의 정성은 도량을 가꾸고 이웃과 나누는 데 쓰입니다.</p>
+        <div class="acct">
+          <div style="color:var(--ink-soft);font-size:13px;margin-bottom:2px">후원 계좌</div>
+          <b>○○은행 000-0000-0000-00</b><br>예금주 : 대한불교 ○○사
+        </div>
+        <p style="font-size:12.5px;color:var(--ink-soft);margin-top:12px">※ 온라인 결제는 추후 도입 예정입니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site">
+  <svg class="dancheong-rule" viewBox="0 0 1200 26" preserveAspectRatio="none" aria-hidden="true" style="height:12px"><rect width="1200" height="26" fill="url(#dc)"/></svg>
+  <div class="foot-main">
+    <div class="wrap">
+      <div class="cols">
+        <div>
+          <div class="name">○○산 ○○사</div>
+          <p>마음을 쉬어가는 산중 도량.<br>계절과 함께 정진하는 우리 지역의 절입니다.</p>
+        </div>
+        <div>
+          <h5>바로가기</h5>
+          <a href="#news">사찰 소식</a><br><a href="#schedule">법회·행사</a><br><a href="#history">가람 중창기</a><br><a href="#visit">오시는 길</a>
+        </div>
+        <div>
+          <h5>연락</h5>
+          <p>전화 02-000-0000<br>이메일 temple@example.kr<br><a href="#" style="color:#d8cdb9;text-decoration:underline">개인정보처리방침</a></p>
+        </div>
+      </div>
+      <div class="foot-bar">
+        <span>© 2026 ○○사. All rights reserved.</span>
+        <span>시안(mockup) · 사찰명·일정·계좌·사진은 예시입니다</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // 햄버거
+  const hmb=document.getElementById('hmb'), menu=document.getElementById('menu');
+  hmb.addEventListener('click',()=>menu.classList.toggle('open'));
+  menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>menu.classList.remove('open')));
+  // 스크롤 리빌
+  const io=new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.14});
+  document.querySelectorAll('.reveal').forEach((el,i)=>{el.style.transitionDelay=(i%3*0.06)+'s';io.observe(el);});
+</script>

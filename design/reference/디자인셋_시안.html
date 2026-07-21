@@ -1,0 +1,265 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --color-ink:#23211E; --color-ink-soft:#6B6258;
+    --color-hanji:#FAF6EE; --color-surface:#FFFFFF; --color-line:#E7DECF;
+    --color-accent:#9E3B2F;      /* 석간주 - 주 포인트 */
+    --color-accent-2:#2E7D74;    /* 뇌록 - 보조 */
+    --color-gold:#C8A24B;        /* 금/황 - 장식 */
+    --font-body:'Pretendard',system-ui,-apple-system,sans-serif;
+    --font-title:'Noto Serif KR',serif;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--color-hanji);color:var(--color-ink);
+    font-family:var(--font-body);line-height:1.7;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:960px;margin:0 auto;padding:40px 20px 72px;}
+  header.head{padding:8px 0 4px;}
+  .eyebrow{font-size:13px;letter-spacing:.18em;color:var(--color-accent);font-weight:700;text-transform:uppercase;}
+  h1{font-family:var(--font-title);font-weight:700;font-size:30px;margin:6px 0 8px;letter-spacing:-.01em;}
+  .lede{color:var(--color-ink-soft);font-size:15px;max-width:60ch;margin:0;}
+  section{margin-top:34px;}
+  h2{font-family:var(--font-title);font-weight:700;font-size:21px;margin:0 0 4px;}
+  .sub{color:var(--color-ink-soft);font-size:13.5px;margin:0 0 16px;}
+  .card{background:var(--color-surface);border:1px solid var(--color-line);border-radius:var(--radius);padding:22px;}
+  .grid{display:grid;gap:16px;}
+  .g3{grid-template-columns:repeat(3,1fr);}
+  .g2{grid-template-columns:repeat(2,1fr);}
+  @media(max-width:680px){.g3,.g2{grid-template-columns:1fr 1fr;}}
+  .tile{display:flex;flex-direction:column;align-items:center;gap:10px;
+    background:var(--color-surface);border:1px solid var(--color-line);border-radius:12px;padding:18px 12px;}
+  .tile .label{font-size:13px;font-weight:600;}
+  .tile .meta{font-size:11.5px;color:var(--color-ink-soft);}
+  .iconrow{display:flex;align-items:center;gap:18px;justify-content:center;}
+  .chip{width:54px;height:54px;display:grid;place-items:center;border-radius:12px;background:var(--color-accent);color:#fff;}
+  .chip.teal{background:var(--color-accent-2);}
+  .swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  @media(max-width:680px){.swatches{grid-template-columns:repeat(2,1fr);}}
+  .sw{border:1px solid var(--color-line);border-radius:12px;overflow:hidden;background:var(--color-surface);}
+  .sw .col{height:56px;}
+  .sw .info{padding:8px 10px;font-size:12px;}
+  .sw .info b{display:block;font-size:12.5px;}
+  .sw .info code{font-size:11px;color:var(--color-ink-soft);font-family:ui-monospace,monospace;}
+  .note{font-size:12.5px;color:var(--color-ink-soft);margin-top:12px;}
+  .divider{margin:30px 0 0;}
+  footer{margin-top:40px;font-size:12px;color:var(--color-ink-soft);border-top:1px solid var(--color-line);padding-top:16px;}
+  .icon-symbol{color:var(--color-accent);}
+</style>
+
+<div class="wrap">
+  <header class="head">
+    <div class="eyebrow">디자인 자산 시안 · v1</div>
+    <h1>사찰 홈페이지 SVG 자산 세트</h1>
+    <p class="lede">V4 기획서의 컬러·타이포 토큰을 적용한 문양·아이콘 시안과 중창기 타임라인·가람배치도 템플릿입니다. 모든 그래픽은 SVG라 컴포넌트로 추출해 색·크기를 자유롭게 조정할 수 있습니다.</p>
+  </header>
+
+  <!-- ============ 컬러 토큰 ============ -->
+  <section>
+    <h2>컬러 토큰</h2>
+    <p class="sub">단청·한지에서 추출한 절제된 팔레트. 포인트는 석간주·뇌록 2색 + 금 장식으로 한정.</p>
+    <div class="card">
+      <div class="swatches">
+        <div class="sw"><div class="col" style="background:#23211E"></div><div class="info"><b>먹 ink</b><code>#23211E</code></div></div>
+        <div class="sw"><div class="col" style="background:#FAF6EE;border-bottom:1px solid var(--color-line)"></div><div class="info"><b>한지 hanji</b><code>#FAF6EE</code></div></div>
+        <div class="sw"><div class="col" style="background:#9E3B2F"></div><div class="info"><b>석간주 accent</b><code>#9E3B2F</code></div></div>
+        <div class="sw"><div class="col" style="background:#2E7D74"></div><div class="info"><b>뇌록 accent-2</b><code>#2E7D74</code></div></div>
+        <div class="sw"><div class="col" style="background:#C8A24B"></div><div class="info"><b>금 gold</b><code>#C8A24B</code></div></div>
+        <div class="sw"><div class="col" style="background:#6B6258"></div><div class="info"><b>먹 보조 ink-soft</b><code>#6B6258</code></div></div>
+        <div class="sw"><div class="col" style="background:#E7DECF"></div><div class="info"><b>구분선 line</b><code>#E7DECF</code></div></div>
+        <div class="sw"><div class="col" style="background:#FFFFFF;border-bottom:1px solid var(--color-line)"></div><div class="info"><b>면 surface</b><code>#FFFFFF</code></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 심볼·문양 ============ -->
+  <section>
+    <h2>심볼 · 문양</h2>
+    <p class="sub">연꽃·법륜은 헤더 로고 옆 심볼, 섹션 장식, 파비콘 등으로 활용. viewBox 0 0 64 64.</p>
+    <div class="grid g2">
+      <!-- 연꽃 -->
+      <div class="tile">
+        <svg width="76" height="76" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="연꽃">
+          <path d="M32 50 C20 48 10 40 7 31 C17 31 27 40 32 50 Z" fill="var(--color-accent)" fill-opacity=".14" stroke="var(--color-accent)" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M32 50 C44 48 54 40 57 31 C47 31 37 40 32 50 Z" fill="var(--color-accent)" fill-opacity=".14" stroke="var(--color-accent)" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M32 50 C24 44 18 32 18 22 C26 26 31 38 32 50 Z" fill="var(--color-accent)" fill-opacity=".22" stroke="var(--color-accent)" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M32 50 C40 44 46 32 46 22 C38 26 33 38 32 50 Z" fill="var(--color-accent)" fill-opacity=".22" stroke="var(--color-accent)" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M32 14 C27 26 27 40 32 50 C37 40 37 26 32 14 Z" fill="var(--color-accent)" fill-opacity=".30" stroke="var(--color-accent)" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M13 51 Q32 57 51 51" stroke="var(--color-accent-2)" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+        </svg>
+        <div class="label">연꽃 蓮</div>
+        <div class="meta">심볼 · 장식</div>
+      </div>
+      <!-- 법륜 -->
+      <div class="tile">
+        <svg width="76" height="76" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="법륜">
+          <circle cx="32" cy="32" r="26" stroke="var(--color-accent)" stroke-width="2"/>
+          <circle cx="32" cy="32" r="21.5" stroke="var(--color-accent)" stroke-width="1.4"/>
+          <circle cx="32" cy="32" r="6" stroke="var(--color-accent)" stroke-width="2"/>
+          <circle cx="32" cy="32" r="2.4" fill="var(--color-accent)"/>
+          <g stroke="var(--color-accent)" stroke-width="1.8" stroke-linecap="round">
+            <line x1="38" y1="32" x2="53.5" y2="32"/><line x1="26" y1="32" x2="10.5" y2="32"/>
+            <line x1="32" y1="38" x2="32" y2="53.5"/><line x1="32" y1="26" x2="32" y2="10.5"/>
+            <line x1="36.24" y1="36.24" x2="47.2" y2="47.2"/><line x1="27.76" y1="27.76" x2="16.8" y2="16.8"/>
+            <line x1="36.24" y1="27.76" x2="47.2" y2="16.8"/><line x1="27.76" y1="36.24" x2="16.8" y2="47.2"/>
+          </g>
+        </svg>
+        <div class="label">법륜 法輪</div>
+        <div class="meta">심볼 · 8정도</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 단청 테두리 ============ -->
+  <section>
+    <h2>단청 테두리</h2>
+    <p class="sub">섹션 구분선·푸터 상단 장식. SVG <code>pattern</code>으로 가로 반복 → 폭에 맞춰 타일링.</p>
+    <div class="card">
+      <svg width="100%" viewBox="0 0 360 30" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="단청 테두리">
+        <defs>
+          <pattern id="dancheong" x="0" y="0" width="40" height="30" patternUnits="userSpaceOnUse">
+            <path d="M2 28 A18 18 0 0 1 38 28 Z" fill="var(--color-accent)"/>
+            <path d="M8 28 A12 12 0 0 1 32 28 Z" fill="var(--color-gold)"/>
+            <path d="M14 28 A6 6 0 0 1 26 28 Z" fill="var(--color-accent-2)"/>
+            <circle cx="20" cy="10.5" r="1.6" fill="var(--color-hanji)"/>
+          </pattern>
+        </defs>
+        <line x1="0" y1="1.5" x2="360" y2="1.5" stroke="var(--color-gold)" stroke-width="2"/>
+        <rect x="0" y="2" width="360" height="26" fill="url(#dancheong)"/>
+        <line x1="0" y1="28.5" x2="360" y2="28.5" stroke="var(--color-gold)" stroke-width="2"/>
+      </svg>
+      <p class="note">머리초(머리 단청)의 색동 아치를 단순화한 단위 문양을 반복. 색은 토큰 변경 시 자동 반영됩니다.</p>
+    </div>
+  </section>
+
+  <!-- ============ 메뉴 아이콘 ============ -->
+  <section>
+    <h2>메뉴 아이콘</h2>
+    <p class="sub">선(stroke) 기반 24px 그리드, <code>currentColor</code> 사용 → 색은 상위에서 제어. 법회=연등, 소식=범종, 오시는길=위치+사찰지붕.</p>
+    <div class="grid g3">
+      <!-- 법회 (연등) -->
+      <div class="tile">
+        <div class="iconrow">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="법회"><path d="M12 2.4v1.6"/><circle cx="12" cy="4.3" r=".4" fill="var(--color-ink)"/><path d="M12 4.4C6.6 6 6.6 17 12 19c5.4-2 5.4-13 0-14.6Z"/><path d="M7.2 9.2h9.6M7.2 14h9.6"/><path d="M12 19v2.4"/><path d="M10.4 21.6h3.2"/></svg>
+          <div class="chip"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.4v1.6"/><path d="M12 4.4C6.6 6 6.6 17 12 19c5.4-2 5.4-13 0-14.6Z"/><path d="M7.2 9.2h9.6M7.2 14h9.6"/><path d="M12 19v2.4"/><path d="M10.4 21.6h3.2"/></svg></div>
+        </div>
+        <div class="label">법회 · 행사</div>
+        <div class="meta">연등 燃燈</div>
+      </div>
+      <!-- 소식 (범종) -->
+      <div class="tile">
+        <div class="iconrow">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="소식"><path d="M12 3.2c.7 0 1.1.6 1.1 1.3"/><path d="M7 17c0-7 2.2-9.8 5-9.8S17 10 17 17"/><path d="M4.8 17h14.4"/><path d="M10.2 20a1.9 1.9 0 0 0 3.6 0"/><path d="M12 4.5v2.7"/></svg>
+          <div class="chip teal"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17c0-7 2.2-9.8 5-9.8S17 10 17 17"/><path d="M4.8 17h14.4"/><path d="M10.2 20a1.9 1.9 0 0 0 3.6 0"/><path d="M12 4.5v2.7"/></svg></div>
+        </div>
+        <div class="label">소식 · 공지</div>
+        <div class="meta">범종 梵鐘</div>
+      </div>
+      <!-- 오시는길 (위치+지붕) -->
+      <div class="tile">
+        <div class="iconrow">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="오시는길"><path d="M12 21c-4.4-5-6.5-7.6-6.5-10.6a6.5 6.5 0 0 1 13 0C18.5 13.4 16.4 16 12 21Z"/><path d="M8.4 11.2c1.2-2 2.3-2.9 3.6-2.9s2.4.9 3.6 2.9"/><path d="M9.6 11.2v2.2h4.8v-2.2"/></svg>
+          <div class="chip"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4.4-5-6.5-7.6-6.5-10.6a6.5 6.5 0 0 1 13 0C18.5 13.4 16.4 16 12 21Z"/><path d="M8.4 11.2c1.2-2 2.3-2.9 3.6-2.9s2.4.9 3.6 2.9"/><path d="M9.6 11.2v2.2h4.8v-2.2"/></svg></div>
+        </div>
+        <div class="label">오시는 길</div>
+        <div class="meta">위치 · 기와지붕</div>
+      </div>
+    </div>
+    <p class="note">기본(먹색) + 강조(석간주/뇌록 배경) 두 가지 표시 예시. 동일 path를 크기만 바꿔 16~48px로 사용 가능.</p>
+  </section>
+
+  <!-- ============ 중창기 타임라인 ============ -->
+  <section>
+    <h2>중창기 타임라인 템플릿</h2>
+    <p class="sub">연도별 마디(노드) + 내용 + 사진 자리. 항목을 반복 배치하는 구조. 텍스트·연도는 예시 자리표시입니다.</p>
+    <div class="card">
+      <svg width="100%" viewBox="0 0 480 330" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard, sans-serif" role="img" aria-label="중창기 타임라인 템플릿">
+        <line x1="44" y1="28" x2="44" y2="300" stroke="var(--color-gold)" stroke-width="2"/>
+        <!-- entry 1 -->
+        <g>
+          <line x1="44" y1="58" x2="66" y2="58" stroke="var(--color-line)" stroke-width="2"/>
+          <circle cx="44" cy="58" r="9" fill="var(--color-hanji)" stroke="var(--color-accent)" stroke-width="2"/>
+          <circle cx="44" cy="58" r="4" fill="var(--color-accent)"/>
+          <text x="74" y="48" font-family="'Noto Serif KR',serif" font-size="16" font-weight="700" fill="var(--color-accent)">1925 · 창건</text>
+          <text x="74" y="68" font-size="14.5" font-weight="700" fill="var(--color-ink)">대웅전 초창(初創)</text>
+          <text x="74" y="86" font-size="12.5" fill="var(--color-ink-soft)">창건 당시 전각·연혁 요약 자리</text>
+          <rect x="372" y="32" width="84" height="58" rx="7" fill="var(--color-surface)" stroke="var(--color-line)"/>
+          <path d="M384 78l10-12 8 9 6-6 10 9" fill="none" stroke="var(--color-line)" stroke-width="1.6" stroke-linejoin="round"/>
+          <circle cx="389" cy="48" r="4" fill="var(--color-line)"/>
+        </g>
+        <!-- entry 2 -->
+        <g>
+          <line x1="44" y1="158" x2="66" y2="158" stroke="var(--color-line)" stroke-width="2"/>
+          <circle cx="44" cy="158" r="9" fill="var(--color-hanji)" stroke="var(--color-accent-2)" stroke-width="2"/>
+          <circle cx="44" cy="158" r="4" fill="var(--color-accent-2)"/>
+          <text x="74" y="148" font-family="'Noto Serif KR',serif" font-size="16" font-weight="700" fill="var(--color-accent-2)">1978 · 중창</text>
+          <text x="74" y="168" font-size="14.5" font-weight="700" fill="var(--color-ink)">요사채·범종각 증축</text>
+          <text x="74" y="186" font-size="12.5" fill="var(--color-ink-soft)">중창 내용·시주 기록 요약 자리</text>
+          <rect x="372" y="132" width="84" height="58" rx="7" fill="var(--color-surface)" stroke="var(--color-line)"/>
+          <path d="M384 178l10-12 8 9 6-6 10 9" fill="none" stroke="var(--color-line)" stroke-width="1.6" stroke-linejoin="round"/>
+          <circle cx="389" cy="148" r="4" fill="var(--color-line)"/>
+        </g>
+        <!-- entry 3 -->
+        <g>
+          <line x1="44" y1="258" x2="66" y2="258" stroke="var(--color-line)" stroke-width="2"/>
+          <circle cx="44" cy="258" r="9" fill="var(--color-hanji)" stroke="var(--color-accent)" stroke-width="2"/>
+          <circle cx="44" cy="258" r="4" fill="var(--color-accent)"/>
+          <text x="74" y="248" font-family="'Noto Serif KR',serif" font-size="16" font-weight="700" fill="var(--color-accent)">2015 · 중수</text>
+          <text x="74" y="268" font-size="14.5" font-weight="700" fill="var(--color-ink)">단청 보수·경내 정비</text>
+          <text x="74" y="286" font-size="12.5" fill="var(--color-ink-soft)">보수 범위·전후 비교 요약 자리</text>
+          <rect x="372" y="232" width="84" height="58" rx="7" fill="var(--color-surface)" stroke="var(--color-line)"/>
+          <path d="M384 278l10-12 8 9 6-6 10 9" fill="none" stroke="var(--color-line)" stroke-width="1.6" stroke-linejoin="round"/>
+          <circle cx="389" cy="248" r="4" fill="var(--color-line)"/>
+        </g>
+      </svg>
+      <p class="note">노드 색을 석간주/뇌록 번갈아 사용해 시기 구분에 리듬을 줌. 우측 박스는 전/후 사진 자리(없으면 생략). 항목 1개당 높이 100px 간격으로 추가.</p>
+    </div>
+  </section>
+
+  <!-- ============ 가람배치도 ============ -->
+  <section>
+    <h2>가람배치도 템플릿</h2>
+    <p class="sub">상→하로 일주문에서 대웅전까지 중심축 배치(예시). 실제 가람에 맞춰 전각·위치 조정.</p>
+    <div class="card">
+      <svg width="100%" viewBox="0 0 380 430" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard, sans-serif" role="img" aria-label="가람배치도 템플릿">
+        <!-- 중심축 -->
+        <line x1="190" y1="44" x2="190" y2="412" stroke="var(--color-gold)" stroke-width="1.4" stroke-dasharray="4 5"/>
+        <!-- 방위 -->
+        <g transform="translate(338,30)">
+          <line x1="0" y1="14" x2="0" y2="-2" stroke="var(--color-ink-soft)" stroke-width="1.4"/>
+          <path d="M0 -6 L4 2 L-4 2 Z" fill="var(--color-ink-soft)"/>
+          <text x="0" y="26" font-size="11" text-anchor="middle" fill="var(--color-ink-soft)">N</text>
+        </g>
+        <!-- 대웅전 (주불전, 강조) -->
+        <rect x="112" y="44" width="156" height="74" rx="6" fill="var(--color-accent)" fill-opacity=".12" stroke="var(--color-accent)" stroke-width="1.8"/>
+        <text x="190" y="86" font-size="15" font-weight="700" text-anchor="middle" fill="var(--color-accent)">대웅전</text>
+        <!-- 삼성각 (좌) / 산령각 영역 -->
+        <rect x="40" y="150" width="84" height="56" rx="6" fill="var(--color-surface)" stroke="var(--color-line)" stroke-width="1.6"/>
+        <text x="82" y="183" font-size="13" text-anchor="middle" fill="var(--color-ink)">삼성각</text>
+        <!-- 범종각 (우) -->
+        <rect x="256" y="150" width="84" height="56" rx="6" fill="var(--color-surface)" stroke="var(--color-line)" stroke-width="1.6"/>
+        <text x="298" y="183" font-size="13" text-anchor="middle" fill="var(--color-ink)">범종각</text>
+        <!-- 석탑 (마당 중앙) -->
+        <g transform="translate(190,150) rotate(45)">
+          <rect x="-9" y="-9" width="18" height="18" fill="var(--color-gold)" fill-opacity=".25" stroke="var(--color-gold)" stroke-width="1.6"/>
+        </g>
+        <text x="190" y="178" font-size="11.5" text-anchor="middle" fill="var(--color-ink-soft)">석탑</text>
+        <!-- 보제루 (누각) -->
+        <rect x="92" y="236" width="196" height="56" rx="6" fill="var(--color-surface)" stroke="var(--color-line)" stroke-width="1.6"/>
+        <text x="190" y="269" font-size="14" font-weight="600" text-anchor="middle" fill="var(--color-ink)">보제루(누각)</text>
+        <!-- 천왕문 -->
+        <rect x="132" y="316" width="116" height="44" rx="6" fill="var(--color-surface)" stroke="var(--color-line)" stroke-width="1.6"/>
+        <text x="190" y="343" font-size="13" text-anchor="middle" fill="var(--color-ink)">천왕문</text>
+        <!-- 일주문 -->
+        <rect x="146" y="378" width="88" height="38" rx="6" fill="var(--color-surface)" stroke="var(--color-line)" stroke-width="1.6"/>
+        <text x="190" y="402" font-size="13" text-anchor="middle" fill="var(--color-ink)">일주문</text>
+      </svg>
+      <p class="note">주불전(대웅전)만 석간주 톤으로 강조, 부속 전각은 면색으로 통일. 중심축 점선과 방위표로 가람의 좌향(坐向)을 표현. ※ 배치는 예시 템플릿입니다.</p>
+    </div>
+  </section>
+
+  <footer>
+    사찰 홈페이지 디자인 자산 시안 · 모든 그래픽은 SVG(벡터)로 색·크기 무손실 조정 가능 · 컬러는 CSS 변수(:root) 한 곳에서 일괄 변경 · 시안용 텍스트/연도/배치는 실제 자료로 교체 필요.
+  </footer>
+</div>

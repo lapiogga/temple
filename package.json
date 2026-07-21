@@ -1,0 +1,25 @@
+{
+  "name": "temple-website",
+  "version": "0.1.0",
+  "private": true,
+  "description": "포교사찰 홈페이지 (1차: 공개 홍보·소식·중창기)",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "next lint",
+    "db:init": "psql \"$DATABASE_URL\" -f db/schema.sql"
+  },
+  "dependencies": {
+    "next": "14.2.5",
+    "pg": "8.12.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "10.4.19",
+    "esbuild": "^0.28.1",
+    "postcss": "8.4.39",
+    "tailwindcss": "3.4.7"
+  }
+}
