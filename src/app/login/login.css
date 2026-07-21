@@ -1,0 +1,62 @@
+/* 운영자 로그인 페이지 전용 스타일 (globals.css 토큰 재사용) */
+.login-wrap {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+.login-card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  box-shadow: 0 18px 40px -30px rgba(35, 33, 30, 0.5);
+}
+.login-card h1 {
+  font-size: 24px;
+  font-weight: 700;
+}
+.login-sub {
+  color: var(--ink-soft);
+  font-size: 14px;
+  margin: 4px 0 22px;
+}
+.login-field {
+  display: block;
+  margin-bottom: 16px;
+}
+.login-field span {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.login-field input {
+  width: 100%;
+  padding: 11px 13px;
+  font-size: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--hanji);
+  color: var(--ink);
+}
+.login-field input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.login-submit {
+  width: 100%;
+  justify-content: center;
+  margin-top: 6px;
+}
+.login-err {
+  background: #fbeae7;
+  border: 1px solid #e6cfc9;
+  color: var(--accent);
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-bottom: 18px;
+}

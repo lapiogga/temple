@@ -41,10 +41,16 @@ npm install
 npm run dev               # http://localhost:3000
 ```
 
-## DB 초기화
+## DB 초기화 & 운영자 계정
 ```bash
-npm run db:init           # psql 로 db/schema.sql 적용
+npm run db:init                       # psql 로 db/schema.sql 적용
+npm run db:seed -- admin '<비밀번호>' 관리자   # 운영자 계정 생성/갱신 (bcrypt 해시)
 ```
+> `.env` 에 **`SESSION_SECRET`**(32자 이상, `openssl rand -base64 32`)이 반드시 있어야 앱이 기동됩니다.
+
+## 관리자 화면
+- 로그인: `/login` · 관리: `/admin` (소식 작성·수정·노출토글·삭제)
+- 인증: bcryptjs + iron-session(HttpOnly 쿠키). `/admin/*` 는 미들웨어 + 각 액션의 `requireSession()` 으로 보호.
 
 ## 배포
 EC2 셋업·배포는 **deploy/SETUP_EC2.md** 참고. 요약:
@@ -54,8 +60,9 @@ EC2 셋업·배포는 **deploy/SETUP_EC2.md** 참고. 요약:
 
 ## 현재 상태 & 다음 작업
 - [x] 메인 페이지(반응형, 소식/법회/중창기/오시는길/후원) — 콘텐츠는 `src/app/page.js` 상단 상수
-- [ ] 콘텐츠를 DB 연동으로 교체 (`src/lib/db.js` 쿼리 사용)
-- [ ] **운영자 관리화면**(소식·중창기·갤러리·일정 등록) — 1차 필수
+- [x] 운영자 인증(로그인/세션) + **소식 관리화면**(작성·수정·노출토글·삭제) — bcryptjs + iron-session
+- [ ] 콘텐츠를 DB 연동으로 교체 (공개 `page.js` 소식 섹션을 `src/lib/notices.js` 로)
+- [ ] 관리화면 확장(중창기·갤러리·일정 등록) — 1차 필수
 - [ ] 서브 페이지(사찰 소개, 중창기 상세, 소식 목록/상세)
 - [ ] 실제 콘텐츠(중창기 사진·소식·연혁) 입력
 - [ ] 2차: 회원·커뮤니티(members/posts/comments)
