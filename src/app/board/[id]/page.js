@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import { DancheongDefs, DancheongRule } from "@/components/Icons";
+import { DancheongDefs } from "@/components/Icons";
 import { getPost, BOARD_LABEL } from "@/lib/posts";
 import { SITE } from "@/content/site";
 
@@ -37,20 +37,40 @@ export default async function PostDetail({ params }) {
     <>
       <DancheongDefs />
       <SiteHeader />
-      <DancheongRule height={12} />
-      <article className="blk">
-        <div className="wrap" style={{ maxWidth: "760px" }}>
+      <article className="screen top">
+        <div className="wrap wide">
           <Link className="more" href="/board">← 게시판</Link>
-          <div style={{ marginTop: "18px" }}>
-            <span className="post-badge" style={{ fontSize: "14px" }}>{BOARD_LABEL[p.board] ?? ""}</span>
-          </div>
-          <h1 className="serif" style={{ fontSize: "clamp(24px,4vw,34px)", fontWeight: 700, lineHeight: 1.3, margin: "6px 0 8px" }}>
-            {p.title}
-          </h1>
-          <div style={{ color: "var(--ink-soft)", fontSize: "15px", marginBottom: "22px" }}>
-            {p.author_name} · {fmt(p.created_at)}
-          </div>
-          <div className="rich-content" dangerouslySetInnerHTML={{ __html: p.body }} />
+
+          {/* 정해진 틀(표): 타이틀·게시자·게시일시·게시내용·첨부자료 */}
+          <table className="detail-table">
+            <tbody>
+              <tr>
+                <th scope="row">타이틀</th>
+                <td>
+                  {BOARD_LABEL[p.board] && <span className="post-badge">{BOARD_LABEL[p.board]}</span>}
+                  <span className="detail-title">{p.title}</span>
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">게시자</th>
+                <td>{p.author_name}</td>
+              </tr>
+              <tr>
+                <th scope="row">게시일시</th>
+                <td>{fmt(p.created_at)}</td>
+              </tr>
+              <tr>
+                <th scope="row">게시내용</th>
+                <td className="detail-body">
+                  <div className="rich-content" dangerouslySetInnerHTML={{ __html: p.body }} />
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">첨부자료</th>
+                <td><span style={{ color: "var(--ink-soft)" }}>첨부파일 없음</span></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </article>
       <SiteFooter />

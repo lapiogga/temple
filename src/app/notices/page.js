@@ -2,17 +2,20 @@ import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import Reveal from "@/components/Reveal";
-import { DancheongDefs, DancheongRule, PhotoIcon } from "@/components/Icons";
+import { DancheongDefs } from "@/components/Icons";
 import { listNotices } from "@/lib/notices";
-import { formatDate, excerpt } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 import { SITE } from "@/content/site";
+import Pager from "@/components/Pager";
 
 // 소식은 관리자 등록에 따라 바뀌므로 항상 최신 DB 조회.
 export const dynamic = "force-dynamic";
 
+const PER_PAGE = 12;
+
 export const metadata = { title: `사찰 소식 | ${SITE.name}` };
 
-export default async function NoticesList() {
+export default async function NoticesList({ searchParams }) {
   let notices = [];
   try {
     notices = await listNotices({ includeUnpublished: false });
@@ -20,15 +23,18 @@ export default async function NoticesList() {
     console.error("소식 목록 조회 실패:", err);
   }
 
+  const totalPages = Math.max(1, Math.ceil(notices.length / PER_PAGE));
+  const page = Math.min(totalPages, Math.max(1, Number(searchParams?.page) || 1));
+  const paged = notices.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
   return (
     <>
       <DancheongDefs />
       <Reveal />
       <SiteHeader />
-      <DancheongRule height={12} />
 
-      <section className="blk">
-        <div className="wrap">
+      <section className="screen top">
+        <div className="wrap wide">
           <div className="sec-head reveal">
             <div>
               <div className="ki">Notice</div>
@@ -37,36 +43,30 @@ export default async function NoticesList() {
             <Link className="more" href="/">← 홈으로</Link>
           </div>
 
-          {notices.length === 0 ? (
-            <p className="reveal" style={{ color: "var(--ink-soft)" }}>
-              등록된 소식이 없습니다. 곧 새로운 소식을 전해드리겠습니다.
-            </p>
-          ) : (
-            <div className="news">
-              {notices.map((n) => (
-                <Link className="ncard reveal" key={n.id} href={`/notices/${n.id}`}>
-                  <div className="ph">
-                    {n.cover_url ? (
-                      // 외부 https 이미지(자체 업로드는 8월 1차) — next/image 대신 순수 img
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={n.cover_url}
-                        alt={n.title}
-                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                      />
-                    ) : (
-                      <PhotoIcon />
-                    )}
-                  </div>
-                  <div className="body">
-                    <div className="date">{formatDate(n.published_at)}</div>
-                    <h3>{n.title}</h3>
-                    <p>{excerpt(n.body)}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
+          <table className="list-table">
+            <thead>
+              <tr>
+                <th className="c-cat">번호</th>
+                <th>제목</th>
+                <th className="c-date">작성일</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paged.length > 0 ? (
+                paged.map((n, i) => (
+                  <tr key={n.id}>
+                    <td className="c-cat">{notices.length - ((page - 1) * PER_PAGE + i)}</td>
+                    <td className="c-title"><Link href={`/notices/${n.id}`}>{n.title}</Link></td>
+                    <td className="c-date">{formatDate(n.published_at)}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr className="empty-row"><td colSpan={3}>등록된 소식이 없습니다. 곧 새로운 소식을 전해드리겠습니다.</td></tr>
+              )}
+            </tbody>
+          </table>
+
+          <Pager basePath="/notices" page={page} totalPages={totalPages} />
         </div>
       </section>
 

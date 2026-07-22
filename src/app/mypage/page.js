@@ -3,7 +3,7 @@ import { requireMember } from "@/lib/member-session";
 import { getMemberById } from "@/lib/members";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import { DancheongDefs, DancheongRule } from "@/components/Icons";
+import { DancheongDefs } from "@/components/Icons";
 import { memberLogout } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -29,8 +29,7 @@ export default async function MyPage() {
     <>
       <DancheongDefs />
       <SiteHeader />
-      <DancheongRule height={12} />
-      <section className="blk">
+      <section className="screen top">
         <div className="wrap" style={{ maxWidth: "560px" }}>
           <div className="sec-head">
             <div><div className="ki">My</div><h2>내 정보</h2></div>

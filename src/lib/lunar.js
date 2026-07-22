@@ -16,3 +16,10 @@ export function lunarLabel(year, month, day) {
   if (!r) return "";
   return `${r.isLeap ? "윤" : ""}${r.lMonth}.${r.lDay}`;
 }
+
+// 음력(year, 1~12월, day, 윤달여부) → 양력 { year, month, day }. 범위 밖이면 null.
+export function lunarToSolar(year, month, day, isLeap = false) {
+  const r = solarlunar.lunar2solar(year, month, day, isLeap);
+  if (!r || r === -1) return null;
+  return { year: r.cYear, month: r.cMonth, day: r.cDay };
+}

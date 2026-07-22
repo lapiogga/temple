@@ -29,6 +29,11 @@ export default function LoginForm({ action }) {
         <SubmitButton />
         <Link href="/join" className="btn btn-ghost">회원가입</Link>
       </div>
+      <div className="auth-find">
+        <Link href="/find-account?tab=id">아이디 찾기</Link>
+        <span className="sep">|</span>
+        <Link href="/find-account?tab=pw">비밀번호 찾기</Link>
+      </div>
     </form>
   );
 }

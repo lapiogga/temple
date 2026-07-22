@@ -295,3 +295,35 @@
 .adm-photo form {
   padding: 8px 10px;
 }
+
+/* 법회·행사 등록 폼 — 넓은 그리드(무스크롤) */
+.ev-form { max-width: 100%; }
+.ev-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px 20px; }
+.ev-grid .adm-field { margin-bottom: 14px; }
+.ev-span { grid-column: 1 / -1; }
+.ev-radios { display: flex; gap: 10px; flex-wrap: wrap; }
+.ev-radio { display: inline-flex; align-items: center; gap: 7px; padding: 8px 18px; border: 1px solid var(--line); border-radius: 999px; background: var(--hanji); font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.ev-radio.on { border-color: var(--accent); background: #fbeeea; color: var(--accent); }
+.ev-radio input { accent-color: var(--accent); }
+.ev-lunar-row { display: flex; gap: 8px; }
+.ev-lunar-row select { flex: 1; }
+.ev-prev { padding: 10px 14px; background: #f0f6f4; border: 1px solid #cfe3de; border-radius: 10px; font-size: 15px; font-weight: 600; color: var(--accent-2); }
+@media (max-width: 900px) { .ev-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 620px) { .ev-grid { grid-template-columns: 1fr; } }
+
+/* 프레임 통일 — 관리 대메뉴 바(홈과 동일 톤) */
+.adm-mainnav { display: flex; gap: 4px; align-items: center; }
+.adm-mainnav a { font-family: var(--font-title); font-size: 16px; font-weight: 700; color: var(--ink); padding: 8px 16px; border-radius: 8px; transition: .18s; }
+.adm-mainnav a:hover { color: var(--accent); background: rgba(158, 59, 47, .06); }
+.adm-screen .adm-h1 { margin-top: 0; }
+.top-admin { cursor: pointer; font-family: inherit; }
+
+/* 홈페이지 콘텐츠 편집 허브 */
+.site-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; max-width: 780px; }
+.site-card { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; text-decoration: none; transition: .2s; }
+.site-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 14px 30px -24px rgba(35, 33, 30, .5); }
+.site-card-l { font-family: var(--font-title); font-weight: 700; font-size: 17px; color: var(--ink); }
+.site-card-go { font-size: 13.5px; font-weight: 700; color: var(--accent); white-space: nowrap; }
+.adm-check-row { display: flex; align-items: center; gap: 9px; margin-bottom: 18px; font-size: 14.5px; font-weight: 600; }
+.adm-check-row input { width: 18px; height: 18px; accent-color: var(--accent); }
+@media (max-width: 720px) { .site-cards { grid-template-columns: 1fr 1fr; } }

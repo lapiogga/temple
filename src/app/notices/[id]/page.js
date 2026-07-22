@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import { DancheongDefs, DancheongRule } from "@/components/Icons";
+import { DancheongDefs } from "@/components/Icons";
 import { getNotice } from "@/lib/notices";
 import { formatDate } from "@/lib/format";
 import { SITE } from "@/content/site";
@@ -43,47 +43,46 @@ export default async function NoticeDetail({ params }) {
     <>
       <DancheongDefs />
       <SiteHeader />
-      <DancheongRule height={12} />
 
-      <article className="blk">
-        <div className="wrap" style={{ maxWidth: "760px" }}>
+      <article className="screen top">
+        <div className="wrap wide">
           <Link className="more" href="/notices">← 소식 목록</Link>
-          <div
-            className="date"
-            style={{
-              marginTop: "18px",
-              color: "var(--accent)",
-              fontWeight: 700,
-              fontSize: "13px",
-            }}
-          >
-            {formatDate(n.published_at)}
-          </div>
-          <h1
-            className="serif"
-            style={{
-              fontSize: "clamp(24px,4vw,34px)",
-              fontWeight: 700,
-              lineHeight: 1.3,
-              margin: "6px 0 20px",
-            }}
-          >
-            {n.title}
-          </h1>
-          {n.cover_url && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={n.cover_url}
-              alt={n.title}
-              style={{
-                width: "100%",
-                borderRadius: "var(--radius)",
-                border: "1px solid var(--line)",
-                marginBottom: "22px",
-              }}
-            />
-          )}
-          <div className="rich-content" dangerouslySetInnerHTML={{ __html: n.body }} />
+
+          {/* 게시판과 동일한 표 틀: 타이틀·게시자·게시일시·게시내용·첨부자료 */}
+          <table className="detail-table">
+            <tbody>
+              <tr>
+                <th scope="row">타이틀</th>
+                <td><span className="detail-title">{n.title}</span></td>
+              </tr>
+              <tr>
+                <th scope="row">게시자</th>
+                <td>종무소</td>
+              </tr>
+              <tr>
+                <th scope="row">게시일시</th>
+                <td>{formatDate(n.published_at)}</td>
+              </tr>
+              <tr>
+                <th scope="row">게시내용</th>
+                <td className="detail-body">
+                  {n.cover_url && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={n.cover_url}
+                      alt={n.title}
+                      style={{ width: "100%", maxWidth: "560px", borderRadius: "var(--radius)", border: "1px solid var(--line)", marginBottom: "16px", display: "block" }}
+                    />
+                  )}
+                  <div className="rich-content" dangerouslySetInnerHTML={{ __html: n.body }} />
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">첨부자료</th>
+                <td><span style={{ color: "var(--ink-soft)" }}>첨부파일 없음</span></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </article>
 

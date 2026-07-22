@@ -1,6 +1,6 @@
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import { DancheongDefs, DancheongRule } from "@/components/Icons";
+import { DancheongDefs } from "@/components/Icons";
 import { SITE } from "@/content/site";
 import QnaWriteForm from "../QnaWriteForm";
 import { createQuestionAction } from "../actions";
@@ -13,8 +13,7 @@ export default function QnaWrite() {
     <>
       <DancheongDefs />
       <SiteHeader />
-      <DancheongRule height={12} />
-      <section className="blk">
+      <section className="screen top">
         <div className="wrap" style={{ maxWidth: "620px" }}>
           <div className="sec-head">
             <div><div className="ki">Q&amp;A</div><h2>묻고답하기</h2></div>

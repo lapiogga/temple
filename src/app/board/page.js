@@ -2,13 +2,16 @@ import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import Reveal from "@/components/Reveal";
-import { DancheongDefs, DancheongRule } from "@/components/Icons";
+import { DancheongDefs } from "@/components/Icons";
 import { listPosts, BOARD_LABEL } from "@/lib/posts";
 import { getMemberSession } from "@/lib/member-session";
 import { SITE } from "@/content/site";
+import Pager from "@/components/Pager";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: `게시판 | ${SITE.name}` };
+
+const PER_PAGE = 12;
 
 function fmt(v) {
   const d = new Date(v);
@@ -30,14 +33,17 @@ export default async function BoardPage({ searchParams }) {
   const session = await getMemberSession();
   const loggedIn = !!session.isLoggedIn;
 
+  const totalPages = Math.max(1, Math.ceil(posts.length / PER_PAGE));
+  const page = Math.min(totalPages, Math.max(1, Number(searchParams?.page) || 1));
+  const paged = posts.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
   return (
     <>
       <DancheongDefs />
       <Reveal />
       <SiteHeader />
-      <DancheongRule height={12} />
-      <section className="blk">
-        <div className="wrap">
+      <section className="screen top">
+        <div className="wrap wide">
           <div className="sec-head reveal">
             <div><div className="ki">Community</div><h2>게시판</h2></div>
             {loggedIn ? (
@@ -53,23 +59,32 @@ export default async function BoardPage({ searchParams }) {
             <Link className={board === "story" ? "on" : ""} href="/board?board=story">신행수기</Link>
           </div>
 
-          {posts.length === 0 ? (
-            <p className="reveal" style={{ color: "var(--ink-soft)" }}>등록된 글이 없습니다. 첫 글을 남겨 보세요.</p>
-          ) : (
-            <ul className="post-list">
-              {posts.map((p) => (
-                <li key={p.id}>
-                  <Link href={`/board/${p.id}`}>
-                    <span className="p-title">
-                      <span className="post-badge">{BOARD_LABEL[p.board] ?? ""}</span>
-                      {p.title}
-                    </span>
-                    <span className="p-meta">{p.author_name} · {fmt(p.created_at)}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
+          <table className="list-table">
+            <thead>
+              <tr>
+                <th className="c-cat">구분</th>
+                <th>제목</th>
+                <th className="c-author th-author">작성자</th>
+                <th className="c-date">작성일</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paged.length > 0 ? (
+                paged.map((p) => (
+                  <tr key={p.id}>
+                    <td className="c-cat"><span className="post-badge">{BOARD_LABEL[p.board] ?? ""}</span></td>
+                    <td className="c-title"><Link href={`/board/${p.id}`}>{p.title}</Link></td>
+                    <td className="c-author">{p.author_name}</td>
+                    <td className="c-date">{fmt(p.created_at)}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr className="empty-row"><td colSpan={4}>등록된 글이 없습니다. 첫 글을 남겨 보세요.</td></tr>
+              )}
+            </tbody>
+          </table>
+
+          <Pager basePath="/board" query={{ board: searchParams?.board }} page={page} totalPages={totalPages} />
         </div>
       </section>
       <SiteFooter />

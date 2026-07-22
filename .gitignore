@@ -9,3 +9,5 @@ out/
 .playwright-mcp/
 # 업로드 이미지(운영자 등록분)는 커밋하지 않음
 /public/uploads/
+# 루트 스크린샷(리뷰/검증용 산출물)은 커밋하지 않음
+/*.png

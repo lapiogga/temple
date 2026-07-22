@@ -1,7 +1,8 @@
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import { DancheongDefs, DancheongRule } from "@/components/Icons";
+import { DancheongDefs } from "@/components/Icons";
 import { SITE } from "@/content/site";
+import { TERMS, PRIVACY } from "@/lib/legal";
 import JoinForm from "./JoinForm";
 import { joinAction } from "./actions";
 
@@ -12,16 +13,15 @@ export default function JoinPage() {
     <>
       <DancheongDefs />
       <SiteHeader />
-      <DancheongRule height={12} />
-      <section className="blk">
-        <div className="wrap" style={{ maxWidth: "620px" }}>
-          <div className="sec-head">
+      <section className="screen top tight">
+        <div className="wrap wide">
+          <div className="sec-head" style={{ marginBottom: "6px" }}>
             <div><div className="ki">Join</div><h2>회원가입</h2></div>
+            <span style={{ color: "var(--ink-soft)", fontSize: "14.5px" }}>
+              가입 신청 후 <b>종무소 승인</b>을 거쳐 이용하실 수 있습니다.
+            </span>
           </div>
-          <p style={{ color: "var(--ink-soft)", marginBottom: "18px", fontSize: "16.5px" }}>
-            가입 신청 후 <b>종무소 승인</b>을 거쳐 이용하실 수 있습니다.
-          </p>
-          <JoinForm action={joinAction} />
+          <JoinForm action={joinAction} terms={TERMS} privacy={PRIVACY} />
         </div>
       </section>
       <SiteFooter />

@@ -2,14 +2,17 @@ import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import Reveal from "@/components/Reveal";
-import { DancheongDefs, DancheongRule, PhotoIcon } from "@/components/Icons";
+import { DancheongDefs, PhotoIcon } from "@/components/Icons";
 import { listAlbums } from "@/lib/gallery";
 import { SITE } from "@/content/site";
+import Pager from "@/components/Pager";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: `갤러리 | ${SITE.name}` };
 
-export default async function GalleryPage() {
+const PER_PAGE = 6;
+
+export default async function GalleryPage({ searchParams }) {
   let albums = [];
   try {
     albums = await listAlbums({ publicOnly: true });
@@ -17,14 +20,17 @@ export default async function GalleryPage() {
     console.error("갤러리 조회 실패:", err);
   }
 
+  const totalPages = Math.max(1, Math.ceil(albums.length / PER_PAGE));
+  const page = Math.min(totalPages, Math.max(1, Number(searchParams?.page) || 1));
+  const paged = albums.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
   return (
     <>
       <DancheongDefs />
       <Reveal />
       <SiteHeader />
-      <DancheongRule height={12} />
 
-      <section className="blk">
+      <section className="screen top">
         <div className="wrap">
           <div className="sec-head reveal">
             <div>
@@ -40,7 +46,7 @@ export default async function GalleryPage() {
             </p>
           ) : (
             <div className="gal-grid">
-              {albums.map((a) => (
+              {paged.map((a) => (
                 <Link className="gal-card reveal" key={a.id} href={`/gallery/${a.id}`}>
                   <div className="cover">
                     {a.cover ? (
@@ -58,6 +64,7 @@ export default async function GalleryPage() {
               ))}
             </div>
           )}
+          <Pager basePath="/gallery" page={page} totalPages={totalPages} />
         </div>
       </section>
 

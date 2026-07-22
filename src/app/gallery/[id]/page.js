@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import Reveal from "@/components/Reveal";
-import { DancheongDefs, DancheongRule } from "@/components/Icons";
+import { DancheongDefs } from "@/components/Icons";
 import { getAlbum, listPhotos } from "@/lib/gallery";
 import { SITE } from "@/content/site";
 
@@ -45,9 +45,8 @@ export default async function AlbumPage({ params }) {
       <DancheongDefs />
       <Reveal />
       <SiteHeader />
-      <DancheongRule height={12} />
 
-      <section className="blk">
+      <section className="screen top">
         <div className="wrap">
           <div className="sec-head reveal">
             <div>

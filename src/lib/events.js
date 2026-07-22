@@ -2,7 +2,7 @@ import { query } from "@/lib/db";
 
 // 법회/행사(events) 데이터 접근 레이어. 파라미터화 쿼리만 사용.
 const COLS =
-  "id, kind, title, when_text, starts_at, recurrence, description, sort_order";
+  "id, kind, title, when_text, starts_at, recurrence, description, sort_order, created_at";
 
 // 특정 월(로컬 기준)에 날짜(starts_at)가 있는 행사.
 export async function listEventsInMonth(year, month) {

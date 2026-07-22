@@ -150,3 +150,10 @@ CREATE TABLE IF NOT EXISTS questions (
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_questions_created ON questions (created_at DESC);
+
+-- 홈페이지 편집 콘텐츠(관리자 CMS) — 섹션별 key → JSONB. 없으면 코드 기본값 폴백.
+CREATE TABLE IF NOT EXISTS site_content (
+  key         TEXT PRIMARY KEY,
+  value       JSONB NOT NULL,
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);

@@ -1,7 +1,7 @@
 import { requireMember } from "@/lib/member-session";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import { DancheongDefs, DancheongRule } from "@/components/Icons";
+import { DancheongDefs } from "@/components/Icons";
 import { SITE } from "@/content/site";
 import BoardWriteForm from "../BoardWriteForm";
 import { createPostAction } from "../actions";
@@ -16,8 +16,7 @@ export default async function BoardWrite({ searchParams }) {
     <>
       <DancheongDefs />
       <SiteHeader />
-      <DancheongRule height={12} />
-      <section className="blk">
+      <section className="screen top">
         <div className="wrap" style={{ maxWidth: "760px" }}>
           <div className="sec-head">
             <div><div className="ki">Write</div><h2>글쓰기</h2></div>

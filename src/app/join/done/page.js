@@ -1,7 +1,7 @@
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import { DancheongDefs, DancheongRule, LotusMark } from "@/components/Icons";
+import { DancheongDefs, LotusMark } from "@/components/Icons";
 
 export const metadata = { title: "가입 신청 완료 | 응선사" };
 
@@ -10,8 +10,7 @@ export default function JoinDone() {
     <>
       <DancheongDefs />
       <SiteHeader />
-      <DancheongRule height={12} />
-      <section className="blk">
+      <section className="screen top">
         <div className="wrap" style={{ maxWidth: "620px", textAlign: "center" }}>
           <LotusMark size={90} opacity={0.5} />
           <h2 style={{ fontFamily: "var(--font-title)", fontSize: "30px", fontWeight: 700, margin: "14px 0 14px" }}>

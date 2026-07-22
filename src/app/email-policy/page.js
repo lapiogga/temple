@@ -1,7 +1,7 @@
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import { DancheongDefs, DancheongRule } from "@/components/Icons";
+import { DancheongDefs } from "@/components/Icons";
 import { SITE } from "@/content/site";
 
 export const metadata = { title: `이메일 무단수집 거부 | ${SITE.name}` };
@@ -11,9 +11,8 @@ export default function EmailPolicy() {
     <>
       <DancheongDefs />
       <SiteHeader />
-      <DancheongRule height={12} />
 
-      <section className="blk">
+      <section className="screen top">
         <div className="wrap" style={{ maxWidth: "760px" }}>
           <div className="sec-head">
             <div><div className="ki">Notice</div><h2>이메일 무단수집 거부</h2></div>

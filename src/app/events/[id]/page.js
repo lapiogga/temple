@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import { DancheongDefs, DancheongRule } from "@/components/Icons";
+import { DancheongDefs } from "@/components/Icons";
 import { getEvent, listAttachments } from "@/lib/events";
 import { SITE } from "@/content/site";
 
@@ -22,6 +22,13 @@ function fmtDateTime(startsAt) {
   const mi = String(d.getMinutes()).padStart(2, "0");
   const time = hh === "00" && mi === "00" ? "" : ` ${hh}:${mi}`;
   return `${d.getFullYear()}. ${mm}. ${dd}.${time}`;
+}
+function fmtDate(v) {
+  if (!v) return "-";
+  const d = new Date(v);
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}. ${mm}. ${dd}.`;
 }
 
 export async function generateMetadata({ params }) {
@@ -61,45 +68,55 @@ export default async function EventDetail({ params }) {
     <>
       <DancheongDefs />
       <SiteHeader />
-      <DancheongRule height={12} />
 
-      <article className="blk">
-        <div className="wrap" style={{ maxWidth: "760px" }}>
+      <article className="screen top">
+        <div className="wrap" style={{ maxWidth: "820px" }}>
           <Link className="more" href="/events">← 법회·행사</Link>
-          <div style={{ marginTop: "18px" }}>
-            <span className="ev-kind" style={{ fontSize: "13px" }}>{KIND_LABEL[e.kind] ?? ""}</span>
-          </div>
-          <h1
-            className="serif"
-            style={{ fontSize: "clamp(24px,4vw,34px)", fontWeight: 700, lineHeight: 1.3, margin: "6px 0 10px" }}
-          >
-            {e.title}
-          </h1>
-          {when && (
-            <div style={{ color: "var(--accent)", fontWeight: 700, fontSize: "16px", marginBottom: "20px" }}>
-              {when}
-            </div>
-          )}
-          {e.description && (
-            <div style={{ fontSize: "17px", lineHeight: 1.8, color: "var(--ink)", whiteSpace: "pre-line" }}>
-              {e.description}
-            </div>
-          )}
 
-          {attachments.length > 0 && (
-            <div style={{ marginTop: "28px" }}>
-              <h2 style={{ fontFamily: "var(--font-title)", fontSize: "20px", fontWeight: 700, marginBottom: "10px" }}>
-                첨부파일
-              </h2>
-              <ul className="attach-list">
-                {attachments.map((a) => (
-                  <li key={a.id}>
-                    <a href={a.file_url} target="_blank" rel="noopener noreferrer">{a.filename}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          {/* 정해진 틀(표): 타이틀·일시·내용·작성자·작성일·첨부자료 */}
+          <table className="detail-table">
+            <tbody>
+              <tr>
+                <th scope="row">타이틀</th>
+                <td>
+                  {KIND_LABEL[e.kind] && <span className="ev-kind">{KIND_LABEL[e.kind]}</span>}
+                  <span className="detail-title">{e.title}</span>
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">일시</th>
+                <td>{when || "-"}</td>
+              </tr>
+              <tr>
+                <th scope="row">내용</th>
+                <td className="detail-body">{e.description || "-"}</td>
+              </tr>
+              <tr>
+                <th scope="row">작성자</th>
+                <td>종무소</td>
+              </tr>
+              <tr>
+                <th scope="row">작성일</th>
+                <td>{fmtDate(e.created_at)}</td>
+              </tr>
+              <tr>
+                <th scope="row">첨부자료</th>
+                <td>
+                  {attachments.length > 0 ? (
+                    <ul className="attach-list">
+                      {attachments.map((a) => (
+                        <li key={a.id}>
+                          <a href={a.file_url} target="_blank" rel="noopener noreferrer">{a.filename}</a>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <span style={{ color: "var(--ink-soft)" }}>첨부파일 없음</span>
+                  )}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </article>
 

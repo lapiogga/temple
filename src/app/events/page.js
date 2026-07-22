@@ -1,7 +1,7 @@
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import { DancheongDefs, DancheongRule, LanternIcon } from "@/components/Icons";
+import { DancheongDefs, LanternIcon } from "@/components/Icons";
 import { listEventsInMonth, listRegular, listAllEvents } from "@/lib/events";
 import { monthMatrix, ymNav, parseYm, ymString } from "@/lib/calendar";
 import { solarToLunar, lunarLabel } from "@/lib/lunar";
@@ -23,12 +23,36 @@ function fmtDateTime(startsAt) {
   return `${d.getFullYear()}. ${p(d.getMonth() + 1)}. ${p(d.getDate())}.${time}`;
 }
 
-// 반복 규칙(weekly:N / lunar:D)이 해당 요일/음력일에 맞는지
-function matchesRecurrence(rec, weekday, lunarDay) {
+const pad = (n) => String(n).padStart(2, "0");
+
+// 반복 규칙 파싱: daily:HH:MM / weekly:N[:HH:MM] / monthly:D[:HH:MM] / lunar:D(구형)
+function parseRec(rec) {
   const r = (rec || "").trim();
-  if (r.startsWith("weekly:")) return Number(r.slice(7)) === weekday;
-  if (r.startsWith("lunar:")) return lunarDay != null && Number(r.slice(6)) === lunarDay;
+  if (r.startsWith("daily:")) return { type: "daily", time: r.slice(6) || null };
+  if (r.startsWith("weekly:")) {
+    const [, n, hh, mm] = r.split(":");
+    return { type: "weekly", weekday: Number(n), time: hh != null ? `${hh}:${mm}` : null };
+  }
+  if (r.startsWith("monthly:")) {
+    const [, d, hh, mm] = r.split(":");
+    return { type: "monthly", day: Number(d), time: hh != null ? `${hh}:${mm}` : null };
+  }
+  if (r.startsWith("lunar:")) return { type: "lunar", lday: Number(r.slice(6)), time: null };
+  return null;
+}
+function recMatches(p, weekday, lunarDay, solarDay) {
+  if (!p) return false;
+  if (p.type === "daily") return true;
+  if (p.type === "weekly") return p.weekday === weekday;
+  if (p.type === "monthly") return p.day === solarDay;
+  if (p.type === "lunar") return lunarDay != null && p.lday === lunarDay;
   return false;
+}
+// "HH:MM" → 분(정렬용). 시간 없으면 맨 뒤.
+function toMin(t) {
+  if (!t) return 100000;
+  const [hh, mm] = t.split(":").map(Number);
+  return hh * 60 + mm;
 }
 
 export default async function EventsPage({ searchParams }) {
@@ -54,10 +78,20 @@ export default async function EventsPage({ searchParams }) {
   });
 
   const recurringRegular = regular.filter((e) => (e.recurrence || "").trim());
-  function recurringFor(day) {
+  // 특정 날짜의 일정(행사 + 반복법회)을 시간순으로 모아 반환
+  function dayItems(day) {
     const weekday = new Date(y, m - 1, day).getDay();
     const lun = solarToLunar(y, m, day);
-    return recurringRegular.filter((e) => matchesRecurrence(e.recurrence, weekday, lun?.lDay));
+    const dated = (byDay[day] ?? []).map((e) => {
+      const d = new Date(e.starts_at);
+      const time = d.getHours() === 0 && d.getMinutes() === 0 ? null : `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      return { key: `e${e.id}`, href: `/events/${e.id}`, title: e.title, time, reg: false, sort: d.getHours() * 60 + d.getMinutes() };
+    });
+    const recs = recurringRegular
+      .map((e) => ({ e, p: parseRec(e.recurrence) }))
+      .filter(({ p }) => recMatches(p, weekday, lun?.lDay, day))
+      .map(({ e, p }) => ({ key: `r${e.id}`, href: `/events/${e.id}`, title: e.title, time: p.time, reg: true, sort: toMin(p.time) }));
+    return [...dated, ...recs].sort((a, b) => a.sort - b.sort);
   }
 
   const weeks = monthMatrix(y, m);
@@ -70,11 +104,10 @@ export default async function EventsPage({ searchParams }) {
     <>
       <DancheongDefs />
       <SiteHeader />
-      <DancheongRule height={12} />
 
-      <section className="blk">
-        <div className="wrap" style={{ maxWidth: "1000px" }}>
-          <div className="sec-head reveal" style={{ marginBottom: "14px" }}>
+      <section className="screen top tight">
+        <div className="wrap wide">
+          <div className="sec-head" style={{ marginBottom: "8px" }}>
             <div>
               <div className="ki">Dharma</div>
               <h2>법회 · 행사 안내</h2>
@@ -94,6 +127,8 @@ export default async function EventsPage({ searchParams }) {
             </div>
           </div>
 
+          <div className="ev-layout">
+            <div className="ev-main">
           {view === "calendar" ? (
             <div className="cal-scroll">
               <table className="cal-grid">
@@ -117,14 +152,9 @@ export default async function EventsPage({ searchParams }) {
                                 </span>
                                 <span className="cal-lunar">{lunarLabel(y, m, day)}</span>
                               </div>
-                              {(byDay[day] ?? []).map((e) => (
-                                <Link key={e.id} className="cal-ev" href={`/events/${e.id}`} title={e.title}>
-                                  {e.title}
-                                </Link>
-                              ))}
-                              {recurringFor(day).map((e) => (
-                                <Link key={"r" + e.id} className="cal-ev reg" href={`/events/${e.id}`} title={e.title}>
-                                  {e.title}
+                              {dayItems(day).map((it) => (
+                                <Link key={it.key} className={`cal-ev${it.reg ? " reg" : ""}`} href={it.href} title={`${it.time ? it.time + " " : ""}${it.title}`}>
+                                  {it.time && <b className="ev-time">{it.time}</b>}{it.title}
                                 </Link>
                               ))}
                             </>
@@ -160,26 +190,28 @@ export default async function EventsPage({ searchParams }) {
               )}
             </ul>
           )}
+            </div>
 
-          <div className="reg-panel reveal">
-            <h3 style={{ fontFamily: "var(--font-title)", fontSize: "20px", fontWeight: 700, marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
-              <LanternIcon size={22} /> 정기 법회
-            </h3>
-            {regular.length === 0 ? (
-              <p style={{ color: "var(--ink-soft)", fontSize: "15.5px" }}>정기 법회 안내는 준비 중입니다.</p>
-            ) : (
-              <ul className="plist">
-                {regular.map((r) => (
-                  <li key={r.id}>
-                    <span className="t">{r.title}</span>
-                    <span className="v">{r.when_text}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
+            <aside className="reg-panel">
+              <h3 style={{ fontFamily: "var(--font-title)", fontSize: "17px", fontWeight: 700, marginBottom: "8px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <LanternIcon size={20} /> 정기 법회
+              </h3>
+              {regular.length === 0 ? (
+                <p style={{ color: "var(--ink-soft)", fontSize: "15px" }}>정기 법회 안내는 준비 중입니다.</p>
+              ) : (
+                <ul className="plist">
+                  {regular.map((r) => (
+                    <li key={r.id}>
+                      <span className="t">{r.title}</span>
+                      <span className="v">{r.when_text}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </aside>
           </div>
 
-          <p className="note-small" style={{ marginTop: "16px" }}>
+          <p className="note-small" style={{ marginTop: "8px" }}>
             ※ 표시된 일정은 예시(리뷰용)입니다. 관리자에서 실제 일정으로 등록·수정합니다.
           </p>
         </div>

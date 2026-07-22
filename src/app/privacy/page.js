@@ -1,7 +1,7 @@
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import { DancheongDefs, DancheongRule } from "@/components/Icons";
+import { DancheongDefs } from "@/components/Icons";
 import { SITE } from "@/content/site";
 import { PRIVACY } from "@/lib/legal";
 
@@ -12,9 +12,8 @@ export default function PrivacyPage() {
     <>
       <DancheongDefs />
       <SiteHeader />
-      <DancheongRule height={12} />
 
-      <section className="blk">
+      <section className="screen top">
         <div className="wrap" style={{ maxWidth: "820px" }}>
           <div className="sec-head">
             <div><div className="ki">Privacy</div><h2>개인정보 보호정책</h2></div>

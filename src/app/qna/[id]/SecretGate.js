@@ -1,6 +1,7 @@
 "use client";
 
 import { useFormState, useFormStatus } from "react-dom";
+import QnaView from "./QnaView";
 
 function Btn() {
   const { pending } = useFormStatus();
@@ -11,33 +12,20 @@ function Btn() {
   );
 }
 
-function fmtIso(iso) {
-  const d = new Date(iso);
-  const p = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}. ${p(d.getMonth() + 1)}. ${p(d.getDate())}.`;
-}
-
 export default function SecretGate({ action }) {
   const [state, formAction] = useFormState(action, {});
 
   if (state?.ok) {
     const q = state.q;
     return (
-      <div>
-        <h1 className="serif" style={{ fontSize: "clamp(24px,4vw,32px)", fontWeight: 700, margin: "0 0 8px", lineHeight: 1.3 }}>
-          {q.title}
-        </h1>
-        <div style={{ color: "var(--ink-soft)", fontSize: "15px", marginBottom: "22px" }}>
-          {q.authorName} · {fmtIso(q.createdAt)}
-        </div>
-        <div style={{ whiteSpace: "pre-line", fontSize: "17px", lineHeight: 1.8, color: "var(--ink)" }}>{q.body}</div>
-        {q.answer && (
-          <div className="qna-answer">
-            <div className="a-label">🙏 답변</div>
-            <div style={{ whiteSpace: "pre-line", fontSize: "16.5px", lineHeight: 1.8 }}>{q.answer}</div>
-          </div>
-        )}
-      </div>
+      <QnaView
+        title={q.title}
+        authorName={q.authorName}
+        createdAt={q.createdAt}
+        body={q.body}
+        answer={q.answer}
+        answeredAt={q.answeredAt}
+      />
     );
   }
 
