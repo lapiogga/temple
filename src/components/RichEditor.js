@@ -21,7 +21,7 @@ export default function RichEditor({ name = "body", initialValue = "" }) {
         ["bold", "italic", "underline", "strike"],
         [{ list: "ordered" }, { list: "bullet" }],
         [{ align: [] }],
-        ["blockquote", "link", "image"],
+        ["blockquote", "link"],
         ["clean"],
       ],
     }),

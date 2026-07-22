@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { requireMember } from "@/lib/member-session";
 import { getMemberById } from "@/lib/members";
 import SiteHeader from "@/components/SiteHeader";
@@ -21,6 +22,8 @@ function fmt(v) {
 export default async function MyPage() {
   const session = await requireMember();
   const m = await getMemberById(session.memberId);
+  // 발급 후 종무소가 정지/거절했을 수 있으므로 최신 상태 재검증.
+  if (!m || m.status !== "approved") redirect("/member-login");
 
   return (
     <>

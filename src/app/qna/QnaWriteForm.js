@@ -76,7 +76,7 @@ export default function QnaWriteForm({ action }) {
         </label>
         {secret && (
           <label className="auth-field" style={{ marginTop: "10px", marginBottom: 0 }}>
-            <span>비밀글 비밀번호 (숫자 4자 이상)</span>
+            <span>비밀글 비밀번호 (숫자 6자 이상)</span>
             <input name="secretCode" type="password" inputMode="numeric" maxLength={20} placeholder="열람용 비밀번호" />
           </label>
         )}

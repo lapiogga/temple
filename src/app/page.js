@@ -170,7 +170,7 @@ export default async function Home() {
               <MapView />
               <div className="info-lines">
                 <div><b>주소</b>　{SITE.addressFull}</div>
-                <div><b>대중교통·주차</b>　안내 준비 중입니다.</div>
+                <div><b>대중교통·주차</b>　{[SITE.transit, SITE.parking].filter(Boolean).join(" · ") || "안내 준비 중입니다."}</div>
                 <div style={{ marginTop: "6px" }}>
                   <a href={SITE.mapUrl} target="_blank" rel="noopener noreferrer"
                     style={{ color: "var(--accent)", fontWeight: 600 }}>

@@ -4,6 +4,7 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs, DancheongRule } from "@/components/Icons";
 import { getPost, BOARD_LABEL } from "@/lib/posts";
+import { requireMember } from "@/lib/member-session";
 import { SITE } from "@/content/site";
 
 export const dynamic = "force-dynamic";
@@ -27,6 +28,7 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function PostDetail({ params }) {
+  await requireMember(); // 회원 전용
   const id = parseId(params.id);
   if (!id) notFound();
   let p = null;

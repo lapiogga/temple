@@ -45,7 +45,14 @@ function toRecord(d) {
 
 // startsAt 유효성(빈 값 허용, 값이 있으면 유효한 날짜여야).
 function validDate(rec, raw) {
-  return !(raw !== "" && Number.isNaN(rec.startsAt?.getTime()));
+  if (raw === "") return true;
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(raw)) return false;
+  const d = rec.startsAt;
+  if (!d || Number.isNaN(d.getTime())) return false;
+  // 라운드트립: 2/30 → 3/2 같은 오버플로 정규화 차단
+  const p = (n) => String(n).padStart(2, "0");
+  const rt = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+  return rt === raw;
 }
 
 export async function createEventAction(prevState, formData) {

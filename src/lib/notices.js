@@ -50,8 +50,13 @@ export async function removeNotice(id) {
 }
 
 export async function setPublished(id, published) {
+  // 비공개→공개 전환 시에만 게시일(published_at)을 공개 시점으로 갱신.
   await query(
-    "UPDATE notices SET published = $2, updated_at = now() WHERE id = $1",
+    `UPDATE notices
+        SET published = $2,
+            published_at = CASE WHEN $2 = true AND published = false THEN now() ELSE published_at END,
+            updated_at = now()
+      WHERE id = $1`,
     [id, published]
   );
 }

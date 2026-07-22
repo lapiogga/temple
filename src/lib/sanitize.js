@@ -1,16 +1,33 @@
-// 리치 텍스트(에디터 HTML) 기본 정화. 위험 태그·이벤트 핸들러·javascript: 스킴 제거.
-// 에디터(Quill) 출력은 제한된 태그만 생성하므로, 여기에 방어선을 더한다.
+import sanitizeHtmlLib from "sanitize-html";
+
+// 파서 기반 allowlist 정화(기존 정규식 블랙리스트 대체 — 우회 가능하던 XSS 차단).
+// 리치에디터(Quill)가 생성하는 서식 태그만 허용하고, 나머지·위험 속성/스킴은 제거한다.
+const ALIGN = ["ql-align-center", "ql-align-right", "ql-align-justify"];
+
+const OPTIONS = {
+  allowedTags: [
+    "p", "br", "strong", "b", "em", "i", "u", "s", "del",
+    "h1", "h2", "h3", "ul", "ol", "li", "a", "blockquote", "span",
+  ],
+  allowedAttributes: {
+    a: ["href", "target", "rel"],
+    p: ["class"], h1: ["class"], h2: ["class"], h3: ["class"],
+    li: ["class"], blockquote: ["class"], span: ["class"],
+  },
+  allowedClasses: {
+    p: ALIGN, h1: ALIGN, h2: ALIGN, h3: ALIGN, li: ALIGN, blockquote: ALIGN, span: ALIGN,
+  },
+  allowedSchemes: ["http", "https", "mailto"],
+  allowedSchemesAppliedToAttributes: ["href"],
+  transformTags: {
+    a: sanitizeHtmlLib.simpleTransform("a", { rel: "noopener noreferrer nofollow", target: "_blank" }),
+  },
+  disallowedTagsMode: "discard",
+};
+
 export function sanitizeHtml(html) {
   if (typeof html !== "string") return "";
-  return html
-    // 스크립트성/구조 태그 블록 제거
-    .replace(/<\s*(script|style|iframe|object|embed|form|meta|link|base)\b[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi, "")
-    // 자기닫힘/미닫힘 위험 태그 제거
-    .replace(/<\s*(script|style|iframe|object|embed|form|meta|link|base)\b[^>]*\/?>/gi, "")
-    // on* 이벤트 핸들러 제거
-    .replace(/\son\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "")
-    // href/src 의 javascript: 스킴 무력화 (data:/http(s): 는 허용)
-    .replace(/(href|src)\s*=\s*("javascript:[^"]*"|'javascript:[^']*')/gi, '$1="#"');
+  return sanitizeHtmlLib(html, OPTIONS);
 }
 
 // 태그 제거 후 순수 텍스트(발췌·길이검증용)

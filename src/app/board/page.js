@@ -4,7 +4,7 @@ import SiteFooter from "@/components/SiteFooter";
 import Reveal from "@/components/Reveal";
 import { DancheongDefs, DancheongRule } from "@/components/Icons";
 import { listPosts, BOARD_LABEL } from "@/lib/posts";
-import { getMemberSession } from "@/lib/member-session";
+import { requireMember } from "@/lib/member-session";
 import { SITE } from "@/content/site";
 
 export const dynamic = "force-dynamic";
@@ -20,14 +20,14 @@ export default async function BoardPage({ searchParams }) {
   const board =
     searchParams?.board === "story" ? "story" : searchParams?.board === "free" ? "free" : null;
 
+  // 게시판은 회원 전용(비로그인 시 로그인 페이지로).
+  await requireMember();
   let posts = [];
   try {
     posts = await listPosts(board ? { board } : {});
   } catch (err) {
     console.error("게시판 조회 실패:", err);
   }
-  const session = await getMemberSession();
-  const loggedIn = !!session.isLoggedIn;
 
   return (
     <>
@@ -39,11 +39,7 @@ export default async function BoardPage({ searchParams }) {
         <div className="wrap">
           <div className="sec-head reveal">
             <div><div className="ki">Community</div><h2>게시판</h2></div>
-            {loggedIn ? (
-              <Link className="btn btn-primary btn-sm" href={`/board/write${board ? `?board=${board}` : ""}`}>글쓰기</Link>
-            ) : (
-              <Link className="more" href="/member-login">로그인 후 글쓰기 →</Link>
-            )}
+            <Link className="btn btn-primary btn-sm" href={`/board/write${board ? `?board=${board}` : ""}`}>글쓰기</Link>
           </div>
 
           <div className="post-tabs">

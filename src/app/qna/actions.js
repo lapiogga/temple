@@ -5,6 +5,23 @@ import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 import { createQuestion, getQuestion } from "@/lib/qna";
 
+// 비밀글 열람 무차별 대입 방지(질문 id별 시도 제한).
+// 프로세스 메모리 기반(단일 서버 리뷰용). 운영 배포 시 DB/Redis 로 이관 권장.
+const revealAttempts = new Map();
+const ATTEMPT_WINDOW = 10 * 60 * 1000;
+const ATTEMPT_MAX = 8;
+function attemptBlocked(id) {
+  const e = revealAttempts.get(id);
+  if (!e || Date.now() - e.first > ATTEMPT_WINDOW) return false;
+  return e.count >= ATTEMPT_MAX;
+}
+function recordFail(id) {
+  const now = Date.now();
+  const e = revealAttempts.get(id);
+  if (!e || now - e.first > ATTEMPT_WINDOW) revealAttempts.set(id, { count: 1, first: now });
+  else e.count += 1;
+}
+
 const schema = z.object({
   authorName: z.string().trim().min(1, "이름을 입력하세요.").max(50),
   title: z.string().trim().min(1, "제목을 입력하세요.").max(200),
@@ -18,8 +35,8 @@ export async function createQuestionAction(prevState, formData) {
 
   const isSecret = formData.get("isSecret") === "on";
   const secretCode = (formData.get("secretCode") ?? "").toString().trim();
-  if (isSecret && !/^\d{4,20}$/.test(secretCode)) {
-    return { error: "비밀글 비밀번호(숫자 4자 이상)를 입력하세요." };
+  if (isSecret && !/^\d{6,20}$/.test(secretCode)) {
+    return { error: "비밀글 비밀번호(숫자 6자 이상)를 입력하세요." };
   }
 
   const parsed = schema.safeParse({
@@ -51,6 +68,9 @@ export async function createQuestionAction(prevState, formData) {
 
 // 비밀글 열람: 코드 확인 후 내용 반환
 export async function revealSecretAction(id, prevState, formData) {
+  if (attemptBlocked(id)) {
+    return { error: "열람 시도가 많아 잠시 제한되었습니다. 10분 후 다시 시도해 주세요." };
+  }
   const code = (formData.get("code") ?? "").toString();
   let q = null;
   try {
@@ -60,7 +80,11 @@ export async function revealSecretAction(id, prevState, formData) {
   }
   if (!q || !q.is_secret) return { error: "잘못된 접근입니다." };
   const ok = q.secret_hash && (await bcrypt.compare(code, q.secret_hash));
-  if (!ok) return { error: "비밀번호가 일치하지 않습니다." };
+  if (!ok) {
+    recordFail(id);
+    return { error: "비밀번호가 일치하지 않습니다." };
+  }
+  revealAttempts.delete(id);
   return {
     ok: true,
     q: {

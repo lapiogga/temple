@@ -10,7 +10,7 @@ export async function listEventsInMonth(year, month) {
   const to = new Date(year, month, 1);
   const { rows } = await query(
     `SELECT ${COLS} FROM events
-      WHERE starts_at >= $1 AND starts_at < $2
+      WHERE kind = 'event' AND starts_at >= $1 AND starts_at < $2
       ORDER BY starts_at ASC`,
     [from, to]
   );
