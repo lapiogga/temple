@@ -100,7 +100,7 @@ export default async function EventsPage({ searchParams }) {
                 <thead>
                   <tr>
                     {WEEK.map((w, i) => (
-                      <th key={w} className={i === 0 ? "sun" : ""}>{w}</th>
+                      <th key={w} className={i === 0 ? "sun" : i === 6 ? "sat" : ""}>{w}</th>
                     ))}
                   </tr>
                 </thead>
@@ -112,7 +112,7 @@ export default async function EventsPage({ searchParams }) {
                           {day != null && (
                             <>
                               <div className="cal-daynum">
-                                <span className={`cal-day${isThisMonth && day === today ? " today" : ""}${di === 0 ? " sun" : ""}`}>
+                                <span className={`cal-day${isThisMonth && day === today ? " today" : ""}${di === 0 ? " sun" : di === 6 ? " sat" : ""}`}>
                                   {day}
                                 </span>
                                 <span className="cal-lunar">{lunarLabel(y, m, day)}</span>
