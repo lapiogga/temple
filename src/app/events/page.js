@@ -1,9 +1,10 @@
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import { DancheongDefs, DancheongRule, LanternIcon, BellIcon } from "@/components/Icons";
+import { DancheongDefs, DancheongRule, LanternIcon } from "@/components/Icons";
 import { listEventsInMonth, listRegular, listAllEvents } from "@/lib/events";
 import { monthMatrix, ymNav, parseYm, ymString } from "@/lib/calendar";
+import { solarToLunar, lunarLabel } from "@/lib/lunar";
 import { SITE } from "@/content/site";
 
 export const dynamic = "force-dynamic";
@@ -17,20 +18,22 @@ function eventDay(startsAt) {
 }
 function fmtDateTime(startsAt) {
   const d = new Date(startsAt);
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  const hh = String(d.getHours()).padStart(2, "0");
-  const mi = String(d.getMinutes()).padStart(2, "0");
-  const time = hh === "00" && mi === "00" ? "" : ` ${hh}:${mi}`;
-  return `${d.getFullYear()}. ${mm}. ${dd}.${time}`;
+  const p = (n) => String(n).padStart(2, "0");
+  const time = d.getHours() === 0 && d.getMinutes() === 0 ? "" : ` ${p(d.getHours())}:${p(d.getMinutes())}`;
+  return `${d.getFullYear()}. ${p(d.getMonth() + 1)}. ${p(d.getDate())}.${time}`;
+}
+
+// 반복 규칙(weekly:N / lunar:D)이 해당 요일/음력일에 맞는지
+function matchesRecurrence(rec, weekday, lunarDay) {
+  const r = (rec || "").trim();
+  if (r.startsWith("weekly:")) return Number(r.slice(7)) === weekday;
+  if (r.startsWith("lunar:")) return lunarDay != null && Number(r.slice(6)) === lunarDay;
+  return false;
 }
 
 export default async function EventsPage({ searchParams }) {
   const now = new Date();
-  const parsed = parseYm(searchParams?.ym) ?? {
-    y: now.getFullYear(),
-    m: now.getMonth() + 1,
-  };
+  const parsed = parseYm(searchParams?.ym) ?? { y: now.getFullYear(), m: now.getMonth() + 1 };
   const { y, m } = parsed;
   const view = searchParams?.view === "list" ? "list" : "calendar";
 
@@ -38,26 +41,29 @@ export default async function EventsPage({ searchParams }) {
   let monthEvents = [];
   let allEvents = [];
   try {
-    if (view === "list") {
-      allEvents = await listAllEvents();
-    } else {
-      monthEvents = await listEventsInMonth(y, m);
-    }
+    if (view === "list") allEvents = await listAllEvents();
+    else monthEvents = await listEventsInMonth(y, m);
   } catch (err) {
     console.error("행사 조회 실패:", err);
   }
 
-  // 캘린더: 날짜별 버킷
   const byDay = {};
   monthEvents.forEach((e) => {
     const d = eventDay(e.starts_at);
     (byDay[d] ||= []).push(e);
   });
+
+  const recurringRegular = regular.filter((e) => (e.recurrence || "").trim());
+  function recurringFor(day) {
+    const weekday = new Date(y, m - 1, day).getDay();
+    const lun = solarToLunar(y, m, day);
+    return recurringRegular.filter((e) => matchesRecurrence(e.recurrence, weekday, lun?.lDay));
+  }
+
   const weeks = monthMatrix(y, m);
   const { prev, next } = ymNav(y, m);
   const isThisMonth = y === now.getFullYear() && m === now.getMonth() + 1;
   const today = now.getDate();
-
   const linkYm = (ny, nm, v = view) => `/events?ym=${ymString(ny, nm)}&view=${v}`;
 
   return (
@@ -67,7 +73,7 @@ export default async function EventsPage({ searchParams }) {
       <DancheongRule height={12} />
 
       <section className="blk">
-        <div className="wrap">
+        <div className="wrap" style={{ maxWidth: "1000px" }}>
           <div className="sec-head reveal" style={{ marginBottom: "14px" }}>
             <div>
               <div className="ki">Dharma</div>
@@ -76,7 +82,6 @@ export default async function EventsPage({ searchParams }) {
             <Link className="more" href="/">← 홈으로</Link>
           </div>
 
-          {/* 컨트롤: 월 이동 + 뷰 토글 */}
           <div className="cal-head">
             <div className="cal-nav">
               <Link href={linkYm(prev.y, prev.m)} aria-label="이전 달">‹</Link>
@@ -106,9 +111,19 @@ export default async function EventsPage({ searchParams }) {
                         <td key={di} className={day == null ? "empty" : ""}>
                           {day != null && (
                             <>
-                              <span className={`cal-day${isThisMonth && day === today ? " today" : ""}`}>{day}</span>
+                              <div className="cal-daynum">
+                                <span className={`cal-day${isThisMonth && day === today ? " today" : ""}${di === 0 ? " sun" : ""}`}>
+                                  {day}
+                                </span>
+                                <span className="cal-lunar">{lunarLabel(y, m, day)}</span>
+                              </div>
                               {(byDay[day] ?? []).map((e) => (
                                 <Link key={e.id} className="cal-ev" href={`/events/${e.id}`} title={e.title}>
+                                  {e.title}
+                                </Link>
+                              ))}
+                              {recurringFor(day).map((e) => (
+                                <Link key={"r" + e.id} className="cal-ev reg" href={`/events/${e.id}`} title={e.title}>
                                   {e.title}
                                 </Link>
                               ))}
@@ -120,6 +135,11 @@ export default async function EventsPage({ searchParams }) {
                   ))}
                 </tbody>
               </table>
+              <p className="cal-legend">
+                <span className="lg-dot ev" /> 행사
+                <span className="lg-dot reg" /> 정기법회(반복)
+                <span style={{ color: "var(--ink-soft)" }}>· 날짜 아래 작은 숫자는 음력</span>
+              </p>
             </div>
           ) : (
             <ul className="ev-list">
@@ -133,9 +153,7 @@ export default async function EventsPage({ searchParams }) {
                         <span className="ev-kind">{KIND_LABEL[e.kind] ?? ""}</span>
                         {e.title}
                       </span>
-                      <span className="ev-w">
-                        {e.starts_at ? fmtDateTime(e.starts_at) : e.when_text}
-                      </span>
+                      <span className="ev-w">{e.starts_at ? fmtDateTime(e.starts_at) : e.when_text}</span>
                     </Link>
                   </li>
                 ))
@@ -143,13 +161,12 @@ export default async function EventsPage({ searchParams }) {
             </ul>
           )}
 
-          {/* 정기 법회 안내 */}
           <div className="reg-panel reveal">
-            <h3 style={{ fontFamily: "var(--font-title)", fontSize: "18px", fontWeight: 700, marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
-              <LanternIcon size={20} /> 정기 법회
+            <h3 style={{ fontFamily: "var(--font-title)", fontSize: "20px", fontWeight: 700, marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
+              <LanternIcon size={22} /> 정기 법회
             </h3>
             {regular.length === 0 ? (
-              <p style={{ color: "var(--ink-soft)", fontSize: "14.5px" }}>정기 법회 안내는 준비 중입니다.</p>
+              <p style={{ color: "var(--ink-soft)", fontSize: "15.5px" }}>정기 법회 안내는 준비 중입니다.</p>
             ) : (
               <ul className="plist">
                 {regular.map((r) => (

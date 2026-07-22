@@ -14,6 +14,7 @@ const eventSchema = z.object({
   title: z.string().trim().min(1, "제목을 입력하세요.").max(200),
   whenText: z.string().trim().max(120),
   startsAt: z.string().trim().max(40),
+  recurrence: z.string().trim().max(40),
   description: z.string().trim().max(5000),
   sortOrder: z.coerce.number().int().min(0).max(9999),
 });
@@ -24,6 +25,7 @@ function readForm(formData) {
     title: formData.get("title") ?? "",
     whenText: formData.get("whenText") ?? "",
     startsAt: formData.get("startsAt") ?? "",
+    recurrence: formData.get("recurrence") ?? "",
     description: formData.get("description") ?? "",
     sortOrder: formData.get("sortOrder") ?? "0",
   };
@@ -35,6 +37,7 @@ function toRecord(d) {
     title: d.title,
     whenText: d.whenText === "" ? null : d.whenText,
     startsAt: d.startsAt === "" ? null : new Date(d.startsAt),
+    recurrence: d.recurrence === "" ? null : d.recurrence,
     description: d.description === "" ? null : d.description,
     sortOrder: d.sortOrder,
   };

@@ -43,23 +43,23 @@ export async function getEvent(id) {
 
 // ── 관리자용 ──────────────────────────────────────────────
 export async function createEvent(d) {
-  const { kind, title, whenText, startsAt, description, sortOrder } = d;
+  const { kind, title, whenText, startsAt, recurrence, description, sortOrder } = d;
   const { rows } = await query(
-    `INSERT INTO events (kind, title, when_text, starts_at, description, sort_order)
-     VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-    [kind, title, whenText, startsAt, description, sortOrder]
+    `INSERT INTO events (kind, title, when_text, starts_at, recurrence, description, sort_order)
+     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+    [kind, title, whenText, startsAt, recurrence, description, sortOrder]
   );
   return rows[0];
 }
 
 export async function updateEvent(id, d) {
-  const { kind, title, whenText, startsAt, description, sortOrder } = d;
+  const { kind, title, whenText, startsAt, recurrence, description, sortOrder } = d;
   await query(
     `UPDATE events
        SET kind = $2, title = $3, when_text = $4, starts_at = $5,
-           description = $6, sort_order = $7
+           recurrence = $6, description = $7, sort_order = $8
      WHERE id = $1`,
-    [id, kind, title, whenText, startsAt, description, sortOrder]
+    [id, kind, title, whenText, startsAt, recurrence, description, sortOrder]
   );
 }
 

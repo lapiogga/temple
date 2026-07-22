@@ -54,6 +54,19 @@ export default function EventForm({ action, initial = {}, submitLabel = "저장"
       </label>
 
       <label className="adm-field">
+        <span>반복 (정기 법회용 · 캘린더에 매월 자동 표시)</span>
+        <select name="recurrence" defaultValue={initial.recurrence ?? ""}>
+          <option value="">반복 없음</option>
+          <option value="weekly:0">매주 일요일</option>
+          <option value="weekly:6">매주 토요일</option>
+          <option value="lunar:1">음력 매월 1일 (초하루)</option>
+          <option value="lunar:15">음력 매월 15일 (보름)</option>
+          <option value="lunar:18">음력 매월 18일 (지장재일)</option>
+          <option value="lunar:24">음력 매월 24일 (관음재일)</option>
+        </select>
+      </label>
+
+      <label className="adm-field">
         <span>설명</span>
         <textarea name="description" defaultValue={initial.description ?? ""} rows={6} />
       </label>
