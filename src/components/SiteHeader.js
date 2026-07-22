@@ -21,6 +21,8 @@ const SITEMAP = [
   { href: "/#news", label: "소식" },
   { href: "/events", label: "법회·행사" },
   { href: "/gallery", label: "갤러리" },
+  { href: "/board", label: "게시판" },
+  { href: "/qna", label: "묻고답하기" },
   { href: "/#visit", label: "오시는 길" },
   { href: "/terms", label: "이용약관" },
   { href: "/privacy", label: "개인정보" },

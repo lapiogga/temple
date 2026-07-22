@@ -315,3 +315,23 @@ footer.site{margin-top:30px;}
 .rich-content blockquote{border-left:4px solid var(--gold);padding:8px 18px;color:var(--ink-soft);margin:14px 0;background:var(--hanji);border-radius:0 8px 8px 0;}
 .rich-content .ql-align-center{text-align:center;}
 .rich-content .ql-align-right{text-align:right;}
+
+/* 게시판 / Q&A */
+.post-tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+.post-tabs a{padding:9px 18px;border:1px solid var(--line);border-radius:999px;font-size:15.5px;font-weight:600;color:var(--ink-soft);background:var(--surface);}
+.post-tabs a.on{background:var(--accent);color:#fff;border-color:var(--accent);}
+.post-list{list-style:none;border-top:2px solid var(--gold);}
+.post-list li{border-bottom:1px solid var(--line);}
+.post-list a{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:17px 6px;flex-wrap:wrap;}
+.post-list .p-title{font-size:17.5px;font-weight:600;color:var(--ink);}
+.post-list a:hover .p-title{color:var(--accent);}
+.post-list .p-meta{font-size:14.5px;color:var(--ink-soft);white-space:nowrap;}
+.post-badge{display:inline-block;font-size:13px;font-weight:700;color:var(--accent-2);margin-right:8px;}
+.p-title .lock{color:var(--ink-soft);margin-right:4px;}
+.qna-answer{background:var(--hanji);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:18px 22px;margin-top:22px;}
+.qna-answer .a-label{font-weight:700;color:var(--accent);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.qna-textarea{width:100%;padding:13px 14px;font-size:16.5px;font-family:inherit;border:1px solid var(--line);border-radius:10px;background:var(--hanji);color:var(--ink);line-height:1.7;resize:vertical;}
+.qna-textarea:focus{outline:2px solid var(--accent);outline-offset:1px;}
+.adm-qna-item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;}
+.adm-qna-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;}
+.adm-qna-body{white-space:pre-line;color:var(--ink);font-size:15.5px;line-height:1.7;padding:10px 0;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line);margin-bottom:12px;}
