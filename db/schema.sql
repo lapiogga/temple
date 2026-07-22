@@ -107,7 +107,8 @@ CREATE TABLE IF NOT EXISTS members (
   id             BIGSERIAL PRIMARY KEY,
   login_id       TEXT NOT NULL UNIQUE,
   password_hash  TEXT NOT NULL,
-  name           TEXT NOT NULL,
+  name           TEXT NOT NULL,               -- 성명(실명, 비공개)
+  nickname       TEXT,                        -- 닉네임(게시판 공개 표시명)
   birth_date     DATE,
   gender         TEXT,                               -- male | female | other
   phone          TEXT,

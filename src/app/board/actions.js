@@ -39,7 +39,7 @@ export async function createPostAction(prevState, formData) {
       title: parsed.data.title,
       body,
       authorMemberId: m.id,
-      authorName: m.name,
+      authorName: m.nickname || m.name,
     });
   } catch (err) {
     console.error("createPost 실패:", err);

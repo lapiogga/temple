@@ -12,7 +12,7 @@ export async function getMemberByLoginId(loginId) {
 
 export async function getMemberById(id) {
   const { rows } = await query(
-    `SELECT id, login_id, name, birth_date, gender, phone, status,
+    `SELECT id, login_id, name, nickname, birth_date, gender, phone, status,
             created_at, approved_at, last_login_at
        FROM members WHERE id = $1`,
     [id]
@@ -26,14 +26,14 @@ export async function loginIdExists(loginId) {
 }
 
 export async function createMember(d) {
-  const { loginId, passwordHash, name, birthDate, gender, phone } = d;
+  const { loginId, passwordHash, name, nickname, birthDate, gender, phone } = d;
   const { rows } = await query(
     `INSERT INTO members
-       (login_id, password_hash, name, birth_date, gender, phone,
+       (login_id, password_hash, name, nickname, birth_date, gender, phone,
         phone_verified, status, agreed_terms, agreed_privacy, agreed_at)
-     VALUES ($1,$2,$3,$4,$5,$6, true, 'pending', true, true, now())
+     VALUES ($1,$2,$3,$4,$5,$6,$7, true, 'pending', true, true, now())
      RETURNING id`,
-    [loginId, passwordHash, name, birthDate, gender, phone]
+    [loginId, passwordHash, name, nickname, birthDate, gender, phone]
   );
   return rows[0];
 }
@@ -41,14 +41,14 @@ export async function createMember(d) {
 export async function listMembers({ status } = {}) {
   if (status) {
     const { rows } = await query(
-      `SELECT id, login_id, name, phone, gender, birth_date, status, created_at, approved_at
+      `SELECT id, login_id, name, nickname, phone, gender, birth_date, status, created_at, approved_at
          FROM members WHERE status = $1 ORDER BY created_at DESC`,
       [status]
     );
     return rows;
   }
   const { rows } = await query(
-    `SELECT id, login_id, name, phone, gender, birth_date, status, created_at, approved_at
+    `SELECT id, login_id, name, nickname, phone, gender, birth_date, status, created_at, approved_at
        FROM members ORDER BY created_at DESC`
   );
   return rows;

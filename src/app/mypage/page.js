@@ -40,6 +40,7 @@ export default async function MyPage() {
               <dl>
                 <dt>아이디</dt><dd>{m.login_id}</dd>
                 <dt>성명</dt><dd>{m.name}</dd>
+                <dt>닉네임</dt><dd>{m.nickname ?? "-"}</dd>
                 <dt>생년월일</dt><dd>{fmt(m.birth_date)}</dd>
                 <dt>성별</dt><dd>{GENDER[m.gender] ?? "-"}</dd>
                 <dt>휴대폰</dt><dd>{m.phone ?? "-"}</dd>

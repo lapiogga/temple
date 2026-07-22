@@ -32,6 +32,7 @@ export default async function MembersAdmin() {
             <thead>
               <tr>
                 <th>성명</th>
+                <th>닉네임</th>
                 <th>아이디</th>
                 <th>휴대폰</th>
                 <th>성별</th>
@@ -45,6 +46,7 @@ export default async function MembersAdmin() {
               {members.map((m) => (
                 <tr key={m.id}>
                   <td>{m.name}</td>
+                  <td>{m.nickname ?? "-"}</td>
                   <td>{m.login_id}</td>
                   <td>{m.phone ?? "-"}</td>
                   <td>{GENDER[m.gender] ?? "-"}</td>

@@ -65,8 +65,12 @@ export default function JoinForm({ action }) {
       <label className="auth-field"><span>비밀번호</span>
         <input name="password" type="password" minLength={8} maxLength={72} required placeholder="8자 이상" />
       </label>
-      <label className="auth-field"><span>성명</span>
+      <label className="auth-field"><span>성명 (실명 · 비공개)</span>
         <input name="name" maxLength={50} required />
+      </label>
+
+      <label className="auth-field"><span>닉네임 (게시판 표시명)</span>
+        <input name="nickname" maxLength={30} required placeholder="게시판에 이 이름으로 표시됩니다" />
       </label>
       <label className="auth-field"><span>생년월일</span>
         <input name="birthDate" type="date" required />
