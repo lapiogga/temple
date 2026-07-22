@@ -23,6 +23,7 @@ export default async function AdminLayout({ children }) {
             <Link href="/admin/notices">소식</Link>
             <Link href="/admin/events">법회·행사</Link>
             <Link href="/admin/gallery">갤러리</Link>
+            <Link href="/admin/members">회원</Link>
           </nav>
           <div className="adm-user">
             <span className="adm-who">{session.loginId}</span>

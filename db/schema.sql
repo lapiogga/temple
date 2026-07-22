@@ -99,7 +99,53 @@ CREATE TABLE IF NOT EXISTS event_attachments (
 CREATE INDEX IF NOT EXISTS idx_event_attach ON event_attachments (event_id);
 
 -- ============================================================
---  2차 확장(회원·커뮤니티) 시 추가 예정:
---    members, posts(자유/신행수기/Q&A), comments
---  그리고 위 테이블의 visibility='member' 활용
+--  회원·커뮤니티 (신도 회원·게시판·Q&A)
 -- ============================================================
+
+-- 신도 회원 (종무소 승인제)
+CREATE TABLE IF NOT EXISTS members (
+  id             BIGSERIAL PRIMARY KEY,
+  login_id       TEXT NOT NULL UNIQUE,
+  password_hash  TEXT NOT NULL,
+  name           TEXT NOT NULL,
+  birth_date     DATE,
+  gender         TEXT,                               -- male | female | other
+  phone          TEXT,
+  phone_verified BOOLEAN NOT NULL DEFAULT false,
+  status         TEXT NOT NULL DEFAULT 'pending',    -- pending | approved | rejected | suspended
+  agreed_terms   BOOLEAN NOT NULL DEFAULT false,
+  agreed_privacy BOOLEAN NOT NULL DEFAULT false,
+  agreed_at      TIMESTAMPTZ,
+  approved_at    TIMESTAMPTZ,
+  last_login_at  TIMESTAMPTZ,
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- 게시판 (자유/신행수기) — 회원 전용 글쓰기
+CREATE TABLE IF NOT EXISTS posts (
+  id               BIGSERIAL PRIMARY KEY,
+  board            TEXT NOT NULL DEFAULT 'free',     -- free | story
+  title            TEXT NOT NULL,
+  body             TEXT NOT NULL,
+  author_member_id BIGINT REFERENCES members(id) ON DELETE SET NULL,
+  author_name      TEXT NOT NULL,
+  published        BOOLEAN NOT NULL DEFAULT true,
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_posts_board ON posts (board, created_at DESC);
+
+-- 묻고답하기(Q&A) — 비회원도 휴대폰 인증 후 작성, 비밀글, 관리자 답변
+CREATE TABLE IF NOT EXISTS questions (
+  id          BIGSERIAL PRIMARY KEY,
+  title       TEXT NOT NULL,
+  body        TEXT NOT NULL,
+  author_name TEXT NOT NULL,
+  phone       TEXT,
+  is_secret   BOOLEAN NOT NULL DEFAULT false,
+  secret_hash TEXT,                                  -- 비밀글 열람 코드(해시)
+  answer      TEXT,                                  -- 관리자 답변
+  answered_at TIMESTAMPTZ,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_questions_created ON questions (created_at DESC);

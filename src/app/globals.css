@@ -258,3 +258,32 @@ footer.site{margin-top:30px;}
 .blk-motif > .wrap{position:relative;z-index:1;}
 .blk-lotus{position:absolute;pointer-events:none;z-index:0;opacity:.06;right:-46px;bottom:-46px;}
 .blk-lotus.tl{right:auto;bottom:auto;left:-56px;top:-40px;opacity:.05;}
+
+/* 인증(회원) 폼 */
+.auth-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:28px 30px 32px;max-width:460px;}
+.auth-card.auth-wide{max-width:560px;}
+.auth-field{display:block;margin-bottom:16px;}
+.auth-field > span{display:block;font-size:15px;font-weight:600;margin-bottom:6px;}
+.auth-field input,.auth-field select{width:100%;padding:13px 14px;font-size:16.5px;font-family:inherit;border:1px solid var(--line);border-radius:10px;background:var(--hanji);color:var(--ink);}
+.auth-field input:focus,.auth-field select:focus{outline:2px solid var(--accent);outline-offset:1px;}
+.auth-actions{display:flex;gap:12px;align-items:center;margin-top:10px;}
+.agree-box{background:var(--hanji);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:20px;}
+.agree-row{display:flex;gap:10px;align-items:flex-start;font-size:15.5px;padding:6px 0;}
+.agree-row input{margin-top:4px;width:18px;height:18px;flex:0 0 auto;}
+.agree-link{color:var(--accent);font-weight:700;text-decoration:underline;}
+.phone-row{display:flex;gap:8px;}
+.phone-row input{flex:1;}
+.btn-sm{padding:11px 16px;font-size:15px;white-space:nowrap;}
+.demo-note{font-size:13.5px;color:var(--ink-soft);margin-top:8px;}
+.verified-note{font-size:14.5px;color:var(--accent-2);font-weight:700;margin-top:8px;}
+.sns-row{display:flex;gap:10px;margin:6px 0 18px;flex-wrap:wrap;}
+.sns-btn{flex:1;min-width:160px;padding:12px;border-radius:10px;border:0;font-size:15px;font-weight:700;cursor:not-allowed;opacity:.7;}
+.sns-btn.kakao{background:#FEE500;color:#3c1e1e;}
+.sns-btn.naver{background:#03C75A;color:#fff;}
+.mypage-info{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px 28px;max-width:520px;}
+.mypage-info dl{display:grid;grid-template-columns:120px 1fr;gap:12px 16px;font-size:16.5px;margin-bottom:6px;}
+.mypage-info dt{color:var(--ink-soft);font-weight:600;}
+.status-badge{display:inline-block;font-size:13px;font-weight:700;padding:3px 10px;border-radius:999px;}
+.status-badge.approved{background:#e6f2f0;color:var(--accent-2);}
+.status-badge.pending{background:#fbf1e0;color:#b8860b;}
+.status-badge.rejected,.status-badge.suspended{background:#fbeae7;color:var(--accent);}

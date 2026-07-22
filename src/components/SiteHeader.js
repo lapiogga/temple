@@ -24,6 +24,8 @@ const SITEMAP = [
   { href: "/#visit", label: "오시는 길" },
   { href: "/terms", label: "이용약관" },
   { href: "/privacy", label: "개인정보" },
+  { href: "/member-login", label: "로그인" },
+  { href: "/join", label: "회원가입" },
 ];
 
 export default function SiteHeader() {
