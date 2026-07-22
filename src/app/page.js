@@ -1,107 +1,53 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
-  DharmaWheel, LotusMark, MountainRidge, DancheongDefs, DancheongRule,
-  LanternIcon, BellIcon, PinIcon, PhotoIcon, LotusPlaceholder, MoktakPlaceholder,
+  LotusMark, MountainRidge, DancheongDefs, DancheongRule,
+  LanternIcon, BellIcon, PinIcon, PhotoIcon,
 } from "@/components/Icons";
+import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
+import Reveal from "@/components/Reveal";
+import MapView from "@/components/MapView";
+import HeroBg from "@/components/HeroBg";
+import { listNotices } from "@/lib/notices";
+import { SITE, HISTORY } from "@/content/site";
+import { formatDate, excerpt } from "@/lib/format";
 
-// ── 콘텐츠 데이터 (추후 PostgreSQL 조회로 교체) ─────────────────────────
-const NEWS = [
-  { date: "2026. 07. 20.", title: "여름 산사 음악회 회향", art: "photo",
-    excerpt: "경내에서 열린 산사 음악회가 많은 신도님과 함께 원만히 회향되었습니다. 함께해 주셔서 감사합니다." },
-  { date: "2026. 07. 08.", title: "백중 우란분재 봉행 안내", art: "lotus",
-    excerpt: "조상 천도와 효를 기리는 백중 우란분재를 봉행합니다. 위패 접수 일정과 절차를 안내드립니다." },
-  { date: "2026. 06. 30.", title: "초하루 법회 및 방생 법회", art: "moktak",
-    excerpt: "매월 음력 초하루 법회와 함께 생명 존중의 방생 법회를 봉행합니다. 많은 동참 바랍니다." },
-];
-const REGULAR = [
-  { t: "일요 가족법회", v: "일요일 10:00" },
-  { t: "초하루 법회", v: "음력 매월 1일" },
-  { t: "지장재일 법회", v: "음력 매월 18일" },
-  { t: "관음재일 법회", v: "음력 매월 24일" },
-];
-const EVENTS = [
-  { t: "백중 우란분재", v: "음력 7. 15." },
-  { t: "여름 안거 회향", v: "8. 15." },
-  { t: "동지 팥죽 나눔", v: "12. 21." },
-  { t: "성도재일 철야정진", v: "음력 12. 8." },
-];
-const HISTORY = [
-  { yr: "1925 · 창건", title: "대웅전 초창", desc: "산자락에 처음 법당을 세워 도량의 기틀을 마련하였습니다." },
-  { yr: "1978 · 중창", title: "요사채·범종각 증축", desc: "신도의 정성을 모아 전각을 늘리고 범종을 봉안하였습니다." },
-  { yr: "2015 · 중수", title: "단청 보수·경내 정비", desc: "퇴락한 단청을 보수하고 경내를 오늘의 모습으로 가꾸었습니다." },
-];
+// 관리자 소식 등록이 즉시 반영되도록 항상 최신 DB 조회.
+export const dynamic = "force-dynamic";
 
-function NewsArt({ art }) {
-  if (art === "lotus") return <LotusPlaceholder />;
-  if (art === "moktak") return <MoktakPlaceholder />;
-  return <PhotoIcon />;
-}
-
-export default function Home() {
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const io = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("in");
-            io.unobserve(e.target);
-          }
-        }),
-      { threshold: 0.14 }
-    );
-    const els = document.querySelectorAll(".reveal");
-    els.forEach((el, i) => {
-      el.style.transitionDelay = `${(i % 3) * 0.06}s`;
-      io.observe(el);
-    });
-    return () => io.disconnect();
-  }, []);
-
-  const nav = [
-    { href: "#news", label: "소식" },
-    { href: "#schedule", label: "법회·행사" },
-    { href: "#history", label: "중창기" },
-    { href: "#visit", label: "오시는 길" },
-  ];
+export default async function Home() {
+  // 소식은 DB(공개분)에서 조회. 조회 실패해도 페이지는 렌더(소식만 빈 상태).
+  let news = [];
+  try {
+    const rows = await listNotices({ includeUnpublished: false });
+    news = rows.slice(0, 3);
+  } catch (err) {
+    console.error("홈 소식 조회 실패:", err);
+  }
 
   return (
     <>
       <DancheongDefs />
-
-      {/* NAV */}
-      <header className="nav">
-        <div className="wrap row">
-          <a className="brand" href="#top">
-            <DharmaWheel />
-            <span className="name">○○사 <small>○○산 · 大韓佛敎</small></span>
-          </a>
-          <nav className={`menu${menuOpen ? " open" : ""}`}>
-            {nav.map((n) => (
-              <a key={n.href} href={n.href} onClick={() => setMenuOpen(false)}>{n.label}</a>
-            ))}
-            <a href="#visit" className="serif" style={{ color: "var(--accent)", fontWeight: 700 }}
-              onClick={() => setMenuOpen(false)}>후원</a>
-          </nav>
-          <button className="hmb" aria-label="메뉴" onClick={() => setMenuOpen((v) => !v)}>
-            <span /><span /><span />
-          </button>
-        </div>
-      </header>
+      <Reveal />
+      <SiteHeader />
 
       {/* HERO */}
       <section className="hero" id="top">
+        <HeroBg />
         <div className="wrap">
           <LotusMark className="hero-lotus" />
           <div className="inner">
-            <span className="eyebrow">마음을 쉬어가는 곳</span>
-            <h1>산자락에 깃든<br />천년의 <em>고요</em>,<br />○○사에 오신 것을 환영합니다</h1>
-            <p className="lede">계절마다 다른 얼굴로 맞이하는 도량입니다. 정기 법회와 사찰 소식, 그리고 오랜 중창의 발자취를 함께 나눕니다.</p>
+            <span className="eyebrow">백사실 계곡 곁, 도심 속 산사</span>
+            <h1>
+              서울 부암동,<br />백사실 계곡 곁<br />
+              <em>{SITE.name}({SITE.hanja})</em>
+            </h1>
+            <p className="lede">
+              부암동 백사실 계곡 가까이 자리한 도심 속 산사입니다. 대웅전에는
+              서울특별시 문화재자료 제14호 「응선사 대웅전 산신도」를 모시고 있습니다.
+            </p>
             <div className="btns">
-              <a className="btn btn-primary" href="#schedule"><LanternIcon /> 법회 안내</a>
+              <a className="btn btn-primary" href="#news"><LanternIcon /> 사찰 소식</a>
               <a className="btn btn-ghost" href="#visit"><PinIcon /> 오시는 길</a>
             </div>
           </div>
@@ -110,81 +56,97 @@ export default function Home() {
       </section>
       <DancheongRule height={14} />
 
-      {/* 다음 법회 / 공지 */}
+      {/* 하이라이트: 산신도 문화재 · 유튜브 법문 (확정 사실) */}
       <div className="wrap">
         <div className="highlight">
           <div className="hcard accent reveal">
-            <span className="tag"><LanternIcon size={16} /> 다음 정기법회</span>
-            <h3>일요 가족법회</h3>
-            <div className="when">매주 일요일 오전 10:00 · 대웅전</div>
-            <p className="desc">사시예불과 법문, 공양이 이어집니다. 처음 오시는 분도 편안히 함께하실 수 있습니다.</p>
+            <span className="tag"><BellIcon size={16} /> 서울특별시 문화재자료 제14호</span>
+            <h3>대웅전 산신도</h3>
+            <div className="when">1914년 조성 · 대웅전 봉안</div>
+            <p className="desc">
+              산신과 호랑이, 네 동자를 담은 근대 불화입니다. 응선사가 소장·관리하는
+              대표 성보입니다.
+            </p>
           </div>
           <div className="hcard teal reveal">
-            <span className="tag"><BellIcon size={16} /> 공지</span>
-            <h3 style={{ fontSize: "18px" }}>여름 안거 회향 안내</h3>
-            <div className="when" style={{ fontWeight: 500, color: "var(--ink-soft)", fontSize: "14px" }}>
-              2026. 8. 15. 오전 10시 · 회향 법회 및 대중공양
+            <span className="tag"><LanternIcon size={16} /> 유튜브 법문</span>
+            <h3 style={{ fontSize: "18px" }}>{SITE.youtubeName}</h3>
+            <div className="when" style={{ fontWeight: 500, fontSize: "14px" }}>
+              <a href={SITE.youtubeUrl} target="_blank" rel="noopener noreferrer"
+                style={{ color: "var(--accent-2)", fontWeight: 700 }}>
+                채널에서 법문 보기 →
+              </a>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 소식 */}
-      <section className="blk" id="news">
+      {/* 소식 (DB 연동) */}
+      <section className="blk blk-motif" id="news">
+        <LotusMark className="blk-lotus" size={300} />
         <div className="wrap">
           <div className="sec-head reveal">
             <div><div className="ki">Notice</div><h2>사찰 소식</h2></div>
-            <a className="more" href="#">소식 전체 보기 →</a>
+            <Link className="more" href="/notices">소식 전체 보기 →</Link>
           </div>
-          <div className="news">
-            {NEWS.map((n) => (
-              <article className="ncard reveal" key={n.title}>
-                <div className="ph"><NewsArt art={n.art} /></div>
-                <div className="body">
-                  <div className="date">{n.date}</div>
-                  <h3>{n.title}</h3>
-                  <p>{n.excerpt}</p>
-                </div>
-              </article>
-            ))}
-          </div>
+          {news.length === 0 ? (
+            <p className="reveal" style={{ color: "var(--ink-soft)" }}>
+              곧 새로운 소식을 전해드리겠습니다.
+            </p>
+          ) : (
+            <div className="news">
+              {news.map((n) => (
+                <Link className="ncard reveal" key={n.id} href={`/notices/${n.id}`}>
+                  <div className="ph">
+                    {n.cover_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={n.cover_url} alt={n.title}
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    ) : (
+                      <PhotoIcon />
+                    )}
+                  </div>
+                  <div className="body">
+                    <div className="date">{formatDate(n.published_at)}</div>
+                    <h3>{n.title}</h3>
+                    <p>{excerpt(n.body)}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
+      <DancheongRule height={12} />
 
-      {/* 법회·행사 */}
+      {/* 법회·행사 → 캘린더 */}
       <section className="blk bg-soft" id="schedule">
         <div className="wrap">
-          <div className="sec-head reveal"><div><div className="ki">Dharma</div><h2>법회 · 행사 안내</h2></div></div>
-          <div className="schedule">
-            <div className="panel reveal">
-              <h3><LanternIcon size={22} /> 정기 법회</h3>
-              <ul className="plist">
-                {REGULAR.map((r) => (
-                  <li key={r.t}><span className="t">{r.t}</span><span className="v">{r.v}</span></li>
-                ))}
-              </ul>
-            </div>
-            <div className="panel reveal">
-              <h3><BellIcon size={22} /> 다가오는 행사</h3>
-              <ul className="plist">
-                {EVENTS.map((e) => (
-                  <li key={e.t}><span className="t">{e.t}</span><span className="v">{e.v}</span></li>
-                ))}
-              </ul>
-            </div>
+          <div className="sec-head reveal">
+            <div><div className="ki">Dharma</div><h2>법회 · 행사 안내</h2></div>
+            <Link className="more" href="/events">캘린더 보기 →</Link>
+          </div>
+          <div className="panel reveal" style={{ textAlign: "center" }}>
+            <h3 style={{ justifyContent: "center" }}><LanternIcon size={22} /> 정기 법회와 행사</h3>
+            <p style={{ color: "var(--ink-soft)", fontSize: "15px", marginBottom: "16px" }}>
+              정기 법회와 다가오는 행사를 캘린더와 목록으로 확인하실 수 있습니다.
+            </p>
+            <Link className="btn btn-primary" href="/events"><LanternIcon /> 법회·행사 캘린더</Link>
           </div>
         </div>
       </section>
+      <DancheongRule height={12} />
 
-      {/* 중창기 */}
-      <section className="blk" id="history">
+      {/* 가람 중창기 */}
+      <section className="blk blk-motif" id="history">
+        <LotusMark className="blk-lotus tl" size={320} />
         <div className="wrap">
           <div className="sec-head reveal">
             <div><div className="ki">History</div><h2>가람 중창기</h2></div>
-            <a className="more" href="#">중창기 전체 보기 →</a>
           </div>
           <p className="reveal" style={{ color: "var(--ink-soft)", maxWidth: "60ch", marginBottom: "22px", fontSize: "15.5px" }}>
-            여러 대에 걸친 불사와 중창의 발자취입니다. 옛 사진과 기록으로 도량이 지나온 길을 담았습니다.
+            응선사가 지나온 발자취입니다. 대웅전에 모신 산신도는 응선사의 역사를 보여주는
+            대표 성보이며, 자세한 창건·중창 연혁은 준비 중입니다.
           </p>
           <div className="timeline">
             {HISTORY.map((h) => (
@@ -197,6 +159,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <DancheongRule height={12} />
 
       {/* 오시는 길 / 후원 */}
       <section className="blk bg-soft" id="visit">
@@ -204,59 +167,40 @@ export default function Home() {
           <div className="foot-grid">
             <div className="reveal">
               <div className="sec-head"><div><div className="ki">Visit</div><h2>오시는 길</h2></div></div>
-              <div className="mapbox">
-                <div style={{ textAlign: "center", color: "var(--ink-soft)" }}>
-                  <PinIcon size={40} />
-                  <div style={{ fontSize: "13px", marginTop: "6px" }}>카카오맵 임베드 영역</div>
-                </div>
-              </div>
+              <MapView />
               <div className="info-lines">
-                <div><b>주소</b>　○○시 ○○구 ○○로 00 (○○동)</div>
-                <div><b>대중교통</b>　○○역 3번 출구 · 마을버스 00번 종점 하차</div>
-                <div><b>주차</b>　경내 소형 30대 · 법회일 혼잡</div>
+                <div><b>주소</b>　{SITE.addressFull}</div>
+                <div><b>대중교통·주차</b>　안내 준비 중입니다.</div>
+                <div style={{ marginTop: "6px" }}>
+                  <a href={SITE.mapUrl} target="_blank" rel="noopener noreferrer"
+                    style={{ color: "var(--accent)", fontWeight: 600 }}>
+                    지도 앱에서 길찾기 →
+                  </a>
+                </div>
               </div>
             </div>
             <div className="donate reveal">
               <div className="sec-head"><div><div className="ki">Donation</div><h2 style={{ fontSize: "24px" }}>후원 안내</h2></div></div>
-              <p style={{ fontSize: "14.5px", color: "var(--ink-soft)" }}>여러분의 정성은 도량을 가꾸고 이웃과 나누는 데 쓰입니다.</p>
-              <div className="acct">
-                <div style={{ color: "var(--ink-soft)", fontSize: "13px", marginBottom: "2px" }}>후원 계좌</div>
-                <b>○○은행 000-0000-0000-00</b><br />예금주 : 대한불교 ○○사
-              </div>
+              <p style={{ fontSize: "14.5px", color: "var(--ink-soft)" }}>
+                여러분의 정성은 도량을 가꾸고 이웃과 나누는 데 쓰입니다.
+              </p>
+              {SITE.donation ? (
+                <div className="acct">
+                  <div style={{ color: "var(--ink-soft)", fontSize: "13px", marginBottom: "2px" }}>후원 계좌</div>
+                  <b>{SITE.donation.bank} {SITE.donation.account}</b><br />예금주 : {SITE.donation.holder}
+                </div>
+              ) : (
+                <div className="acct">
+                  <b>후원 안내 준비 중</b><br />계좌 안내는 곧 등록될 예정입니다.
+                </div>
+              )}
               <p className="note-small">※ 온라인 결제는 추후 도입 예정입니다.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="site">
-        <DancheongRule height={12} />
-        <div className="foot-main">
-          <div className="wrap">
-            <div className="cols">
-              <div>
-                <div className="name">○○산 ○○사</div>
-                <p>마음을 쉬어가는 산중 도량.<br />계절과 함께 정진하는 우리 지역의 절입니다.</p>
-              </div>
-              <div>
-                <h5>바로가기</h5>
-                <a href="#news">사찰 소식</a><br /><a href="#schedule">법회·행사</a><br />
-                <a href="#history">가람 중창기</a><br /><a href="#visit">오시는 길</a>
-              </div>
-              <div>
-                <h5>연락</h5>
-                <p>전화 02-000-0000<br />이메일 temple@example.kr<br />
-                  <a href="#" style={{ color: "#d8cdb9", textDecoration: "underline" }}>개인정보처리방침</a></p>
-              </div>
-            </div>
-            <div className="foot-bar">
-              <span>© 2026 ○○사. All rights reserved.</span>
-              <span>시안(mockup) · 사찰명·일정·계좌·사진은 예시입니다</span>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </>
   );
 }

@@ -1,0 +1,79 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
+import Reveal from "@/components/Reveal";
+import { DancheongDefs, DancheongRule } from "@/components/Icons";
+import { getAlbum, listPhotos } from "@/lib/gallery";
+import { SITE } from "@/content/site";
+
+export const dynamic = "force-dynamic";
+
+function parseId(raw) {
+  const id = Number(raw);
+  return Number.isInteger(id) && id > 0 ? id : null;
+}
+
+export async function generateMetadata({ params }) {
+  const id = parseId(params.id);
+  if (!id) return { title: `갤러리 | ${SITE.name}` };
+  let a = null;
+  try {
+    a = await getAlbum(id);
+  } catch {
+    a = null;
+  }
+  return { title: a ? `${a.title} | ${SITE.name}` : `갤러리 | ${SITE.name}` };
+}
+
+export default async function AlbumPage({ params }) {
+  const id = parseId(params.id);
+  if (!id) notFound();
+
+  let album = null;
+  let photos = [];
+  try {
+    album = await getAlbum(id);
+    if (album) photos = await listPhotos(id);
+  } catch (err) {
+    console.error("앨범 조회 실패:", err);
+  }
+  if (!album || album.visibility !== "public") notFound();
+
+  return (
+    <>
+      <DancheongDefs />
+      <Reveal />
+      <SiteHeader />
+      <DancheongRule height={12} />
+
+      <section className="blk">
+        <div className="wrap">
+          <div className="sec-head reveal">
+            <div>
+              <div className="ki">Gallery</div>
+              <h2>{album.title}</h2>
+            </div>
+            <Link className="more" href="/gallery">← 갤러리</Link>
+          </div>
+
+          {photos.length === 0 ? (
+            <p className="reveal" style={{ color: "var(--ink-soft)" }}>등록된 사진이 없습니다.</p>
+          ) : (
+            <div className="photo-grid">
+              {photos.map((p) => (
+                <figure className="reveal" key={p.id}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={p.image_url} alt={p.caption ?? album.title} />
+                  {p.caption && <figcaption>{p.caption}</figcaption>}
+                </figure>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <SiteFooter />
+    </>
+  );
+}

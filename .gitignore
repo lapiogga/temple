@@ -7,3 +7,5 @@ out/
 .DS_Store
 /backups/
 .playwright-mcp/
+# 업로드 이미지(운영자 등록분)는 커밋하지 않음
+/public/uploads/

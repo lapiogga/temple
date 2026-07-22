@@ -1,0 +1,4 @@
+# 초안(테스트) 기간 — 검색엔진 색인 전면 차단.
+# 8월 정식 오픈 시 이 파일과 next.config.mjs / layout.js 의 noindex 를 함께 해제한다.
+User-agent: *
+Disallow: /

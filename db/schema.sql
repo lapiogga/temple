@@ -85,6 +85,19 @@ CREATE TABLE IF NOT EXISTS dharma_talks (
   published_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- 행사 첨부파일 (안내문·신청서 등)
+CREATE TABLE IF NOT EXISTS event_attachments (
+  id          BIGSERIAL PRIMARY KEY,
+  event_id    BIGINT REFERENCES events(id) ON DELETE CASCADE,
+  file_url    TEXT NOT NULL,
+  filename    TEXT NOT NULL,
+  mime        TEXT,
+  size        INT,
+  sort_order  INT NOT NULL DEFAULT 0,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_event_attach ON event_attachments (event_id);
+
 -- ============================================================
 --  2차 확장(회원·커뮤니티) 시 추가 예정:
 --    members, posts(자유/신행수기/Q&A), comments

@@ -4,7 +4,7 @@ import { logout } from "./actions";
 import "./admin.css";
 
 export const metadata = {
-  title: "관리자 | ○○사",
+  title: "관리자 | 응선사",
   robots: { index: false, follow: false },
 };
 
@@ -17,10 +17,12 @@ export default async function AdminLayout({ children }) {
       <header className="adm-top">
         <div className="adm-top-in wrap">
           <Link href="/admin" className="adm-brand serif">
-            ○○사 관리자
+            응선사 관리자
           </Link>
           <nav className="adm-nav">
             <Link href="/admin/notices">소식</Link>
+            <Link href="/admin/events">법회·행사</Link>
+            <Link href="/admin/gallery">갤러리</Link>
           </nav>
           <div className="adm-user">
             <span className="adm-who">{session.loginId}</span>
