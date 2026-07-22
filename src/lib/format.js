@@ -11,6 +11,10 @@ export function formatDate(value) {
 
 // 본문 발췌: 공백 정규화 후 지정 길이로 자르고 말줄임.
 export function excerpt(text, max = 100) {
-  const s = (text ?? "").replace(/\s+/g, " ").trim();
+  const s = (text ?? "")
+    .replace(/<[^>]*>/g, " ") // HTML 태그 제거(리치 본문 대응)
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
   return s.length > max ? s.slice(0, max) + "…" : s;
 }

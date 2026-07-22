@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useFormState, useFormStatus } from "react-dom";
+import RichEditor from "@/components/RichEditor";
 
 function SubmitButton({ label }) {
   const { pending } = useFormStatus();
@@ -38,10 +39,10 @@ export default function NoticeForm({ action, initial = {}, submitLabel = "저장
         <input name="title" defaultValue={initial.title ?? ""} maxLength={200} required />
       </label>
 
-      <label className="adm-field">
+      <div className="adm-field">
         <span>본문</span>
-        <textarea name="body" defaultValue={initial.body ?? ""} rows={10} required />
-      </label>
+        <RichEditor name="body" initialValue={initial.body ?? ""} />
+      </div>
 
       <label className="adm-field">
         <span>대표 이미지 URL (선택 · https)</span>

@@ -295,3 +295,23 @@ footer.site{margin-top:30px;}
 .status-badge.approved{background:#e6f2f0;color:var(--accent-2);}
 .status-badge.pending{background:#fbf1e0;color:#b8860b;}
 .status-badge.rejected,.status-badge.suspended{background:#fbeae7;color:var(--accent);}
+
+/* 리치 텍스트 에디터 */
+.rich-editor .ql-toolbar{border-color:var(--line);border-radius:10px 10px 0 0;background:var(--hanji);}
+.rich-editor .ql-container{border-color:var(--line);border-radius:0 0 10px 10px;background:var(--surface);font-family:var(--font-body);font-size:16.5px;min-height:300px;}
+.rich-editor .ql-editor{min-height:300px;line-height:1.8;}
+.rich-editor .ql-editor.ql-blank::before{color:var(--ink-soft);font-style:normal;}
+.rich-loading{padding:40px;text-align:center;color:var(--ink-soft);border:1px solid var(--line);border-radius:10px;background:var(--surface);}
+
+/* 리치 텍스트 렌더 */
+.rich-content{font-size:17.5px;line-height:1.85;color:var(--ink);}
+.rich-content h2{font-family:var(--font-title);font-size:24px;font-weight:700;margin:20px 0 10px;}
+.rich-content h3{font-size:20px;font-weight:700;margin:16px 0 8px;}
+.rich-content p{margin-bottom:12px;}
+.rich-content ul,.rich-content ol{margin:0 0 12px 26px;}
+.rich-content li{margin-bottom:5px;}
+.rich-content a{color:var(--accent);text-decoration:underline;}
+.rich-content img{max-width:100%;height:auto;border-radius:10px;margin:12px 0;}
+.rich-content blockquote{border-left:4px solid var(--gold);padding:8px 18px;color:var(--ink-soft);margin:14px 0;background:var(--hanji);border-radius:0 8px 8px 0;}
+.rich-content .ql-align-center{text-align:center;}
+.rich-content .ql-align-right{text-align:right;}

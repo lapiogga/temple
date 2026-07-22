@@ -83,16 +83,7 @@ export default async function NoticeDetail({ params }) {
               }}
             />
           )}
-          <div
-            style={{
-              fontSize: "17px",
-              lineHeight: 1.8,
-              color: "var(--ink)",
-              whiteSpace: "pre-line",
-            }}
-          >
-            {n.body}
-          </div>
+          <div className="rich-content" dangerouslySetInnerHTML={{ __html: n.body }} />
         </div>
       </article>
 

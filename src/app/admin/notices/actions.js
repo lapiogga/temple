@@ -10,6 +10,7 @@ import {
   removeNotice,
   setPublished,
 } from "@/lib/notices";
+import { sanitizeHtml, stripTags } from "@/lib/sanitize";
 
 // 빈 값 또는 https URL 만 허용(javascript: 등 스킴 차단)
 function isBlankOrHttpsUrl(v) {
@@ -24,7 +25,7 @@ function isBlankOrHttpsUrl(v) {
 const noticeSchema = z.object({
   category: z.enum(["notice", "news"]),
   title: z.string().trim().min(1, "제목을 입력하세요.").max(200),
-  body: z.string().trim().min(1, "본문을 입력하세요.").max(20000),
+  body: z.string().max(60000),
   coverUrl: z
     .string()
     .trim()
@@ -50,7 +51,7 @@ function toRecord(data) {
   return {
     category: data.category,
     title: data.title,
-    body: data.body,
+    body: sanitizeHtml(data.body),
     coverUrl: data.coverUrl === "" ? null : data.coverUrl,
     isPinned: data.isPinned,
     published: data.published,
@@ -68,8 +69,12 @@ export async function createNoticeAction(prevState, formData) {
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "입력값을 확인하세요." };
   }
+  const record = toRecord(parsed.data);
+  if (stripTags(record.body).length < 1) {
+    return { error: "본문을 입력하세요." };
+  }
   try {
-    await createNotice(toRecord(parsed.data));
+    await createNotice(record);
   } catch (err) {
     console.error("createNotice 실패:", err);
     return { error: "저장 중 오류가 발생했습니다." };
@@ -84,8 +89,12 @@ export async function updateNoticeAction(id, prevState, formData) {
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "입력값을 확인하세요." };
   }
+  const record = toRecord(parsed.data);
+  if (stripTags(record.body).length < 1) {
+    return { error: "본문을 입력하세요." };
+  }
   try {
-    await updateNotice(id, toRecord(parsed.data));
+    await updateNotice(id, record);
   } catch (err) {
     console.error("updateNotice 실패:", err);
     return { error: "저장 중 오류가 발생했습니다." };
