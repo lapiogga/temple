@@ -3,13 +3,23 @@
 # prod(/var/www/temple → DB temple), dev(~/temple-dev → DB temple_dev) 양쪽에서 동일하게 동작한다.
 #
 # cron 등록:
-#   crontab -e →  0 4 * * *  /var/www/temple/deploy/backup-db.sh
+#   crontab -e →  0 19 * * *  /var/www/temple/deploy/backup-db.sh
 set -euo pipefail
+umask 077
 
 APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENV_FILE="${APP_DIR}/.env"
 BACKUP_DIR="${BACKUP_DIR:-/home/ubuntu/backups}"
 KEEP_DAYS=14
+
+# off-VPS 반출(선택). 설정돼 있으면 실패 시 스크립트도 실패한다(조용한 no-op 금지).
+#   예) BACKUP_REMOTE="r2:temple-backups"
+BACKUP_REMOTE="${BACKUP_REMOTE:-}"
+RCLONE="${RCLONE:-/home/ubuntu/bin/rclone}"
+RCLONE_FLAGS="${RCLONE_FLAGS:---s3-no-check-bucket}"
+
+# 실패 통보(선택) — healthchecks.io 류 dead-man's switch. 완주했을 때만 핑을 보낸다.
+HC_URL_DB="${HC_URL_DB:-}"
 
 [ -r "$ENV_FILE" ] || { echo "ERROR: .env 를 읽을 수 없음: $ENV_FILE" >&2; exit 1; }
 
@@ -25,7 +35,13 @@ else
 fi
 
 STAMP="$(date +%Y%m%d_%H%M%S)"
-mkdir -p "$BACKUP_DIR"
+install -d -m 700 "$BACKUP_DIR"
+
+# 여유 공간 가드 — 디스크를 채워 PostgreSQL 을 죽이기 전에 백업이 먼저 죽게 한다
+AVAIL="$(df -B1 --output=avail "$BACKUP_DIR" | tail -1)"
+[ "$AVAIL" -gt $((1024 * 1024 * 1024)) ] || {
+  echo "ERROR: 여유공간 1GB 미만(avail=${AVAIL}B) — 덤프 취소" >&2; exit 1; }
+
 OUT="${BACKUP_DIR}/${DB_NAME}_${STAMP}.sql.gz"
 TMP="${OUT}.part"
 
@@ -38,11 +54,27 @@ pg_dump -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" | gzip > "$TMP"
 # 최소 크기 검증(빈 덤프 방지)
 SIZE="$(stat -c %s "$TMP")"
 [ "$SIZE" -gt 1000 ] || { echo "ERROR: 덤프가 비정상적으로 작음(${SIZE}B) — 백업 취소" >&2; exit 1; }
+gzip -t "$TMP" || { echo "ERROR: gzip 무결성 검증 실패 — 백업 취소" >&2; exit 1; }
 
 mv "$TMP" "$OUT"
 trap - EXIT
 
-# 오래된 백업 정리
-find "$BACKUP_DIR" -name "${DB_NAME}_*.sql.gz" -mtime +$KEEP_DAYS -delete
+# off-VPS 반출: 설정돼 있는데 실패하면 스크립트도 실패해야 한다.
+# 반드시 보관정리(아래 find)보다 앞에 둘 것 — 반출 못 한 백업을 지우지 않기 위해서다.
+if [ -n "$BACKUP_REMOTE" ]; then
+  [ -x "$RCLONE" ] || { echo "ERROR: BACKUP_REMOTE 설정됐으나 rclone 없음: $RCLONE" >&2; exit 1; }
+  # shellcheck disable=SC2086
+  "$RCLONE" copy "$OUT" "${BACKUP_REMOTE}/db/" $RCLONE_FLAGS \
+    || { echo "ERROR: off-VPS 반출 실패: ${BACKUP_REMOTE}/db/" >&2; exit 1; }
+  echo "off-VPS 반출 완료: ${BACKUP_REMOTE}/db/"
+fi
+
+# 오래된 백업 정리(로컬만. 원격 보관정리는 목적지 수명주기 규칙에 맡긴다)
+find "$BACKUP_DIR" -maxdepth 1 -name "${DB_NAME}_*.sql.gz" -mtime +$KEEP_DAYS -delete
 
 echo "backup done: $(basename "$OUT") (${SIZE}B)"
+
+# 완주했을 때만 핑 → 어떤 이유로든 중단되면 정해진 시각에 핑이 안 와 알림이 간다
+if [ -n "$HC_URL_DB" ]; then
+  curl -fsS -m 10 "$HC_URL_DB" >/dev/null || echo "WARN: healthcheck 핑 실패" >&2
+fi

@@ -100,6 +100,18 @@ PATH=/usr/local/bin:/usr/bin:/bin
 산출물: `/home/ubuntu/backups/` (DB), `/home/ubuntu/backups/uploads/{current,prev}/` (이미지), 로그 `backup.log`.
 두 스크립트 모두 **자기가 놓인 체크아웃의 `.env` 를 읽으므로** prod/dev 양쪽에서 그대로 동작한다.
 
+### 실패에 대한 설계 (2026-07-28 적대적 감사 반영)
+`backup-uploads.sh` 는 아래 원칙 위에 있다. 셋 다 실패 재현으로 확인된 것이며 **개별로 떼어내 고치면 안 된다**.
+
+| 상황 | 동작 | 이유 |
+|---|---|---|
+| tar 경고 종료(rc=1)<br>`File removed / file changed / File shrank` | 아카이브를 **승격**하고 스냅샷도 함께 전진 | 아카이브는 유효하다. 아카이브만 버리고 스냅샷을 전진시키면 그 회차 변경분이 어느 백업에도 남지 않는다 |
+| tar 치명적 실패(rc≥2) | 아카이브 폐기 + 스냅샷 **미전진**, 증분 중이었다면 라이브 스냅샷도 폐기 | 다음 실행이 전체 백업으로 자가복구된다. 스냅샷이 손상돼 최대 30일 무증상 정지하는 것을 막는다 |
+| 전체 백업 실패 | `staging` 에서 작업하므로 `current`·`prev` **무손상** | 파괴적 로테이션은 새 전체 백업이 검증을 통과한 뒤에만 실행한다 |
+
+MODE 판정 기준은 '스냅샷 존재'가 아니라 **'전체 아카이브 존재'** 다 → 실패한 전체 백업이 다음 날 자동 재시도된다.
+여유 공간 가드가 tar/pg_dump 앞에 있어, 디스크가 차더라도 PostgreSQL 이 죽기 전에 백업이 먼저 실패한다.
+
 ### 복원
 ```bash
 # DB
@@ -110,16 +122,49 @@ for f in $(ls -1 uploads_*_full.tar.gz; ls -1 uploads_*_inc.tar.gz | sort); do
   tar --listed-incremental=/dev/null -xzf "$f" -C /var/www/temple/public
 done
 ```
+> ⚠️ 원격에서 받아올 때는 **반드시 주기별 prefix(`uploads/<CYCLE>/`) 단위로** 받을 것.
+> 전 주기 아카이브를 한 디렉터리에 섞으면 지난 주기 증분이 새 주기 전체 뒤에 적용돼 복원이 깨진다.
+> `CYCLE` 값은 각 주기 디렉터리의 `CYCLE` 파일에 있다.
 
-### ⚠️ 아직 남은 것 — off-VPS 반출
-위 백업은 **원본과 같은 디스크**에 저장된다. 디스크 장애 시 원본과 함께 사라지므로
-실질적 대비가 되려면 외부 반출이 필요하다. `backup-uploads.sh` 에 훅이 있다:
+검증 이력: 2026-07-28 DB 덤프를 별도 스키마로 복원해 원본과 md5 일치 확인
+(한글·이모지·HTML·역슬래시·개행 전부 보존). 이미지는 전체+증분 복원본이 원본과 `diff -r` 일치.
+
+### ⚠️ 아직 남은 것 — off-VPS 반출 (마이그레이션 전 필수)
+위 백업은 **원본과 같은 디스크**에 저장된다. 디스크 장애·랜섬웨어·계정 사고에는 무력하다.
+지금 보호 대상은 플레이스홀더 11장과 빈 DB뿐이라 손실 상한이 작지만,
+**게시글 200 + 이미지 2,000장이 들어오는 순간 이 항목의 심각도가 올라간다.**
+
+**목적지: Cloudflare R2** (2026-07 조사 기준 30GB 에서 월 약 414원, 실사용 4GB 구간은 무료 10GB 안이라 0원).
+선정 이유는 ①키 한 쌍으로 끝나는 헤드리스 인증(Google Drive 는 브라우저 OAuth 라 무인 백업에 부적합)
+②egress 가 구조적으로 항상 $0 — 복원 비용 함정이 없음 ③AWS 는 kis_quant 와 프로바이더가 겹쳐 '완전 분리' 원칙 위배
+④이 VPS(쿠알라룸푸르)에서 ping 7~8ms 로 후보 중 최속. 2순위 예비는 Backblaze B2.
+
 ```bash
-sudo apt install rclone && rclone config          # B2/S3/구글드라이브 등 목적지 등록
-# 이후 cron 항목에 환경변수 추가:
-BACKUP_REMOTE="b2:temple-backups/uploads"
+# 1) rclone — sudo 불필요, 사용자 홈에 설치
+curl -O https://downloads.rclone.org/rclone-current-linux-amd64.zip
+unzip -j rclone-current-linux-amd64.zip '*/rclone' -d ~/bin && chmod +x ~/bin/rclone
+
+# 2) R2 목적지 등록 (브라우저에서 발급한 키 한 쌍 필요)
+~/bin/rclone config create r2 s3 provider=Cloudflare \
+  access_key_id=<KEY> secret_access_key=<SECRET> \
+  endpoint=https://<ACCOUNT_ID>.r2.cloudflarestorage.com
+
+# 3) crontab 에 환경변수 추가 — 두 스크립트가 같은 규약으로 읽는다
+BACKUP_REMOTE=r2:temple-backups
 ```
-+ Hostinger 일간백업 애드온 병행 권장.
+> **버킷에 버저닝 또는 객체잠금을 반드시 켤 것.** R2 API 토큰에는 '쓰기 전용' 스코프가 없어,
+> VPS 가 털리면 그 키로 원격 백업까지 지울 수 있다. 이게 없으면 오프사이트를 붙여도 랜섬웨어는 못 막는다.
+> 스크립트가 원격 보관정리를 하지 않는 것도 같은 이유다 — 수명주기는 R2 대시보드 규칙에 맡긴다.
+
+**Hostinger 일간 백업 애드온($6/월)은 사지 말 것.** off-host 이지 off-provider 가 아니다.
+결제 실패 시 서버와 백업이 동시에 정지 대상이 되고, 공식 문서상 스냅샷을 로컬로 내려받는 경로 자체가 없다.
+무료로 딸려오는 주간분은 재구축 시간 단축용으로만 켜두고 백업 전략으로 계산하지 말 것.
+
+### ⚠️ 실패 통보 경로가 아직 없다
+MTA 미설치 + `MAILTO` 무효 + 로그 무감시 상태다. **`MAILTO` 를 넣어도 메일은 나가지 않는다.**
+dead-man's switch 가 이 서버에 맞는 답이다 — healthchecks.io 무료 체크 2개를 만들고
+crontab 에 `HC_URL_DB`, `HC_URL_UPLOADS` 를 넣으면 두 스크립트가 **완주했을 때만** 핑을 보낸다.
+디스크 풀·인증 실패·cron 중단·서버 다운 어느 쪽이든 핑이 끊겨 알림이 온다.
 
 ---
 

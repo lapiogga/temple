@@ -96,7 +96,12 @@ crontab -e
 # 매일 04:00 DB 백업
 0 4 * * * /home/ubuntu/projects/temple/deploy/backup-db.sh >> /home/ubuntu/backups/backup.log 2>&1
 ```
-> S3 업로드를 쓰려면 `deploy/backup-db.sh` 의 aws s3 줄 주석을 해제하고 aws-cli·버킷을 준비하세요. EBS 스냅샷도 주기 설정 권장.
+> 원격 반출은 `BACKUP_REMOTE` 환경변수 + rclone 으로 처리합니다. 설정 방법은
+> `deploy/HOSTINGER_SETUP.md` §5 를 보세요. EBS 스냅샷도 주기 설정 권장.
+
+> ⚠️ 이 문서는 EC2(kis_quant 공유 devbox) 시절 기록입니다. 2026-07-28 부로 운영은
+> Hostinger VPS 로 이전됐고, 경로도 `/home/ubuntu/projects/temple` → prod `/var/www/temple` /
+> dev `/home/ubuntu/temple-dev` 로 바뀌었습니다. 현행 절차는 `deploy/HOSTINGER_SETUP.md` 를 따르세요.
 
 ## 9. 재배포 (코드 수정 후)
 ```bash
