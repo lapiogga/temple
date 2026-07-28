@@ -82,13 +82,44 @@ sudo systemctl restart temple
 ---
 
 ## 5. 백업 (내구성 보완 — 중요)
-단일 VPS라 디스크 장애 시 이미지+DB 동시 유실 위험. 최소:
-```bash
-# DB 일 1회 pg_dump (기존 스크립트)
-crontab -e →  0 4 * * *  /home/ubuntu/projects/temple/deploy/backup-db.sh
-# 이미지 tar + DB덤프를 외부(S3/Backblaze B2 등)로 반출 권장(off-VPS)
+단일 VPS라 디스크 장애 시 이미지+DB 동시 유실 위험.
+
+### 등록된 cron (2026-07-28 구성 완료, `crontab -l` for ubuntu)
 ```
-+ Hostinger 일간백업 애드온 병행.
+PATH=/usr/local/bin:/usr/bin:/bin
+0 19 * * *  /var/www/temple/deploy/backup-db.sh      >> /home/ubuntu/backups/backup.log 2>&1
+5 19 * * *  /var/www/temple/deploy/backup-uploads.sh >> /home/ubuntu/backups/backup.log 2>&1
+```
+> 서버 TZ 가 UTC 이므로 **19:00 UTC = 04:00 KST**.
+
+| 스크립트 | 대상 | 방식 | 보관 |
+|---|---|---|---|
+| `backup-db.sh` | DB(`temple`) | 매일 pg_dump + gzip | 14일 |
+| `backup-uploads.sh` | `public/uploads` | 매월 1일 전체 + 매일 증분(tar `--listed-incremental`) | 현재 주기 + 직전 주기 |
+
+산출물: `/home/ubuntu/backups/` (DB), `/home/ubuntu/backups/uploads/{current,prev}/` (이미지), 로그 `backup.log`.
+두 스크립트 모두 **자기가 놓인 체크아웃의 `.env` 를 읽으므로** prod/dev 양쪽에서 그대로 동작한다.
+
+### 복원
+```bash
+# DB
+gunzip -c /home/ubuntu/backups/temple_<STAMP>.sql.gz | psql "$DATABASE_URL"
+# 이미지 — 전체 → 증분 순(파일명 일련번호 덕에 사전순 = 생성순)
+cd /home/ubuntu/backups/uploads/current
+for f in $(ls -1 uploads_*_full.tar.gz; ls -1 uploads_*_inc.tar.gz | sort); do
+  tar --listed-incremental=/dev/null -xzf "$f" -C /var/www/temple/public
+done
+```
+
+### ⚠️ 아직 남은 것 — off-VPS 반출
+위 백업은 **원본과 같은 디스크**에 저장된다. 디스크 장애 시 원본과 함께 사라지므로
+실질적 대비가 되려면 외부 반출이 필요하다. `backup-uploads.sh` 에 훅이 있다:
+```bash
+sudo apt install rclone && rclone config          # B2/S3/구글드라이브 등 목적지 등록
+# 이후 cron 항목에 환경변수 추가:
+BACKUP_REMOTE="b2:temple-backups/uploads"
+```
++ Hostinger 일간백업 애드온 병행 권장.
 
 ---
 
