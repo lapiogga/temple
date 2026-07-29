@@ -171,6 +171,14 @@ R2 API 토큰에는 '쓰기 전용' 스코프가 없다. 즉 VPS 가 털리면 �
 > ⚠️ **lock 기간 < lifecycle 기간** 순서를 지킬 것. bucket lock 은 lifecycle 보다 우선하므로
 > lock 이 더 길면 삭제가 영영 일어나지 않고 무한 누적된다. (권장: lock 30일 / lifecycle 90일)
 
+#### 점검 — `deploy/verify-backup-remote.sh`
+```bash
+./deploy/verify-backup-remote.sh          # BACKUP_REMOTE 는 환경변수→crontab 순으로 자동 탐색
+```
+rclone·설정 퍼미션, 원격 쓰기·읽기 왕복, **bucket lock 생존**(삭제가 *성공하면* 실패로 친다),
+백업 신선도(기본 48시간), 각 주기에 전체 아카이브가 있는지를 본다. 문제 있으면 exit 1.
+**토큰 교체 직후·서버 재구축 후·주기 점검** 때 이걸 돌린다.
+
 #### 신규 서버에서 다시 구성할 때
 ```bash
 # 1) rclone — sudo 불필요. unzip 이 없으면 python3 -m zipfile 로 풀어도 된다
