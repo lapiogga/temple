@@ -132,19 +132,48 @@ done
 - **2026-07-28 19:00/19:05 UTC 첫 자동 cron 발화 성공** — DB `temple_20260728_190001.sql.gz`,
   이미지 `uploads_20260728_190501_01_inc.tar.gz`(mode=inc, cycle 인식 정상).
   산출물 퍼미션 600 유지 확인(`umask 077` 동작). cron 발화 자체가 이때까지 미검증이었다.
+- **2026-07-29 off-VPS 반출 연결 + 원격 단독 재해복구 리허설 통과**
+  - 토큰 스코프 확인: `ListBuckets` 403(=버킷 한정 정상), 객체 읽기·쓰기 정상
+  - **bucket lock 실증**: 업로드한 객체 삭제 시도가 `409 ObjectLockedByBucketPolicy` 로 차단됨
+  - cron 유사 환경(`env -i`, 최소 PATH)에서 두 스크립트 완주 — rclone 이 cron 환경에서도 설정을 찾음
+  - **로컬 백업을 일절 참조하지 않고** R2 에서만 회수해 복원: DB 덤프 gzip 무결성 + 12개 테이블 확인,
+    이미지는 전체→증분 순 적용 후 원본과 `diff -r` 완전 일치(11개 파일)
 
-### ⚠️ 아직 남은 것 — off-VPS 반출 (마이그레이션 전 필수)
-위 백업은 **원본과 같은 디스크**에 저장된다. 디스크 장애·랜섬웨어·계정 사고에는 무력하다.
-지금 보호 대상은 플레이스홀더 11장과 빈 DB뿐이라 손실 상한이 작지만,
-**게시글 200 + 이미지 2,000장이 들어오는 순간 이 항목의 심각도가 올라간다.**
+### off-VPS 반출 — Cloudflare R2 (2026-07-29 연결 완료)
+위 백업은 원본과 **같은 디스크**에 저장된다. 그것만으로는 디스크 장애·랜섬웨어·계정 사고에 무력하므로
+off-VPS 사본을 Cloudflare R2 에 둔다.
 
-**목적지: Cloudflare R2** (2026-07 조사 기준 30GB 에서 월 약 414원, 실사용 4GB 구간은 무료 10GB 안이라 0원).
-선정 이유는 ①키 한 쌍으로 끝나는 헤드리스 인증(Google Drive 는 브라우저 OAuth 라 무인 백업에 부적합)
+**R2 선정 이유**: ①키 한 쌍으로 끝나는 헤드리스 인증(Google Drive 는 브라우저 OAuth 라 무인 백업에 부적합)
 ②egress 가 구조적으로 항상 $0 — 복원 비용 함정이 없음 ③AWS 는 kis_quant 와 프로바이더가 겹쳐 '완전 분리' 원칙 위배
-④이 VPS(쿠알라룸푸르)에서 ping 7~8ms 로 후보 중 최속. 2순위 예비는 Backblaze B2.
+④이 VPS(쿠알라룸푸르)에서 최근접. 2순위 예비는 Backblaze B2.
 
+#### 구성된 것
+| 항목 | 값 |
+|---|---|
+| rclone | `v1.74.4`, `/home/ubuntu/bin/rclone` (사용자 홈 설치 — sudo 불필요) |
+| 설정 | `~/.config/rclone/rclone.conf` (`600`), remote 이름 `r2`, `provider=Cloudflare` |
+| 버킷 | `temple-backups` (Location hint: APAC) |
+| 토큰 | **Account** 토큰 / **Object Read and Write** / **버킷 한정** |
+| 원격 레이아웃 | `db/<덤프>.sql.gz` · `uploads/<CYCLE>/<아카이브>` |
+| crontab | `BACKUP_REMOTE=r2:temple-backups` |
+
+두 스크립트의 rclone 기본 플래그는 `--s3-no-check-bucket` 이다. 버킷 한정 토큰은 `HeadBucket`/`CreateBucket`
+권한이 없어 이 플래그가 없으면 반출이 실패한다 — 바꾸지 말 것.
+
+#### 랜섬웨어 방어 — Bucket Lock (필수)
+R2 API 토큰에는 '쓰기 전용' 스코프가 없다. 즉 VPS 가 털리면 그 키로 **원격 백업까지 지울 수 있다.**
+이 구멍을 막는 R2 기능이 **Bucket Locks**(보존 정책)이며, 삭제와 **덮어쓰기를 모두** 차단한다.
+현재 `temple-backups` 에 **보존 30일 규칙(prefix 전체)** 이 걸려 있다.
+
+스크립트가 원격 보관정리를 하지 않는 것도 같은 이유다 — 키에 삭제 권한이 붙는 순간 그게 랜섬웨어 경로가 된다.
+수명주기는 **R2 대시보드의 lifecycle 규칙**에 맡긴다.
+
+> ⚠️ **lock 기간 < lifecycle 기간** 순서를 지킬 것. bucket lock 은 lifecycle 보다 우선하므로
+> lock 이 더 길면 삭제가 영영 일어나지 않고 무한 누적된다. (권장: lock 30일 / lifecycle 90일)
+
+#### 신규 서버에서 다시 구성할 때
 ```bash
-# 1) rclone — sudo 불필요, 사용자 홈에 설치
+# 1) rclone — sudo 불필요. unzip 이 없으면 python3 -m zipfile 로 풀어도 된다
 curl -O https://downloads.rclone.org/rclone-current-linux-amd64.zip
 unzip -j rclone-current-linux-amd64.zip '*/rclone' -d ~/bin && chmod +x ~/bin/rclone
 
@@ -152,13 +181,18 @@ unzip -j rclone-current-linux-amd64.zip '*/rclone' -d ~/bin && chmod +x ~/bin/rc
 ~/bin/rclone config create r2 s3 provider=Cloudflare \
   access_key_id=<KEY> secret_access_key=<SECRET> \
   endpoint=https://<ACCOUNT_ID>.r2.cloudflarestorage.com
+chmod 600 ~/.config/rclone/rclone.conf
 
 # 3) crontab 에 환경변수 추가 — 두 스크립트가 같은 규약으로 읽는다
 BACKUP_REMOTE=r2:temple-backups
 ```
-> **버킷에 버저닝 또는 객체잠금을 반드시 켤 것.** R2 API 토큰에는 '쓰기 전용' 스코프가 없어,
-> VPS 가 털리면 그 키로 원격 백업까지 지울 수 있다. 이게 없으면 오프사이트를 붙여도 랜섬웨어는 못 막는다.
-> 스크립트가 원격 보관정리를 하지 않는 것도 같은 이유다 — 수명주기는 R2 대시보드 규칙에 맡긴다.
+> **기존 백업 선반출을 잊지 말 것.** 스크립트는 *그 회차 산출물만* 올린다.
+> 이미 로컬에 있는 전체 아카이브를 먼저 올리지 않으면 원격엔 증분만 쌓여 **복원이 불가능**하다.
+> ```bash
+> CYCLE=$(cat ~/backups/uploads/current/CYCLE)
+> ~/bin/rclone copy ~/backups r2:temple-backups/db/ --include "temple_2*.sql.gz" --s3-no-check-bucket
+> ~/bin/rclone copy ~/backups/uploads/current r2:temple-backups/uploads/$CYCLE/ --exclude "*.snar" --s3-no-check-bucket
+> ```
 
 **Hostinger 일간 백업 애드온($6/월)은 사지 말 것.** off-host 이지 off-provider 가 아니다.
 결제 실패 시 서버와 백업이 동시에 정지 대상이 되고, 공식 문서상 스냅샷을 로컬로 내려받는 경로 자체가 없다.
