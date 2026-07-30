@@ -3,7 +3,7 @@
   min-height: 100vh;
   display: grid;
   place-items: center;
-  padding: 24px;
+  padding: var(--sp-xxl);
 }
 .login-card {
   width: 100%;
@@ -11,7 +11,7 @@
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--r-card);
-  padding: 32px 28px;
+  padding: var(--sp-xxxl) var(--sp-xxl);
   box-shadow: var(--sh-8);
 }
 .login-card h1 {
@@ -20,21 +20,21 @@
 .login-sub {
   color: var(--ink-soft);
   font-size:var(--fs-300);
-  margin: 4px 0 22px;
+  margin: var(--sp-xs) 0 var(--sp-xl);
 }
 .login-field {
   display: block;
-  margin-bottom: 16px;
+  margin-bottom: var(--sp-l);
 }
 .login-field span {
   display: block;
   font-size:var(--fs-300);
   font-weight: 600;
-  margin-bottom: 6px;
+  margin-bottom: var(--sp-snudge);
 }
 .login-field input {
   width: 100%;
-  padding: 11px 13px;
+  padding: var(--sp-m) var(--sp-m);
   font-size:var(--fs-400);
   /* 컨트롤 경계선 — WCAG 1.4.11 의 3:1 */
   border: 1px solid var(--n-stroke-acc);
@@ -54,14 +54,14 @@
 .login-submit {
   width: 100%;
   justify-content: center;
-  margin-top: 6px;
+  margin-top: var(--sp-snudge);
 }
 .login-err {
   background: #fbeae7;
   border: 1px solid #e6cfc9;
   color: var(--accent);
   font-size:var(--fs-300);
-  padding: 10px 12px;
+  padding: var(--sp-mnudge) var(--sp-m);
   border-radius: var(--r-drop);
-  margin-bottom: 18px;
+  margin-bottom: var(--sp-l);
 }
