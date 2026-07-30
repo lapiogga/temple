@@ -100,11 +100,11 @@
   border-radius: var(--r-circular);
 }
 .adm-badge.on {
-  background: #e6f2f0;
+  background: var(--sec-tint);
   color: var(--sec);
 }
 .adm-badge.off {
-  background: #f0ece3;
+  background: var(--n-bg-5);
   color: var(--n-fg-3);
 }
 .adm-th-actions,
@@ -229,8 +229,8 @@
   align-items: center;
 }
 .adm-form-err {
-  background: #fbeae7;
-  border: 1px solid #e6cfc9;
+  background: var(--danger-tint);
+  border: 1px solid var(--danger-150);
   color: var(--brand);
   font-size:var(--fs-300);
   padding: var(--sp-mnudge) var(--sp-m);
@@ -238,8 +238,8 @@
   margin-bottom: var(--sp-l);
 }
 .adm-form-ok {
-  background: #e6f2f0;
-  border: 1px solid #bfe0d9;
+  background: var(--sec-tint);
+  border: 1px solid var(--sec-tint-2);
   color: var(--sec);
   font-size:var(--fs-300);
   padding: var(--sp-mnudge) var(--sp-m);
@@ -281,18 +281,18 @@
 .ev-span { grid-column: 1 / -1; }
 .ev-radios { display: flex; gap: var(--sp-mnudge); flex-wrap: wrap; }
 .ev-radio { display: inline-flex; align-items: center; gap: var(--sp-snudge); padding: var(--sp-s) var(--sp-l); border: 1px solid var(--n-stroke-2); border-radius: var(--r-circular); background: var(--n-bg-2); font-size:var(--fs-300); font-weight: 600; cursor: pointer; white-space: nowrap; }
-.ev-radio.on { border-color: var(--brand); background: #fbeeea; color: var(--brand); }
+.ev-radio.on { border-color: var(--brand); background: var(--brand-tint); color: var(--brand); }
 .ev-radio input { accent-color: var(--brand); }
 .ev-lunar-row { display: flex; gap: var(--sp-s); }
 .ev-lunar-row select { flex: 1; }
-.ev-prev { padding: var(--sp-mnudge) var(--sp-m); background: #f0f6f4; border: 1px solid #cfe3de; border-radius: var(--r-drop); font-size:var(--fs-300); font-weight: 600; color: var(--sec); }
+.ev-prev { padding: var(--sp-mnudge) var(--sp-m); background: var(--sec-tint); border: 1px solid var(--sec-tint-2); border-radius: var(--r-drop); font-size:var(--fs-300); font-weight: 600; color: var(--sec); }
 @media (max-width: 900px) { .ev-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 620px) { .ev-grid { grid-template-columns: 1fr; } }
 
 /* 프레임 통일 — 관리 대메뉴 바(홈과 동일 톤) */
 .adm-mainnav { display: flex; gap: var(--sp-xs); align-items: center; }
 .adm-mainnav a { font-family: var(--font-title); font-size:var(--fs-400); font-weight: 700; color: var(--n-fg-1); padding: var(--sp-s) var(--sp-l); border-radius: var(--r-ctl); transition: var(--t-state);line-height:var(--lh-400);}
-.adm-mainnav a:hover { color: var(--brand); background: rgba(158, 59, 47, .06); }
+.adm-mainnav a:hover { color: var(--brand); background: var(--brand-tint); }
 .adm-mainnav a:active { color: var(--brand-pressed); background: var(--brand-tint); }
 .adm-screen .adm-h1 { margin-top: 0; }
 .top-admin { cursor: pointer; font-family: inherit; }

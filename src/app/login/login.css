@@ -57,8 +57,8 @@
   margin-top: var(--sp-snudge);
 }
 .login-err {
-  background: #fbeae7;
-  border: 1px solid #e6cfc9;
+  background: var(--danger-tint);
+  border: 1px solid var(--danger-150);
   color: var(--brand);
   font-size:var(--fs-300);
   padding: var(--sp-mnudge) var(--sp-m);
