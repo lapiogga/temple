@@ -9,14 +9,14 @@
   width: 100%;
   max-width: 380px;
   background: var(--n-bg-1);
-  border: 1px solid var(--n-stroke-2);
+  border: var(--st-thin) solid var(--n-stroke-2);
   border-radius: var(--r-card);
   padding: var(--sp-xxxl) var(--sp-xxl);
   box-shadow: var(--sh-8);
 }
 .login-card h1 {
   font-size:var(--fs-600);
-  font-weight: 700;line-height:var(--lh-600);}
+  font-weight: var(--fw-bold);line-height:var(--lh-600);}
 .login-sub {
   color: var(--n-fg-3);
   font-size:var(--fs-300);
@@ -29,7 +29,7 @@
 .login-field span {
   display: block;
   font-size:var(--fs-300);
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
   margin-bottom: var(--sp-snudge);
 }
 .login-field input {
@@ -37,7 +37,7 @@
   padding: var(--sp-m) var(--sp-m);
   font-size:var(--fs-400);
   /* 컨트롤 경계선 — WCAG 1.4.11 의 3:1 */
-  border: 1px solid var(--n-stroke-acc);
+  border: var(--st-thin) solid var(--n-stroke-acc);
   border-radius: var(--r-ctl);
   background: var(--n-bg-1);
   color: var(--n-fg-1);
@@ -58,7 +58,7 @@
 }
 .login-err {
   background: var(--danger-tint);
-  border: 1px solid var(--danger-150);
+  border: var(--st-thin) solid var(--danger-150);
   color: var(--brand);
   font-size:var(--fs-300);
   padding: var(--sp-mnudge) var(--sp-m);

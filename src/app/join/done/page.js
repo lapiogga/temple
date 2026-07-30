@@ -13,7 +13,7 @@ export default function JoinDone() {
       <section className="screen top">
         <div className="wrap" style={{ maxWidth: "620px", textAlign: "center" }}>
           <LotusMark size={90} opacity={0.5} />
-          <h2 style={{ fontFamily: "var(--font-title)", fontSize: "var(--fs-700)", lineHeight: "var(--lh-700)", fontWeight: 700, margin: "14px 0 14px" }}>
+          <h2 style={{ fontFamily: "var(--font-title)", fontSize: "var(--fs-700)", lineHeight: "var(--lh-700)", fontWeight: "var(--fw-bold)", margin: "14px 0 14px" }}>
             가입 신청이 완료되었습니다
           </h2>
           <p style={{ color: "var(--n-fg-3)", fontSize: "var(--fs-400)", lineHeight: "var(--lh-ko-400)" }}>

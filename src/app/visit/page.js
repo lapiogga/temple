@@ -25,7 +25,7 @@ export default async function VisitPage() {
                 <div><b>대중교통·주차</b>　{[v.transit, v.parking].filter(Boolean).join(" · ") || "안내 준비 중입니다."}</div>
                 <div style={{ marginTop: "6px" }}>
                   <a href={v.mapUrl} target="_blank" rel="noopener noreferrer"
-                    style={{ color: "var(--brand)", fontWeight: 600 }}>
+                    style={{ color: "var(--brand)", fontWeight: "var(--fw-semibold)" }}>
                     지도 앱에서 길찾기 →
                   </a>
                 </div>
