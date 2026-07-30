@@ -71,7 +71,7 @@ export default async function NoticeDetail({ params }) {
                     <img
                       src={n.cover_url}
                       alt={n.title}
-                      style={{ width: "100%", maxWidth: "560px", borderRadius: "var(--radius)", border: "1px solid var(--line)", marginBottom: "16px", display: "block" }}
+                      style={{ width: "100%", maxWidth: "560px", borderRadius: "var(--r-card)", border: "1px solid var(--line)", marginBottom: "16px", display: "block" }}
                     />
                   )}
                   <div className="rich-content" dangerouslySetInnerHTML={{ __html: n.body }} />

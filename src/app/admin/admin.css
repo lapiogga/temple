@@ -32,7 +32,7 @@
 .adm-card {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: var(--r-card);
   padding: 20px 22px;
 }
 .adm-card-n {
@@ -53,7 +53,7 @@
   color: var(--ink-soft);
   background: var(--surface);
   border: 1px dashed var(--line);
-  border-radius: var(--radius);
+  border-radius: var(--r-card);
   padding: 28px;
   text-align: center;
 }
@@ -61,7 +61,7 @@
   overflow-x: auto;
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: var(--r-card);
 }
 .adm-table {
   width: 100%;
@@ -97,7 +97,7 @@
   font-size:var(--fs-200);
   font-weight: 700;
   padding: 3px 9px;
-  border-radius: 999px;
+  border-radius: var(--r-circular);
 }
 .adm-badge.on {
   background: #e6f2f0;
@@ -122,7 +122,7 @@
 .adm-link-btn {
   background: none;
   border: 1px solid var(--line);
-  border-radius: 7px;
+  border-radius: var(--r-ctl);
   padding: 6px 10px;
   /* 클릭하는 컨트롤이므로 캡션(12px)이 아니라 body1(14px) */
   font-size:var(--fs-300);
@@ -167,7 +167,7 @@
   max-width: 640px;
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: var(--r-card);
   padding: 26px 26px 30px;
 }
 .adm-field {
@@ -234,7 +234,7 @@
   color: var(--accent);
   font-size:var(--fs-300);
   padding: 10px 12px;
-  border-radius: 10px;
+  border-radius: var(--r-drop);
   margin-bottom: 18px;
 }
 .adm-form-ok {
@@ -243,7 +243,7 @@
   color: var(--accent-2);
   font-size:var(--fs-300);
   padding: 10px 12px;
-  border-radius: 10px;
+  border-radius: var(--r-drop);
   margin-bottom: 18px;
 }
 
@@ -256,7 +256,7 @@
 .adm-photo {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: var(--r-card);
   overflow: hidden;
 }
 .adm-photo img {
@@ -280,18 +280,18 @@
 .ev-grid .adm-field { margin-bottom: 14px; }
 .ev-span { grid-column: 1 / -1; }
 .ev-radios { display: flex; gap: 10px; flex-wrap: wrap; }
-.ev-radio { display: inline-flex; align-items: center; gap: 7px; padding: 8px 18px; border: 1px solid var(--line); border-radius: 999px; background: var(--hanji); font-size:var(--fs-300); font-weight: 600; cursor: pointer; white-space: nowrap; }
+.ev-radio { display: inline-flex; align-items: center; gap: 7px; padding: 8px 18px; border: 1px solid var(--line); border-radius: var(--r-circular); background: var(--hanji); font-size:var(--fs-300); font-weight: 600; cursor: pointer; white-space: nowrap; }
 .ev-radio.on { border-color: var(--accent); background: #fbeeea; color: var(--accent); }
 .ev-radio input { accent-color: var(--accent); }
 .ev-lunar-row { display: flex; gap: 8px; }
 .ev-lunar-row select { flex: 1; }
-.ev-prev { padding: 10px 14px; background: #f0f6f4; border: 1px solid #cfe3de; border-radius: 10px; font-size:var(--fs-300); font-weight: 600; color: var(--accent-2); }
+.ev-prev { padding: 10px 14px; background: #f0f6f4; border: 1px solid #cfe3de; border-radius: var(--r-drop); font-size:var(--fs-300); font-weight: 600; color: var(--accent-2); }
 @media (max-width: 900px) { .ev-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 620px) { .ev-grid { grid-template-columns: 1fr; } }
 
 /* 프레임 통일 — 관리 대메뉴 바(홈과 동일 톤) */
 .adm-mainnav { display: flex; gap: 4px; align-items: center; }
-.adm-mainnav a { font-family: var(--font-title); font-size:var(--fs-400); font-weight: 700; color: var(--ink); padding: 8px 16px; border-radius: 8px; transition: .18s;line-height:var(--lh-400);}
+.adm-mainnav a { font-family: var(--font-title); font-size:var(--fs-400); font-weight: 700; color: var(--ink); padding: 8px 16px; border-radius: var(--r-ctl); transition: .18s;line-height:var(--lh-400);}
 .adm-mainnav a:hover { color: var(--accent); background: rgba(158, 59, 47, .06); }
 .adm-mainnav a:active { color: var(--brand-pressed); background: var(--brand-tint); }
 .adm-screen .adm-h1 { margin-top: 0; }
@@ -299,7 +299,7 @@
 
 /* 홈페이지 콘텐츠 편집 허브 */
 .site-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; max-width: 780px; }
-.site-card { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; text-decoration: none; transition: .2s; }
+.site-card { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 18px 20px; text-decoration: none; transition: .2s; }
 .site-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 14px 30px -24px rgba(35, 33, 30, .5); }
 .site-card-l { font-family: var(--font-title); font-weight: 700; font-size:var(--fs-400); color: var(--ink);line-height:var(--lh-400);}
 .site-card-go { font-size:var(--fs-300); font-weight: 700; color: var(--accent); white-space: nowrap; }
