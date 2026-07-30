@@ -20,7 +20,7 @@ export default async function MembersAdmin() {
   return (
     <section>
       <h1 className="adm-h1">회원 관리</h1>
-      <p style={{ color: "var(--ink-soft)", marginBottom: "16px" }}>
+      <p style={{ color: "var(--n-fg-3)", marginBottom: "16px" }}>
         승인 대기 <b>{pending}</b>명 · 전체 {members.length}명
       </p>
 

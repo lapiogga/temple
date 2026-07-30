@@ -41,7 +41,7 @@ export default async function GalleryPage({ searchParams }) {
           </div>
 
           {albums.length === 0 ? (
-            <p className="reveal" style={{ color: "var(--ink-soft)" }}>
+            <p className="reveal" style={{ color: "var(--n-fg-3)" }}>
               등록된 사진이 없습니다. 곧 도량의 모습을 담아 올리겠습니다.
             </p>
           ) : (

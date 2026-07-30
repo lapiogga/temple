@@ -58,7 +58,7 @@ export default async function QnaPage({ searchParams }) {
                     <td className="c-cat">
                       {q.answered
                         ? <span className="post-badge">답변완료</span>
-                        : <span style={{ color: "var(--ink-soft)", fontSize: "var(--fs-200)" }}>대기</span>}
+                        : <span style={{ color: "var(--n-fg-3)", fontSize: "var(--fs-200)" }}>대기</span>}
                     </td>
                     <td className="c-title">
                       <Link href={`/qna/${q.id}`}>

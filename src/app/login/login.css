@@ -8,8 +8,8 @@
 .login-card {
   width: 100%;
   max-width: 380px;
-  background: var(--surface);
-  border: 1px solid var(--line);
+  background: var(--n-bg-1);
+  border: 1px solid var(--n-stroke-2);
   border-radius: var(--r-card);
   padding: var(--sp-xxxl) var(--sp-xxl);
   box-shadow: var(--sh-8);
@@ -18,7 +18,7 @@
   font-size:var(--fs-600);
   font-weight: 700;line-height:var(--lh-600);}
 .login-sub {
-  color: var(--ink-soft);
+  color: var(--n-fg-3);
   font-size:var(--fs-300);
   margin: var(--sp-xs) 0 var(--sp-xl);
 }
@@ -39,8 +39,8 @@
   /* 컨트롤 경계선 — WCAG 1.4.11 의 3:1 */
   border: 1px solid var(--n-stroke-acc);
   border-radius: var(--r-ctl);
-  background: var(--surface);
-  color: var(--ink);
+  background: var(--n-bg-1);
+  color: var(--n-fg-1);
   transition: border-color var(--t-state), box-shadow var(--t-state);
 }
 .login-field input:hover {
@@ -59,7 +59,7 @@
 .login-err {
   background: #fbeae7;
   border: 1px solid #e6cfc9;
-  color: var(--accent);
+  color: var(--brand);
   font-size:var(--fs-300);
   padding: var(--sp-mnudge) var(--sp-m);
   border-radius: var(--r-drop);

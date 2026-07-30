@@ -16,7 +16,7 @@ export default async function QnaAdmin() {
   return (
     <section>
       <h1 className="adm-h1">묻고답하기 관리</h1>
-      <p style={{ color: "var(--ink-soft)", marginBottom: "16px" }}>
+      <p style={{ color: "var(--n-fg-3)", marginBottom: "16px" }}>
         미답변 <b>{unanswered}</b> · 전체 {qs.length}
       </p>
 
@@ -29,7 +29,7 @@ export default async function QnaAdmin() {
               <div className="adm-qna-head">
                 <div>
                   <b>{q.is_secret ? "🔒 " : ""}{q.title}</b>{" "}
-                  <span style={{ color: "var(--ink-soft)", fontSize: "var(--fs-300)" }}>
+                  <span style={{ color: "var(--n-fg-3)", fontSize: "var(--fs-300)" }}>
                     · {q.author_name} · {q.phone ?? ""} · {fmt(q.created_at)}
                   </span>
                 </div>

@@ -71,7 +71,7 @@ export default async function NoticeDetail({ params }) {
                     <img
                       src={n.cover_url}
                       alt={n.title}
-                      style={{ width: "100%", maxWidth: "560px", borderRadius: "var(--r-card)", border: "1px solid var(--line)", marginBottom: "16px", display: "block" }}
+                      style={{ width: "100%", maxWidth: "560px", borderRadius: "var(--r-card)", border: "1px solid var(--n-stroke-2)", marginBottom: "16px", display: "block" }}
                     />
                   )}
                   <div className="rich-content" dangerouslySetInnerHTML={{ __html: n.body }} />
@@ -79,7 +79,7 @@ export default async function NoticeDetail({ params }) {
               </tr>
               <tr>
                 <th scope="row">첨부자료</th>
-                <td><span style={{ color: "var(--ink-soft)" }}>첨부파일 없음</span></td>
+                <td><span style={{ color: "var(--n-fg-3)" }}>첨부파일 없음</span></td>
               </tr>
             </tbody>
           </table>

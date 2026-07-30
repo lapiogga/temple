@@ -16,7 +16,7 @@ export default function JoinDone() {
           <h2 style={{ fontFamily: "var(--font-title)", fontSize: "var(--fs-700)", lineHeight: "var(--lh-700)", fontWeight: 700, margin: "14px 0 14px" }}>
             가입 신청이 완료되었습니다
           </h2>
-          <p style={{ color: "var(--ink-soft)", fontSize: "var(--fs-400)", lineHeight: "var(--lh-ko-400)" }}>
+          <p style={{ color: "var(--n-fg-3)", fontSize: "var(--fs-400)", lineHeight: "var(--lh-ko-400)" }}>
             종무소 승인 후 로그인하여 이용하실 수 있습니다.<br />
             승인까지 다소 시간이 걸릴 수 있습니다.
           </p>

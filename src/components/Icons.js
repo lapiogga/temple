@@ -99,7 +99,7 @@ export function PinIcon({ size = 18 }) {
   );
 }
 
-export function PhotoIcon({ size = 60, stroke = "var(--line)" }) {
+export function PhotoIcon({ size = 60, stroke = "var(--n-stroke-2)" }) {
   return (
     <svg width={size} height={size * 0.8} viewBox="0 0 24 24" fill="none" stroke={stroke}
       strokeWidth="1.4" aria-hidden="true">

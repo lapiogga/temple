@@ -31,7 +31,7 @@ export default function SecretGate({ action }) {
 
   return (
     <div className="auth-card">
-      <p style={{ marginBottom: "14px", color: "var(--ink-soft)" }}>🔒 비밀글입니다. 열람 비밀번호를 입력하세요.</p>
+      <p style={{ marginBottom: "14px", color: "var(--n-fg-3)" }}>🔒 비밀글입니다. 열람 비밀번호를 입력하세요.</p>
       {state?.error ? <p className="adm-form-err" role="alert">{state.error}</p> : null}
       <form action={formAction}>
         <label className="auth-field"><span>비밀번호</span>

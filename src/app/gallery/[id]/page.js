@@ -57,7 +57,7 @@ export default async function AlbumPage({ params }) {
           </div>
 
           {photos.length === 0 ? (
-            <p className="reveal" style={{ color: "var(--ink-soft)" }}>등록된 사진이 없습니다.</p>
+            <p className="reveal" style={{ color: "var(--n-fg-3)" }}>등록된 사진이 없습니다.</p>
           ) : (
             <div className="photo-grid">
               {photos.map((p) => (

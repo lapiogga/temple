@@ -67,7 +67,7 @@ export default async function PostDetail({ params }) {
               </tr>
               <tr>
                 <th scope="row">첨부자료</th>
-                <td><span style={{ color: "var(--ink-soft)" }}>첨부파일 없음</span></td>
+                <td><span style={{ color: "var(--n-fg-3)" }}>첨부파일 없음</span></td>
               </tr>
             </tbody>
           </table>

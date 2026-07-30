@@ -168,7 +168,7 @@ export default async function EventsPage({ searchParams }) {
               <p className="cal-legend">
                 <span className="lg-dot ev" /> 행사
                 <span className="lg-dot reg" /> 정기법회(반복)
-                <span style={{ color: "var(--ink-soft)" }}>· 날짜 아래 작은 숫자는 음력</span>
+                <span style={{ color: "var(--n-fg-3)" }}>· 날짜 아래 작은 숫자는 음력</span>
               </p>
             </div>
           ) : (
@@ -197,7 +197,7 @@ export default async function EventsPage({ searchParams }) {
                 <LanternIcon size={20} /> 정기 법회
               </h3>
               {regular.length === 0 ? (
-                <p style={{ color: "var(--ink-soft)", fontSize: "var(--fs-300)" }}>정기 법회 안내는 준비 중입니다.</p>
+                <p style={{ color: "var(--n-fg-3)", fontSize: "var(--fs-300)" }}>정기 법회 안내는 준비 중입니다.</p>
               ) : (
                 <ul className="plist">
                   {regular.map((r) => (

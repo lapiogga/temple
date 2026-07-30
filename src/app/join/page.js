@@ -17,7 +17,7 @@ export default function JoinPage() {
         <div className="wrap wide">
           <div className="sec-head" style={{ marginBottom: "6px" }}>
             <div><div className="ki">Join</div><h2>회원가입</h2></div>
-            <span style={{ color: "var(--ink-soft)", fontSize: "var(--fs-300)" }}>
+            <span style={{ color: "var(--n-fg-3)", fontSize: "var(--fs-300)" }}>
               가입 신청 후 <b>종무소 승인</b>을 거쳐 이용하실 수 있습니다.
             </span>
           </div>

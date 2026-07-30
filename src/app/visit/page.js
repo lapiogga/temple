@@ -25,7 +25,7 @@ export default async function VisitPage() {
                 <div><b>대중교통·주차</b>　{[v.transit, v.parking].filter(Boolean).join(" · ") || "안내 준비 중입니다."}</div>
                 <div style={{ marginTop: "6px" }}>
                   <a href={v.mapUrl} target="_blank" rel="noopener noreferrer"
-                    style={{ color: "var(--accent)", fontWeight: 600 }}>
+                    style={{ color: "var(--brand)", fontWeight: 600 }}>
                     지도 앱에서 길찾기 →
                   </a>
                 </div>
@@ -33,12 +33,12 @@ export default async function VisitPage() {
             </div>
             <div className="donate">
               <div className="sec-head"><div><div className="ki">Donation</div><h2 style={{ fontSize: "var(--fs-600)", lineHeight: "var(--lh-600)" }}>후원 안내</h2></div></div>
-              <p style={{ fontSize: "var(--fs-300)", color: "var(--ink-soft)" }}>
+              <p style={{ fontSize: "var(--fs-300)", color: "var(--n-fg-3)" }}>
                 여러분의 정성은 도량을 가꾸고 이웃과 나누는 데 쓰입니다.
               </p>
               {v.donation ? (
                 <div className="acct">
-                  <div style={{ color: "var(--ink-soft)", fontSize: "var(--fs-200)", marginBottom: "2px" }}>후원 계좌</div>
+                  <div style={{ color: "var(--n-fg-3)", fontSize: "var(--fs-200)", marginBottom: "2px" }}>후원 계좌</div>
                   <b>{v.donation.bank} {v.donation.account}</b><br />예금주 : {v.donation.holder}
                 </div>
               ) : (

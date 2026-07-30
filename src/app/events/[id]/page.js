@@ -111,7 +111,7 @@ export default async function EventDetail({ params }) {
                       ))}
                     </ul>
                   ) : (
-                    <span style={{ color: "var(--ink-soft)" }}>첨부파일 없음</span>
+                    <span style={{ color: "var(--n-fg-3)" }}>첨부파일 없음</span>
                   )}
                 </td>
               </tr>

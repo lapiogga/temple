@@ -51,7 +51,7 @@ export default async function ManageAlbum({ params }) {
         </div>
       )}
 
-      <div style={{ marginTop: "34px", borderTop: "1px solid var(--line)", paddingTop: "20px" }}>
+      <div style={{ marginTop: "34px", borderTop: "1px solid var(--n-stroke-2)", paddingTop: "20px" }}>
         <DeleteAlbumButton id={id} title={album.title} />
       </div>
     </section>
