@@ -7,7 +7,7 @@ export default async function AdminSite() {
   return (
     <section>
       <h1 className="adm-h1">홈페이지 콘텐츠</h1>
-      <p style={{ color: "var(--ink-soft)", fontSize: "14.5px", marginBottom: "18px" }}>
+      <p style={{ color: "var(--ink-soft)", fontSize: "var(--fs-300)", marginBottom: "18px" }}>
         홈페이지 각 영역의 문구·이미지를 수정합니다. 저장하면 공개 화면에 바로 반영됩니다.
       </p>
       <div className="site-cards">

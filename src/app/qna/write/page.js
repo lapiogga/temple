@@ -18,7 +18,7 @@ export default function QnaWrite() {
           <div className="sec-head">
             <div><div className="ki">Q&amp;A</div><h2>묻고답하기</h2></div>
           </div>
-          <p style={{ color: "var(--ink-soft)", marginBottom: "18px", fontSize: "16px" }}>
+          <p style={{ color: "var(--ink-soft)", marginBottom: "18px", fontSize: "var(--fs-400)" }}>
             휴대폰 본인인증 후 누구나 질문을 남길 수 있습니다. 비밀글은 작성자와 관리자만 열람합니다.
           </p>
           <QnaWriteForm action={createQuestionAction} />

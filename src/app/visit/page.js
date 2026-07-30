@@ -32,13 +32,13 @@ export default async function VisitPage() {
               </div>
             </div>
             <div className="donate">
-              <div className="sec-head"><div><div className="ki">Donation</div><h2 style={{ fontSize: "24px" }}>후원 안내</h2></div></div>
-              <p style={{ fontSize: "14.5px", color: "var(--ink-soft)" }}>
+              <div className="sec-head"><div><div className="ki">Donation</div><h2 style={{ fontSize: "var(--fs-600)", lineHeight: "var(--lh-600)" }}>후원 안내</h2></div></div>
+              <p style={{ fontSize: "var(--fs-300)", color: "var(--ink-soft)" }}>
                 여러분의 정성은 도량을 가꾸고 이웃과 나누는 데 쓰입니다.
               </p>
               {v.donation ? (
                 <div className="acct">
-                  <div style={{ color: "var(--ink-soft)", fontSize: "13px", marginBottom: "2px" }}>후원 계좌</div>
+                  <div style={{ color: "var(--ink-soft)", fontSize: "var(--fs-200)", marginBottom: "2px" }}>후원 계좌</div>
                   <b>{v.donation.bank} {v.donation.account}</b><br />예금주 : {v.donation.holder}
                 </div>
               ) : (

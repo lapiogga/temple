@@ -32,10 +32,10 @@ export default async function EditEvent({ params }) {
 
       <EventForm action={bound} initial={e} submitLabel="저장" />
 
-      <h2 className="adm-h1" style={{ fontSize: "20px", marginTop: "30px" }}>첨부파일 추가</h2>
+      <h2 className="adm-h1" style={{ fontSize: "var(--fs-500)", lineHeight: "var(--lh-500)", marginTop: "30px" }}>첨부파일 추가</h2>
       <AttachmentUpload eventId={id} />
 
-      <h2 className="adm-h1" style={{ fontSize: "20px", marginTop: "30px" }}>
+      <h2 className="adm-h1" style={{ fontSize: "var(--fs-500)", lineHeight: "var(--lh-500)", marginTop: "30px" }}>
         첨부 {attachments.length}개
       </h2>
       {attachments.length === 0 ? (

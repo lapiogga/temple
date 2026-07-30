@@ -26,10 +26,10 @@ export default async function ManageAlbum({ params }) {
 
       <AlbumForm action={updateBound} initial={album} submitLabel="앨범 정보 저장" />
 
-      <h2 className="adm-h1" style={{ fontSize: "20px", marginTop: "30px" }}>사진 추가</h2>
+      <h2 className="adm-h1" style={{ fontSize: "var(--fs-500)", lineHeight: "var(--lh-500)", marginTop: "30px" }}>사진 추가</h2>
       <PhotoUpload albumId={id} />
 
-      <h2 className="adm-h1" style={{ fontSize: "20px", marginTop: "30px" }}>
+      <h2 className="adm-h1" style={{ fontSize: "var(--fs-500)", lineHeight: "var(--lh-500)", marginTop: "30px" }}>
         사진 {photos.length}장
       </h2>
       {photos.length === 0 ? (

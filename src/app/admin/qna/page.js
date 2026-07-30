@@ -29,7 +29,7 @@ export default async function QnaAdmin() {
               <div className="adm-qna-head">
                 <div>
                   <b>{q.is_secret ? "🔒 " : ""}{q.title}</b>{" "}
-                  <span style={{ color: "var(--ink-soft)", fontSize: "13.5px" }}>
+                  <span style={{ color: "var(--ink-soft)", fontSize: "var(--fs-300)" }}>
                     · {q.author_name} · {q.phone ?? ""} · {fmt(q.created_at)}
                   </span>
                 </div>

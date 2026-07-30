@@ -193,11 +193,11 @@ export default async function EventsPage({ searchParams }) {
             </div>
 
             <aside className="reg-panel">
-              <h3 style={{ fontFamily: "var(--font-title)", fontSize: "17px", fontWeight: 700, marginBottom: "8px", display: "flex", alignItems: "center", gap: "8px" }}>
+              <h3 style={{ fontFamily: "var(--font-title)", fontSize: "var(--fs-400)", lineHeight: "var(--lh-400)", fontWeight: 700, marginBottom: "8px", display: "flex", alignItems: "center", gap: "8px" }}>
                 <LanternIcon size={20} /> 정기 법회
               </h3>
               {regular.length === 0 ? (
-                <p style={{ color: "var(--ink-soft)", fontSize: "15px" }}>정기 법회 안내는 준비 중입니다.</p>
+                <p style={{ color: "var(--ink-soft)", fontSize: "var(--fs-300)" }}>정기 법회 안내는 준비 중입니다.</p>
               ) : (
                 <ul className="plist">
                   {regular.map((r) => (
