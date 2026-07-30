@@ -13,6 +13,10 @@ const MENU = [
       { href: "/about/history", label: "연혁" },
       { href: "/about/sansindo", label: "산신도" },
       { href: "/about/guide", label: "안내도" },
+      { href: "/about/teaching", label: "법문-살며 생각하며" },
+      { href: "/about/hyusim-tapjeon", label: "휴심선원(탑전)" },
+      { href: "/about/hyusim-jirisan", label: "휴심선원(지리산 휴심)" },
+      // 길 안내는 소개 성격이 아니라 실무 정보라 소메뉴 맨 아래에 둔다
       { href: "/visit", label: "오시는 길" },
     ],
   },
