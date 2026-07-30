@@ -33,6 +33,9 @@
 .adm-nav a:hover {
   color: var(--accent);
 }
+.adm-nav a:active {
+  color: var(--brand-pressed);
+}
 .adm-user {
   display: flex;
   align-items: center;
@@ -54,6 +57,11 @@
 .adm-logout:hover {
   border-color: var(--accent);
   color: var(--accent);
+}
+.adm-logout:active {
+  border-color: var(--brand-pressed);
+  color: var(--brand-pressed);
+  background: var(--brand-tint);
 }
 .adm-main {
   padding-top: 28px;
@@ -189,9 +197,31 @@
   border-color: var(--accent);
   color: var(--accent);
 }
+.adm-link-btn:active {
+  border-color: var(--brand-pressed);
+  color: var(--brand-pressed);
+  background: var(--brand-tint);
+}
+.adm-link-btn:disabled {
+  color: var(--n-fg-disabled);
+  border-color: var(--n-stroke-disabled);
+  background: var(--n-bg-disabled);
+  cursor: not-allowed;
+}
+/* 파괴적 동작은 브랜드색에서 분리한다 — 기존 #b23b2c 는 석간주와
+   OKLCH 거리 0.04 로 사실상 같은 색이어서 삭제가 주 동작처럼 보였다. */
+.adm-link-btn.danger {
+  color: var(--danger);
+}
 .adm-link-btn.danger:hover {
-  border-color: #b23b2c;
-  color: #b23b2c;
+  border-color: var(--danger);
+  color: var(--danger-hover);
+  background: var(--danger-tint);
+}
+.adm-link-btn.danger:active {
+  border-color: var(--danger-hover);
+  color: var(--danger-hover);
+  background: var(--danger-150);
 }
 
 /* 폼 */
@@ -219,20 +249,29 @@
   padding: 11px 13px;
   font-size: 15px;
   font-family: inherit;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--hanji);
+  /* 컨트롤 경계선 — WCAG 1.4.11 의 3:1. 기존 --line 은 1.20:1 로 미달이었다. */
+  border: 1px solid var(--n-stroke-acc);
+  border-radius: var(--r-ctl);
+  background: var(--surface);
   color: var(--ink);
+  transition: border-color var(--t-state), box-shadow var(--t-state);
 }
 .adm-field textarea {
   resize: vertical;
   line-height: 1.7;
 }
+.adm-field input:hover,
+.adm-field select:hover,
+.adm-field textarea:hover {
+  border-color: var(--n-stroke-acc-hover);
+}
+/* Fluent 입력 포커스 = 브랜드색 밑선. 포커스 링은 globals.css 의
+   *:focus-visible 이 담당하므로 여기서 outline 을 잡지 않는다. */
 .adm-field input:focus,
 .adm-field select:focus,
 .adm-field textarea:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
+  border-color: var(--brand);
+  box-shadow: inset 0 -2px 0 0 var(--brand);
 }
 .adm-checks {
   display: flex;
@@ -315,6 +354,7 @@
 .adm-mainnav { display: flex; gap: 4px; align-items: center; }
 .adm-mainnav a { font-family: var(--font-title); font-size: 16px; font-weight: 700; color: var(--ink); padding: 8px 16px; border-radius: 8px; transition: .18s; }
 .adm-mainnav a:hover { color: var(--accent); background: rgba(158, 59, 47, .06); }
+.adm-mainnav a:active { color: var(--brand-pressed); background: var(--brand-tint); }
 .adm-screen .adm-h1 { margin-top: 0; }
 .top-admin { cursor: pointer; font-family: inherit; }
 

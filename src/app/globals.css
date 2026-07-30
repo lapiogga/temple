@@ -539,8 +539,11 @@ footer.site{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--s
 .auth-card.auth-wide{max-width:560px;}
 .auth-field{display:block;margin-bottom:16px;}
 .auth-field > span{display:block;font-size:14px;font-weight:600;margin-bottom:4px;}
-.auth-field input,.auth-field select{width:100%;padding:8px 12px;font-size:15px;font-family:inherit;border:1px solid var(--line);border-radius:9px;background:var(--hanji);color:var(--ink);}
-.auth-field input:focus,.auth-field select:focus{outline:2px solid var(--accent);outline-offset:1px;}
+.auth-field input,.auth-field select{width:100%;padding:8px 12px;font-size:15px;font-family:inherit;border:1px solid var(--n-stroke-acc);border-radius:var(--r-ctl);background:var(--surface);color:var(--ink);transition:border-color var(--t-state),box-shadow var(--t-state);}
+.auth-field input:hover,.auth-field select:hover{border-color:var(--n-stroke-acc-hover);}
+/* Fluent 입력 포커스 = 브랜드색 밑선. 포커스 링은 아래 *:focus-visible 이 담당하므로
+   여기서 outline 을 잡지 않는다(잡으면 특이도가 높아 링을 덮어버린다). */
+.auth-field input:focus,.auth-field select:focus{border-color:var(--brand);box-shadow:inset 0 -2px 0 0 var(--brand);}
 .auth-actions{display:flex;gap:12px;align-items:center;margin-top:10px;}
 .agree-box{display:flex;flex-direction:column;gap:16px;margin-bottom:20px;}
 .agree-row{display:flex;gap:10px;align-items:flex-start;font-size:15.5px;padding:6px 0;}
@@ -644,8 +647,119 @@ footer.site{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--s
 .qna-noanswer{color:var(--ink-soft);font-size:15.5px;padding:18px 20px;background:var(--hanji);border:1px dashed var(--line);border-top:0;border-radius:0 0 10px 10px;}
 .detail-body .rich-content{font-size:16px;}
 .detail-body .rich-content p:last-child{margin-bottom:0;}
-.qna-textarea{width:100%;padding:13px 14px;font-size:16.5px;font-family:inherit;border:1px solid var(--line);border-radius:10px;background:var(--hanji);color:var(--ink);line-height:1.7;resize:vertical;}
-.qna-textarea:focus{outline:2px solid var(--accent);outline-offset:1px;}
+.qna-textarea{width:100%;padding:13px 14px;font-size:16.5px;font-family:inherit;border:1px solid var(--n-stroke-acc);border-radius:var(--r-ctl);background:var(--surface);color:var(--ink);line-height:1.7;resize:vertical;transition:border-color var(--t-state),box-shadow var(--t-state);}
+.qna-textarea:hover{border-color:var(--n-stroke-acc-hover);}
+.qna-textarea:focus{border-color:var(--brand);box-shadow:inset 0 -2px 0 0 var(--brand);}
 .adm-qna-item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;}
 .adm-qna-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;}
 .adm-qna-body{white-space:pre-line;color:var(--ink);font-size:15.5px;line-height:1.7;padding:10px 0;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line);margin-bottom:12px;}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   상호작용 상태 — Fluent 2 의 6상태 규약
+   (rest · hover · pressed · selected · disabled · focus)
+
+   이 블록 도입 전 실측: :focus-visible 0건 · :active 0건 · :disabled 0건.
+   버튼·대메뉴·페이저·탭·캐러셀 도트를 키보드로 이동하면 위치가 보이지 않았다 (WCAG 2.4.7).
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 포커스 인디케이터 ──
+   먹색 2px 링 + 2px 오프셋. 오프셋 틈으로 배경이 드러나 링이 요소에서 떨어져 보인다.
+   한지(#fefaf2) 위 15.4:1, 석간주 버튼 주변도 페이지 배경 기준이라 동일하게 확보된다.
+   :focus 가 아니라 :focus-visible 이므로 마우스 클릭에는 뜨지 않는다.
+   특이도를 0,1,0 으로 낮게 유지하고, 개별 컨트롤의 :focus 규칙에서는
+   outline 을 잡지 않는 것으로 충돌을 피한다. */
+*:focus-visible{
+  outline:var(--st-thick) solid var(--focus-outer);
+  outline-offset:var(--st-thick);
+}
+/* overflow:hidden / 스크롤 컨테이너 안에서는 바깥 오프셋 링이 잘리므로 안쪽으로 그린다 */
+.ncard :focus-visible,.gal-card :focus-visible,.photo-grid :focus-visible,
+.hero-cx :focus-visible,.cal-scroll :focus-visible,.adm-table-wrap :focus-visible,
+.adm-photo :focus-visible,.screen-scroll :focus-visible,.guide-map :focus-visible,
+.treasure-detail :focus-visible,.agree-scroll-box :focus-visible{
+  outline-offset:calc(-1 * var(--st-thick));
+}
+
+/* ── 버튼 ── */
+.btn-primary:active{background:var(--brand-pressed);filter:none;transform:none;box-shadow:none;}
+.btn-ghost:active{border-color:var(--brand-pressed);color:var(--brand-pressed);transform:none;}
+.btn:disabled,.btn[aria-disabled="true"]{
+  background:var(--n-bg-disabled);color:var(--n-fg-disabled);border-color:var(--n-stroke-disabled);
+  cursor:not-allowed;transform:none;box-shadow:none;filter:none;
+}
+
+/* ── 상단바 ── */
+.top-login:active{background:var(--brand-pressed);filter:none;}
+.top-link:active{background:var(--brand-tint-2);color:var(--brand-pressed);}
+.top-admin:active{border-color:var(--sec-pressed);color:var(--sec-pressed);}
+
+/* ── 대메뉴 ──
+   기존에는 onMouseEnter 로만 열려 키보드로 하위 항목에 도달하는 경로가 불안정했다. */
+.gnb-group:focus-within .gnb-sub{display:flex;}
+.gnb-top:active{color:var(--brand-pressed);}
+.gnb-sub a:active{background:var(--n-bg-3-pressed);color:var(--brand-pressed);}
+
+/* ── 페이저 ── */
+.pg-num:active,.pg-arrow:active{background:var(--brand-tint-2);border-color:var(--brand-pressed);color:var(--brand-pressed);}
+
+/* ── 탭 · 토글 ── */
+.post-tabs a:active,.view-toggle a:active{background:var(--brand-tint-2);color:var(--brand-pressed);}
+.find-tab:active{background:var(--brand-tint-2);border-color:var(--brand-pressed);color:var(--brand-pressed);}
+
+/* ── 목록 행 ── */
+.list-table tbody tr:active{background:var(--n-bg-2-pressed);}
+.post-list a:active .p-title{color:var(--brand-pressed);}
+.mini-table tr:active td.t a,.mini-list li a:active .t{color:var(--brand-pressed);}
+
+/* ── 카드 ── */
+.ncard:active,.gal-card:active,.hcard:active,.hfade:active,.site-card:active{
+  transform:none;box-shadow:var(--sh-card);
+}
+
+/* ── 캘린더 ── */
+.cal-nav a:active{background:var(--n-bg-3-pressed);color:var(--brand-pressed);}
+.cal-ev:active{filter:none;background:var(--brand-tint-2);}
+
+/* 관리자 화면의 상태 규칙은 admin.css 에 둔다 (rest·hover 가 거기 있다) */
+
+/* ── 라디오 ── */
+.ev-radio:active{border-color:var(--brand-pressed);background:var(--brand-tint-2);}
+
+/* ── 폼 컨트롤 비활성 ──
+   WCAG 1.4.3 은 비활성 컨트롤의 대비를 면제하지만, 비활성임이 보이긴 해야 한다. */
+input:disabled,select:disabled,textarea:disabled{
+  background:var(--n-bg-disabled);color:var(--n-fg-disabled);
+  border-color:var(--n-stroke-disabled);cursor:not-allowed;box-shadow:none;
+}
+input:disabled::placeholder,textarea:disabled::placeholder{color:var(--n-fg-disabled);}
+.agree-row input:disabled,.adm-check-row input:disabled{cursor:not-allowed;}
+
+/* ── 캐러셀 도트: 히트 영역 24×24px 확보 (WCAG 2.5.8)
+   시각 크기는 9px 그대로 두고 투명한 확장 영역만 얹는다. ── */
+.hcx-dots button{position:relative;}
+.hcx-dots button::after{
+  content:"";position:absolute;left:50%;top:50%;
+  width:24px;height:24px;transform:translate(-50%,-50%);
+}
+.hcx-dots button:active{transform:scale(1.05);}
+
+/* ── 캘린더 일정 종류를 색만으로 구분하지 않는다 (WCAG 1.4.1)
+   행사는 채운 원, 정기법회는 빈 원(고리). 5~6px 에서도 채움/비움은 구별되므로
+   색각 이상에서도 종류가 읽힌다. ── */
+.cal-ev::before{
+  content:"";display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:currentColor;margin-right:5px;vertical-align:middle;flex:none;
+}
+.cal-ev.reg::before{background:transparent;box-shadow:inset 0 0 0 2px currentColor;}
+
+/* ── 모션 저감 요청 시 ──
+   기존에는 .reveal 과 스크롤에만 대응돼 있었다. 카드 부양·캐러셀·배경 페이드·
+   드롭다운·상태 전환을 모두 포함한다. ── */
+@media(prefers-reduced-motion:reduce){
+  .hcx-track{transition:none;}
+  .hero-bg-img{transition:none;}
+  .ncard,.gal-card,.hcard,.hfade,.site-card{transition:none;}
+  .ncard:hover,.gal-card:hover,.hcard:hover,.hfade:hover,.site-card:hover{transform:none;}
+  .btn-primary:hover,.btn-ghost:hover{transform:none;}
+  .hcx-dots button,.hcx-dots button.on{transition:none;}
+}
