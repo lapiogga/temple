@@ -5,12 +5,126 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ══════════════════════════════════════════════════════════════════════════
+   디자인 토큰 — Microsoft Fluent 2 Web 의 척도 체계를 단청 팔레트에 이식.
+
+   · 색은 유지한다. 램프는 Fluent brandWeb 의 OKLCH 명도차·채도비 곡선을
+     석간주·뇌록·금의 색상각에 적용해 생성했고, 80 단계는 기존 색과 같은 hex 다.
+   · 원본 토큰 값 출처: npm @fluentui/tokens@1.0.0-alpha.23
+     (Figma 의 Fluent 2 Web 킷이 생성되는 소스와 동일)
+   · 자세한 근거와 BEFORE/AFTER 비교: design/reference/Fluent2_구조시안.html
+   ══════════════════════════════════════════════════════════════════════════ */
 :root{
-  --ink:#23211E; --ink-soft:#6B6258; --hanji:#FAF6EE; --surface:#FFFFFF;
-  --line:#E7DECF; --accent:#9E3B2F; --accent-2:#2E7D74; --gold:#C8A24B;
+  /* ── 석간주 램프 (brand) · 앵커 80 = 기존 --accent ── */
+  --seok-10:#190806; --seok-20:#2a0f0b; --seok-30:#3a1611; --seok-40:#4c1f19;
+  --seok-50:#60261e; --seok-60:#742e25; --seok-70:#873329; --seok-80:#9e3b2f;
+  --seok-90:#be5243; --seok-100:#d66a5b; --seok-110:#da7d6f; --seok-120:#df8d80;
+  --seok-130:#e5a297; --seok-140:#e8b9b1; --seok-150:#ebcdc8; --seok-160:#eee3e0;
+
+  /* ── 뇌록 램프 (secondary) · 앵커 80 = 기존 --accent-2 ── */
+  --noe-10:#0e1b19; --noe-20:#142826; --noe-30:#1a3531; --noe-40:#21433e;
+  --noe-50:#25514b; --noe-60:#2a6059; --noe-70:#2a6d65; --noe-80:#2e7d74;
+  --noe-90:#44978d; --noe-100:#60aea4; --noe-110:#77b8af; --noe-120:#8bc2ba;
+  --noe-130:#a4d0c9; --noe-140:#c0ded9; --noe-150:#d8eae7; --noe-160:#f1f8f7;
+
+  /* ── 금 램프 (장식 스트로크 전용) · 앵커 80 = 기존 --gold
+        밝은 단계는 이 색상각에서 sRGB 색역을 벗어나 축약했다.
+        흰 글씨 대비 2.41 이라 버튼 배경으로는 쓰지 않는다. ── */
+  --gold-40:#806e47; --gold-50:#927b49; --gold-60:#a4884c; --gold-70:#b4944a;
+  --gold-80:#c8a24b; --gold-90:#e6bc5f; --gold-100:#fed57c;
+
+  /* ── 위험 램프 (danger) · 신설
+        기존 삭제 버튼색 #b23b2c 는 석간주 80 과 OKLCH 거리 0.04 로 사실상
+        같은 색이었다. 색상각을 12° 틀고 채도를 1.35배 올려 분리한다. ── */
+  --danger-50:#6b1622; --danger-60:#811a2b; --danger-70:#961830;
+  --danger-80:#af1937; --danger-90:#d2354b; --danger-150:#f2c9ca; --danger-160:#f1e2e0;
+
+  /* ── 중성 램프 — Fluent 중성 계단을 한지 색상각(H 84.6°)으로 이식 ── */
+  --n-bg-1:#ffffff; --n-bg-1-hover:#f9f5ed; --n-bg-1-pressed:#e4e0d8; --n-bg-1-selected:#efebe3;
+  --n-bg-2:#fefaf2; --n-bg-2-hover:#f4f0e8; --n-bg-2-pressed:#dfdbd3; --n-bg-2-selected:#eae6de;
+  --n-bg-3:#f9f5ed; --n-bg-3-hover:#efebe3; --n-bg-3-pressed:#dad6ce; --n-bg-3-selected:#e4e0d8;
+  --n-bg-4:#f4f0e8; --n-bg-5:#efebe3; --n-bg-6:#eae6de;
+  --n-fg-1:#23211e;   /* 본문 · 16.06:1 on 흰색 */
+  --n-fg-2:#44423e;   /* 강조 보조 · 10.03:1 */
+  --n-fg-3:#63615d;   /* 보조 · 6.18:1 */
+  --n-fg-4:#73706a;   /* 약한 보조 · 4.94:1 — AA 하한이므로 본문에 쓰지 않는다 */
+  --n-stroke-1:#d4d1c9; --n-stroke-2:#e4e0d8; --n-stroke-3:#f4f0e8;  /* 장식 구분선 */
+  /* 컨트롤 경계선 — Fluent colorNeutralStrokeAccessible 대응.
+     입력 필드 테두리는 그 컨트롤을 식별하는 요소라 WCAG 1.4.11 의 3:1 이 필요하다.
+     기존 --line(#E7DECF) 은 한지 위 1.20:1 로 위반이었다. */
+  --n-stroke-acc:#63615d; --n-stroke-acc-hover:#44423e; --n-stroke-acc-pressed:#23211e;
+  --n-fg-disabled:#c0bdb5; --n-bg-disabled:#f4f0e8; --n-stroke-disabled:#e4e0d8;
+
+  /* ── 의미 별칭 (상태 6종) ── */
+  --brand:var(--seok-80); --brand-hover:var(--seok-70); --brand-pressed:var(--seok-60);
+  --brand-selected:var(--seok-50); --brand-tint:var(--seok-160); --brand-tint-2:var(--seok-150);
+  --sec:var(--noe-80); --sec-hover:var(--noe-70); --sec-pressed:var(--noe-60);
+  --sec-tint:var(--noe-160); --sec-tint-2:var(--noe-150);
+  --danger:var(--danger-80); --danger-hover:var(--danger-70); --danger-tint:var(--danger-160);
+
+  /* ── 포커스 인디케이터 (Fluent 2 방식: 밝은 안쪽 선 + 어두운 바깥쪽 선)
+        한지 배경과 흰 서피스 양쪽에서 모두 보이도록 2겹으로 쓴다. ── */
+  --focus-inner:#ffffff; --focus-outer:#23211e; --focus-w:2px;
+
+  /* ── 타입 램프 (Fluent 단계 + 한글용 행간 보정) ── */
+  --fs-100:10px;  --lh-100:16px;   /* caption2 */
+  --fs-200:12px;  --lh-200:18px;   /* caption1 — 라틴 16 → 한글 18 */
+  --fs-300:14px;  --lh-300:22px;   /* body1    — 라틴 20 → 한글 22 */
+  --fs-400:16px;  --lh-400:26px;   /* body2    — 라틴 22 → 한글 26 (본문) */
+  --fs-500:20px;  --lh-500:30px;   /* subtitle1 */
+  --fs-600:24px;  --lh-600:34px;   /* title3 */
+  --fs-700:28px;  --lh-700:38px;   /* title2 */
+  --fs-800:32px;  --lh-800:42px;   /* title1 */
+  --fs-900:40px;  --lh-900:54px;   /* largeTitle */
+  --fw-regular:400; --fw-medium:500; --fw-semibold:600; --fw-bold:700;
+
+  /* ── 간격 램프 (Fluent spacing) ── */
+  --sp-xxs:2px; --sp-xs:4px; --sp-snudge:6px; --sp-s:8px; --sp-mnudge:10px;
+  --sp-m:12px; --sp-l:16px; --sp-xl:20px; --sp-xxl:24px; --sp-xxxl:32px;
+
+  /* ── 모서리 램프 (Fluent borderRadius) ── */
+  --r-none:0; --r-sm:2px; --r-md:4px; --r-lg:6px; --r-xl:8px;
+  --r-2xl:12px; --r-3xl:16px; --r-4xl:24px; --r-circular:10000px;
+  /* 요소별 위계: 컨트롤 < 드롭다운 < 카드 */
+  --r-ctl:var(--r-md);    /* 입력 · 작은 버튼 4px */
+  --r-drop:var(--r-xl);   /* 드롭다운 · 시트 8px */
+  --r-card:var(--r-2xl);  /* 카드 · 패널 12px */
+
+  /* ── 스트로크 (Fluent strokeWidth) ── */
+  --st-thin:1px; --st-thick:2px; --st-thicker:3px; --st-thickest:4px;
+
+  /* ── 엘리베이션 (Fluent 2겹: ambient + key) · 그림자색은 먹 계열 유지 ── */
+  --sh-2:0 0 2px rgba(35,33,30,.12), 0 1px 2px rgba(35,33,30,.14);
+  --sh-4:0 0 2px rgba(35,33,30,.12), 0 2px 4px rgba(35,33,30,.14);
+  --sh-8:0 0 2px rgba(35,33,30,.12), 0 4px 8px rgba(35,33,30,.14);
+  --sh-16:0 0 2px rgba(35,33,30,.12), 0 8px 16px rgba(35,33,30,.14);
+  --sh-28:0 0 8px rgba(35,33,30,.12), 0 14px 28px rgba(35,33,30,.14);
+  --sh-64:0 0 8px rgba(35,33,30,.12), 0 32px 64px rgba(35,33,30,.14);
+  --sh-card:var(--sh-2); --sh-card-hover:var(--sh-4); --sh-drop:var(--sh-16);
+
+  /* ── 모션 (Fluent duration + curve) ── */
+  --d-ultrafast:50ms; --d-faster:100ms; --d-fast:150ms; --d-normal:200ms;
+  --d-gentle:250ms; --d-slow:300ms; --d-slower:400ms; --d-ultraslow:500ms;
+  --c-accel-max:cubic-bezier(0.9,0.1,1,0.2);  --c-accel-mid:cubic-bezier(1,0,1,1);
+  --c-accel-min:cubic-bezier(0.8,0,0.78,1);   --c-decel-max:cubic-bezier(0.1,0.9,0.2,1);
+  --c-decel-mid:cubic-bezier(0,0,0,1);        --c-decel-min:cubic-bezier(0.33,0,0.1,1);
+  --c-easy-max:cubic-bezier(0.8,0,0.2,1);     --c-easy:cubic-bezier(0.33,0,0.67,1);
+  --c-linear:cubic-bezier(0,0,1,1);
+  /* Fluent 원칙 — 진입 Decelerate · 이탈 Accelerate · 상태전환 EasyEase */
+  --t-state:var(--d-fast) var(--c-easy);
+  --t-enter:var(--d-normal) var(--c-decel-mid);
+  --t-exit:var(--d-faster) var(--c-accel-min);
+
+  /* ══ 레거시 별칭 — 기존 CSS 가 그대로 동작하도록 새 토큰을 가리킨다.
+        화면별로 이전이 끝나면 이 블록을 걷어낸다. ══ */
+  --ink:var(--n-fg-1); --ink-soft:var(--n-fg-3);
+  --hanji:var(--n-bg-2); --surface:var(--n-bg-1); --line:var(--n-stroke-2);
+  --accent:var(--seok-80); --accent-2:var(--noe-80); --gold:var(--gold-80);
+
   --font-body:'Pretendard',system-ui,-apple-system,sans-serif;
   --font-title:'Noto Serif KR',serif;
-  --maxw:1080px; --radius:16px;
+  --maxw:1080px;
+  --radius:var(--r-card);        /* 16px → 12px : 카드 모서리 확정값 */
   --nav-h:94px; --foot-h:44px;   /* 슬림(80%) 고정 헤더 / 푸터 높이(실측 보정) */
 }
 *{box-sizing:border-box;margin:0;padding:0;}
