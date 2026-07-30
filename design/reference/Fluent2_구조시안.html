@@ -1,0 +1,1395 @@
+<title>응선사 · Fluent 2 구조 이식 시안</title>
+
+<style>
+/* 폰트: 저장소 사본은 globals.css 와 같은 CDN 을 쓴다.
+   (Artifact 발행본은 CSP 때문에 서브셋 인라인 — 같은 폰트, 로드 방식만 다름) */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&display=swap');
+
+
+/* ══════════════════════════════════════════════════════════════
+   검토 도구(chrome) 토큰 — 시안과 다투지 않도록 한지 색상각(H≈84)으로
+   편향된 중성만 사용한다. 강조는 석간주 하나로 제한.
+   ══════════════════════════════════════════════════════════════ */
+:root{
+  --t-ground:#F2EEE5;
+  --t-panel:#FFFFFF;
+  --t-panel-2:#FBF8F1;
+  --t-line:#DED5C4;
+  --t-line-soft:#EBE4D6;
+  --t-fg:#23211E;
+  --t-fg-2:#44423E;
+  --t-dim:#63615D;
+  --t-accent:#9E3B2F;
+  --t-accent-soft:#EEE3E0;
+  --t-teal:#2A6D65;
+  --t-teal-soft:#F1F8F7;
+  --t-gold:#B4944A;
+  --t-code-bg:#F6F2E9;
+  --t-shadow:0 0 2px rgba(35,33,30,.10), 0 2px 4px rgba(35,33,30,.10);
+  --t-shadow-lg:0 0 8px rgba(35,33,30,.10), 0 14px 28px rgba(35,33,30,.12);
+
+  --t-font-ui:'Pretendard', system-ui, -apple-system, sans-serif;
+  --t-font-title:'Noto Serif KR', 'Noto Serif KR', serif;
+  --t-font-mono:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --t-maxw:1240px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --t-ground:#14120E;
+    --t-panel:#1C1913;
+    --t-panel-2:#221E17;
+    --t-line:#332E24;
+    --t-line-soft:#282318;
+    --t-fg:#EDE7DA;
+    --t-fg-2:#C9C1B0;
+    --t-dim:#9A9184;
+    --t-accent:#D66A5B;
+    --t-accent-soft:#3A1611;
+    --t-teal:#60AEA4;
+    --t-teal-soft:#1A3531;
+    --t-gold:#C8A24B;
+    --t-code-bg:#191610;
+    --t-shadow:0 0 2px rgba(0,0,0,.4), 0 2px 4px rgba(0,0,0,.5);
+    --t-shadow-lg:0 0 8px rgba(0,0,0,.4), 0 14px 28px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"]{
+  --t-ground:#14120E; --t-panel:#1C1913; --t-panel-2:#221E17;
+  --t-line:#332E24; --t-line-soft:#282318;
+  --t-fg:#EDE7DA; --t-fg-2:#C9C1B0; --t-dim:#9A9184;
+  --t-accent:#D66A5B; --t-accent-soft:#3A1611;
+  --t-teal:#60AEA4; --t-teal-soft:#1A3531; --t-gold:#C8A24B;
+  --t-code-bg:#191610;
+  --t-shadow:0 0 2px rgba(0,0,0,.4), 0 2px 4px rgba(0,0,0,.5);
+  --t-shadow-lg:0 0 8px rgba(0,0,0,.4), 0 14px 28px rgba(0,0,0,.5);
+}
+:root[data-theme="light"]{
+  --t-ground:#F2EEE5; --t-panel:#FFFFFF; --t-panel-2:#FBF8F1;
+  --t-line:#DED5C4; --t-line-soft:#EBE4D6;
+  --t-fg:#23211E; --t-fg-2:#44423E; --t-dim:#63615D;
+  --t-accent:#9E3B2F; --t-accent-soft:#EEE3E0;
+  --t-teal:#2A6D65; --t-teal-soft:#F1F8F7; --t-gold:#B4944A;
+  --t-code-bg:#F6F2E9;
+  --t-shadow:0 0 2px rgba(35,33,30,.10), 0 2px 4px rgba(35,33,30,.10);
+  --t-shadow-lg:0 0 8px rgba(35,33,30,.10), 0 14px 28px rgba(35,33,30,.12);
+}
+
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--t-ground); color:var(--t-fg);
+  font-family:var(--t-font-ui); font-size:15px; line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+.doc{max-width:var(--t-maxw); margin:0 auto; padding:0 24px 96px;}
+
+/* ── 문서 타이포 ── */
+h1,h2,h3,h4{margin:0; font-weight:700; text-wrap:balance;}
+h1{font-family:var(--t-font-title); font-size:clamp(28px,4.2vw,42px); line-height:1.2; letter-spacing:-.01em;}
+h2{font-family:var(--t-font-title); font-size:clamp(21px,2.6vw,27px); line-height:1.3;}
+h3{font-size:17px; line-height:1.4;}
+h4{font-size:14px; line-height:1.45;}
+p{margin:0;}
+a{color:var(--t-accent);}
+code, .mono{font-family:var(--t-font-mono); font-size:.875em; font-variant-ligatures:none;}
+code{background:var(--t-code-bg); padding:.12em .38em; border-radius:3px;}
+.num{font-variant-numeric:tabular-nums;}
+
+.eyebrow{
+  font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--t-accent); display:flex; align-items:center; gap:9px;
+}
+.eyebrow::before{content:""; width:22px; height:2px; background:var(--t-gold); flex:none;}
+.lede{font-size:17px; line-height:1.7; color:var(--t-fg-2); max-width:64ch;}
+.note{font-size:13px; line-height:1.6; color:var(--t-dim); max-width:74ch;}
+
+/* ── 문서 헤더 ── */
+.masthead{padding:56px 0 28px; display:flex; flex-direction:column; gap:18px;}
+.masthead .meta{
+  display:flex; flex-wrap:wrap; gap:8px 10px; align-items:center;
+  font-size:12px; color:var(--t-dim);
+}
+.chip{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:4px 10px; border:1px solid var(--t-line); border-radius:10000px;
+  font-size:12px; font-weight:600; color:var(--t-fg-2); background:var(--t-panel);
+  white-space:nowrap;
+}
+.chip.keep{color:var(--t-teal); border-color:var(--t-teal); background:var(--t-teal-soft);}
+.chip.change{color:var(--t-accent); border-color:var(--t-accent); background:var(--t-accent-soft);}
+
+/* ── 컨트롤 바 ── */
+.controls{
+  position:sticky; top:0; z-index:40;
+  background:color-mix(in srgb, var(--t-ground) 88%, transparent);
+  backdrop-filter:blur(12px) saturate(1.2);
+  border-bottom:1px solid var(--t-line);
+  margin:0 -24px 0; padding:11px 24px;
+  display:flex; flex-wrap:wrap; gap:10px 20px; align-items:center;
+}
+.ctl-group{display:flex; align-items:center; gap:8px; min-width:0;}
+.ctl-label{
+  font-size:10.5px; font-weight:700; letter-spacing:.11em; text-transform:uppercase;
+  color:var(--t-dim); white-space:nowrap;
+}
+.seg{display:inline-flex; border:1px solid var(--t-line); border-radius:8px; overflow:hidden; background:var(--t-panel);}
+.seg button{
+  font:inherit; font-size:12.5px; font-weight:600; color:var(--t-dim);
+  background:none; border:0; padding:6px 12px; cursor:pointer;
+  border-right:1px solid var(--t-line-soft);
+  transition:background 150ms cubic-bezier(0.33,0,0.67,1), color 150ms cubic-bezier(0.33,0,0.67,1);
+  white-space:nowrap;
+}
+.seg button:last-child{border-right:0;}
+.seg button:hover{background:var(--t-panel-2); color:var(--t-fg);}
+.seg button[aria-pressed="true"]{background:var(--t-accent); color:#fff;}
+.seg button:focus-visible{outline:2px solid var(--t-fg); outline-offset:-2px;}
+.ctl-note{font-size:11.5px; color:var(--t-dim); margin-left:auto;}
+
+/* ── 섹션 ── */
+section{padding:46px 0 0; scroll-margin-top:64px;}
+.sec-hd{display:flex; flex-direction:column; gap:10px; margin-bottom:22px; padding-bottom:14px; border-bottom:1px solid var(--t-line);}
+.sec-hd .n{
+  font-family:var(--t-font-mono); font-size:11px; font-weight:700; color:var(--t-dim);
+  letter-spacing:.08em;
+}
+
+/* ── 카드/패널 ── */
+.card{
+  background:var(--t-panel); border:1px solid var(--t-line); border-radius:10px;
+  padding:20px 22px; box-shadow:var(--t-shadow);
+}
+.grid{display:grid; gap:16px;}
+.g2{grid-template-columns:repeat(auto-fit, minmax(280px,1fr));}
+.g3{grid-template-columns:repeat(auto-fit, minmax(220px,1fr));}
+
+/* ── 표 ── */
+.tbl-wrap{overflow-x:auto; border:1px solid var(--t-line); border-radius:10px; background:var(--t-panel);}
+table.data{width:100%; border-collapse:collapse; font-size:13px;}
+table.data th, table.data td{padding:9px 12px; text-align:left; border-bottom:1px solid var(--t-line-soft); white-space:nowrap;}
+table.data th{
+  font-size:10.5px; font-weight:700; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--t-dim); background:var(--t-panel-2); position:sticky; top:0;
+}
+table.data tr:last-child td{border-bottom:0;}
+table.data td.wrap{white-space:normal; min-width:22ch;}
+.pass{color:var(--t-teal); font-weight:700;}
+.fail{color:var(--t-accent); font-weight:700;}
+.sw{display:inline-block; width:13px; height:13px; border-radius:3px; border:1px solid rgba(0,0,0,.14); vertical-align:-2px; margin-right:6px;}
+
+/* ── 램프 스와치 ── */
+.ramp{display:flex; border-radius:8px; overflow:hidden; border:1px solid var(--t-line);}
+.ramp .stop{
+  flex:1; min-width:0; height:64px; position:relative;
+  display:flex; align-items:flex-end; justify-content:center; padding-bottom:5px;
+}
+.ramp .stop span{
+  font-family:var(--t-font-mono); font-size:9px; font-weight:700; letter-spacing:.02em;
+  opacity:.92;
+}
+.ramp .stop.anchor{box-shadow:inset 0 0 0 2px #fff, inset 0 0 0 4px rgba(0,0,0,.5);}
+.ramp-legend{display:flex; justify-content:space-between; font-size:11px; color:var(--t-dim); margin-top:5px;}
+.ramp-row{display:flex; flex-direction:column; gap:3px;}
+.ramp-row > h4{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;}
+.ramp-row > h4 .mono{font-weight:400; color:var(--t-dim); font-size:11.5px;}
+
+/* ══════════════════════════════════════════════════════════════
+   시안 플레이트 — BEFORE / AFTER
+   ══════════════════════════════════════════════════════════════ */
+.plate{margin-bottom:24px;}
+.plate-hd{display:flex; flex-wrap:wrap; gap:4px 14px; align-items:baseline; margin-bottom:10px;}
+.plate-hd h3{font-size:15.5px;}
+.plate-hd p{font-size:12.5px; color:var(--t-dim);}
+
+.plate-body{display:grid; gap:14px; grid-template-columns:1fr 1fr;}
+@media (max-width:900px){ .plate-body{grid-template-columns:1fr;} }
+
+/* 겹쳐 보기 모드 */
+body[data-mode="stack"] .plate-body{grid-template-columns:1fr; position:relative;}
+body[data-mode="stack"] .spec{grid-area:1/1;}
+body[data-mode="stack"] .spec[data-v="before"]{display:var(--show-before, block);}
+body[data-mode="stack"] .spec[data-v="after"]{display:var(--show-after, none);}
+body[data-mode="stack"][data-show="after"]{--show-before:none; --show-after:block;}
+
+.spec{margin:0; display:flex; flex-direction:column; gap:0; min-width:0;}
+.spec > figcaption{
+  font-family:var(--t-font-mono); font-size:10px; font-weight:700; letter-spacing:.13em;
+  padding:5px 10px; border:1px solid var(--t-line); border-bottom:0;
+  border-radius:8px 8px 0 0; background:var(--t-panel-2); color:var(--t-dim);
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+}
+.spec[data-v="before"] > figcaption{color:var(--t-dim);}
+.spec[data-v="after"] > figcaption{color:var(--t-teal); background:var(--t-teal-soft); border-color:var(--t-teal);}
+.spec > figcaption em{font-style:normal; font-family:var(--t-font-ui); font-weight:600; letter-spacing:0; font-size:11px; opacity:.85;}
+.spec-frame{
+  border:1px solid var(--t-line); border-radius:0 0 8px 8px;
+  overflow:hidden; min-width:0;
+}
+.spec[data-v="after"] .spec-frame{border-color:var(--t-teal);}
+
+/* ── 시안 내부: 공통 구조 (토큰만 스코프별로 갈린다) ── */
+.stage{
+  background:var(--s-page-bg);
+  color:var(--s-fg1);
+  font-family:var(--s-font-body);
+  font-size:var(--s-fs-body); line-height:var(--s-lh-body);
+  padding:var(--s-stage-pad);
+  overflow-x:auto;
+}
+.stage *{box-sizing:border-box;}
+.stage a{color:inherit; text-decoration:none;}
+
+/* ────────── BEFORE 스코프: 현재 코드베이스 값 그대로 ────────── */
+[data-v="before"]{
+  --s-fg1:#23211E; --s-fg2:#6B6258; --s-fg3:#6B6258; --s-fg4:#b3a892;
+  --s-page-bg:#FAF6EE; --s-surface:#FFFFFF; --s-bg2:#FAF6EE; --s-bg3:#f6efe3;
+  --s-line:#E7DECF; --s-line-ctl:#E7DECF;
+  --s-brand:#9E3B2F; --s-brand-h:#9E3B2F; --s-brand-p:#9E3B2F;
+  --s-brand-tint:#fbeeea; --s-brand-tint-2:#fbe9e5;
+  --s-teal:#2E7D74; --s-teal-tint:#e6f2f0;
+  --s-gold:#C8A24B;
+  --s-danger:#b23b2c;
+  --s-font-body:'Pretendard', system-ui, sans-serif;
+  --s-font-title:'Noto Serif KR', serif;
+
+  --s-fs-body:16.5px;  --s-lh-body:1.8;
+  --s-fs-sm:15.5px;    --s-lh-sm:1.7;
+  --s-fs-xs:13px;      --s-fs-xxs:11.5px;
+  --s-fs-h3:18.5px;    --s-fs-h2:23px;
+  --s-fs-tbl:15.5px;   --s-fs-th:15.5px;
+
+  --s-r-ctl:9px; --s-r-card:16px; --s-r-sm:7px; --s-r-pill:999px; --s-r-drop:12px;
+  --s-stroke:1px; --s-stroke-em:1.5px;
+  --s-sh-card:0 14px 32px -28px rgba(35,33,30,.5);
+  --s-sh-card-hover:0 20px 40px -28px rgba(35,33,30,.45);
+  --s-sh-drop:0 12px 28px rgba(60,40,20,.14);
+  --s-dur:.2s; --s-dur-fast:.15s; --s-curve:ease;
+  --s-stage-pad:18px;
+  --s-gap:16px; --s-pad-card:15px 18px; --s-pad-cell:12px 14px; --s-pad-btn:9px 24px;
+  --s-focus-ring:none;
+}
+/* ────────── AFTER 스코프: Fluent 2 구조 + 단청 팔레트 ────────── */
+[data-v="after"]{
+  --s-fg1:#23211e; --s-fg2:#44423e; --s-fg3:#63615d; --s-fg4:#73706a;
+  --s-page-bg:#fefaf2; --s-surface:#ffffff; --s-bg2:#fefaf2; --s-bg3:#f9f5ed;
+  --s-line:#e4e0d8; --s-line-ctl:#63615d;      /* 컨트롤 경계 = StrokeAccessible */
+  --s-brand:#9e3b2f; --s-brand-h:#873329; --s-brand-p:#742e25;
+  --s-brand-tint:#eee3e0; --s-brand-tint-2:#ebcdc8;
+  --s-teal:#2e7d74; --s-teal-h:#2a6d65; --s-teal-tint:#f1f8f7;
+  --s-gold:#b4944a;
+  --s-danger:#af1937; --s-danger-h:#961830;
+  --s-font-body:'Pretendard', system-ui, sans-serif;
+  --s-font-title:'Noto Serif KR', serif;
+
+  /* 타입: Fluent 램프 단계 + 한글용 lineHeight 보정 (아래 knob 으로 조절) */
+  --s-fs-body:16px;    --s-lh-body:26px;
+  --s-fs-sm:14px;      --s-lh-sm:22px;
+  --s-fs-xs:12px;      --s-fs-xxs:10px;
+  --s-fs-h3:20px;      --s-fs-h2:24px;
+  --s-fs-tbl:14px;     --s-fs-th:12px;
+
+  --s-r-ctl:4px; --s-r-card:8px; --s-r-sm:4px; --s-r-pill:10000px; --s-r-drop:8px;
+  --s-stroke:1px; --s-stroke-em:2px;
+  --s-sh-card:0 0 2px rgba(35,33,30,.12), 0 2px 4px rgba(35,33,30,.14);
+  --s-sh-card-hover:0 0 2px rgba(35,33,30,.12), 0 4px 8px rgba(35,33,30,.14);
+  --s-sh-drop:0 0 2px rgba(35,33,30,.12), 0 8px 16px rgba(35,33,30,.14);
+  --s-dur:150ms; --s-dur-fast:100ms; --s-curve:cubic-bezier(0.33,0,0.67,1);
+  --s-stage-pad:20px;
+  --s-gap:16px; --s-pad-card:16px 20px; --s-pad-cell:12px 16px; --s-pad-btn:8px 20px;
+  --s-focus-ring:1;
+}
+
+/* ── 시안 컴포넌트: 한 번만 정의, 토큰으로 갈린다 ── */
+.stage .u-serif{font-family:var(--s-font-title);}
+
+/* 헤더/GNB */
+.x-nav{background:var(--s-page-bg); border-bottom:var(--s-stroke) solid var(--s-line);}
+.x-topbar{display:flex; align-items:center; justify-content:space-between; height:46px; gap:12px;}
+.x-brand{display:flex; align-items:center; gap:9px; font-family:var(--s-font-title); font-weight:700; font-size:var(--s-fs-h3);}
+.x-brand .mark{width:22px; height:22px; flex:none; border-radius:var(--s-r-pill); border:2px solid var(--s-brand); position:relative;}
+.x-brand .mark::before{content:""; position:absolute; inset:5px; border-radius:var(--s-r-pill); border:1.5px solid var(--s-brand);}
+.x-actions{display:flex; align-items:center; gap:8px;}
+.x-toplink{font-size:var(--s-fs-sm); font-weight:600; color:var(--s-fg3); padding:7px 13px; border-radius:var(--s-r-pill); transition:background var(--s-dur) var(--s-curve), color var(--s-dur) var(--s-curve); cursor:pointer;}
+.x-toplink:hover{color:var(--s-brand); background:var(--s-brand-tint);}
+.x-toplogin{font-size:var(--s-fs-sm); font-weight:700; color:#fff; background:var(--s-brand); padding:7px 17px; border-radius:var(--s-r-pill); transition:background var(--s-dur) var(--s-curve); cursor:pointer;}
+.x-toplogin:hover{background:var(--s-brand-h);}
+.x-toplogin:active{background:var(--s-brand-p);}
+.x-topadmin{font-size:var(--s-fs-xs); font-weight:700; color:var(--s-fg1); background:var(--s-surface); border:var(--s-stroke-em) solid var(--s-line); padding:6px 14px; border-radius:var(--s-r-pill); cursor:pointer; transition:border-color var(--s-dur) var(--s-curve), color var(--s-dur) var(--s-curve);}
+.x-topadmin:hover{border-color:var(--s-teal); color:var(--s-teal);}
+.x-mainbar{background:var(--s-bg3); border-top:var(--s-stroke) solid var(--s-line);}
+.x-gnb{display:flex; gap:4px; min-height:38px; align-items:center;}
+.x-gnb-top{font-family:inherit; font-size:var(--s-fs-sm); font-weight:700; color:var(--s-fg1); background:none; border:0; cursor:pointer; padding:8px 16px; border-radius:var(--s-r-ctl); display:inline-flex; align-items:center; gap:5px; transition:color var(--s-dur) var(--s-curve), background var(--s-dur) var(--s-curve);}
+.x-gnb-top:hover{color:var(--s-brand); background:var(--s-brand-tint);}
+.x-gnb-top .caret{font-size:10px; color:var(--s-fg3);}
+.x-drop{margin-top:6px; background:var(--s-surface); border:var(--s-stroke) solid var(--s-line); border-radius:var(--s-r-drop); box-shadow:var(--s-sh-drop); padding:8px; display:flex; flex-direction:column; width:186px;}
+.x-drop a{font-size:var(--s-fs-sm); font-weight:600; padding:9px 12px; border-radius:var(--s-r-sm); cursor:pointer; transition:background var(--s-dur-fast) var(--s-curve), color var(--s-dur-fast) var(--s-curve);}
+.x-drop a:hover{background:var(--s-bg3); color:var(--s-brand);}
+
+/* 패널 (홈 3단) */
+.x-panels{display:grid; grid-template-columns:repeat(3,1fr); gap:var(--s-gap);}
+@media (max-width:720px){ .x-panels{grid-template-columns:1fr;} }
+.x-panel{display:flex; flex-direction:column; background:var(--s-surface); border:var(--s-stroke) solid var(--s-line); border-radius:var(--s-r-card); padding:var(--s-pad-card); box-shadow:var(--s-sh-card);}
+.x-panel-hd{display:flex; align-items:baseline; gap:9px; padding-bottom:8px; margin-bottom:7px; border-bottom:var(--s-stroke) solid var(--s-line);}
+.x-panel-hd .k{font-size:var(--s-fs-xxs); font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--s-brand);}
+.x-panel-hd h3{font-family:var(--s-font-title); font-size:var(--s-fs-h3); font-weight:700; margin:0;}
+.x-mini{width:100%; border-collapse:collapse; font-size:var(--s-fs-sm);}
+.x-mini td{padding:6px 0; border-bottom:1px dashed var(--s-line); vertical-align:top;}
+.x-mini td.d{color:var(--s-brand); font-weight:700; font-size:var(--s-fs-xs); white-space:nowrap; width:1%; padding-right:12px; font-variant-numeric:tabular-nums;}
+.x-mini td.t{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:0;}
+.x-mini tr:hover td.t{color:var(--s-brand);}
+.x-more{margin-top:auto; align-self:flex-end; padding-top:10px; font-size:var(--s-fs-xs); font-weight:700; color:var(--s-brand); cursor:pointer; border-radius:var(--s-r-sm);}
+.x-more:hover{text-decoration:underline;}
+.x-fade{position:relative; display:flex; align-items:flex-end; border-radius:var(--s-r-card); overflow:hidden; border:var(--s-stroke) solid var(--s-line); box-shadow:var(--s-sh-card); min-height:150px; background:linear-gradient(145deg,#dcd3c0,#c9bda4); transition:transform var(--s-dur) var(--s-curve), box-shadow var(--s-dur) var(--s-curve); cursor:pointer;}
+.x-fade::before{content:""; position:absolute; inset:0; background:linear-gradient(180deg, color-mix(in srgb, var(--s-page-bg) 62%, transparent), color-mix(in srgb, var(--s-page-bg) 84%, transparent));}
+.x-fade:hover{transform:translateY(-4px); box-shadow:var(--s-sh-card-hover);}
+.x-fade-in{position:relative; padding:14px 18px;}
+.x-fade-in .k{font-size:var(--s-fs-xxs); font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--s-brand);}
+.x-fade-in h3{font-family:var(--s-font-title); font-size:var(--s-fs-h3); font-weight:700; margin:3px 0;}
+.x-fade-in p{font-size:var(--s-fs-xs); color:var(--s-fg3); margin:0 0 5px;}
+
+/* 목록 표 */
+.x-tbl{width:100%; border-collapse:collapse; border-top:2px solid var(--s-gold); font-size:var(--s-fs-tbl); background:var(--s-surface);}
+.x-tbl thead th{background:var(--s-bg3); font-family:var(--s-font-title); font-size:var(--s-fs-th); font-weight:700; color:var(--s-fg2); padding:var(--s-pad-cell); text-align:left; border-bottom:var(--s-stroke) solid var(--s-line); white-space:nowrap;}
+.x-tbl tbody td{padding:var(--s-pad-cell); border-bottom:var(--s-stroke) solid var(--s-line); vertical-align:middle;}
+.x-tbl tbody tr{transition:background var(--s-dur-fast) var(--s-curve);}
+.x-tbl tbody tr:hover{background:var(--s-bg2);}
+.x-tbl .c-cat{white-space:nowrap; width:1%;}
+.x-tbl .c-title{max-width:0;}
+.x-tbl .c-title a{font-weight:600; display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border-radius:var(--s-r-sm);}
+.x-tbl tbody tr:hover .c-title a{color:var(--s-brand);}
+.x-tbl .c-date{white-space:nowrap; color:var(--s-fg3); width:1%; text-align:center; font-variant-numeric:tabular-nums;}
+.x-badge-cat{display:inline-block; font-size:var(--s-fs-xs); font-weight:700; color:var(--s-teal); background:var(--s-teal-tint); padding:2px 9px; border-radius:var(--s-r-pill);}
+
+/* 상세 표 */
+.x-detail{width:100%; border-collapse:collapse; border-top:2px solid var(--s-fg1); font-size:var(--s-fs-sm); background:var(--s-surface);}
+.x-detail th, .x-detail td{border-bottom:var(--s-stroke) solid var(--s-line); padding:var(--s-pad-cell); text-align:left; vertical-align:top;}
+.x-detail th{width:110px; background:var(--s-bg3); font-weight:700; color:var(--s-fg2); white-space:nowrap; font-family:var(--s-font-title);}
+
+/* 폼 */
+.x-form{background:var(--s-surface); border:var(--s-stroke) solid var(--s-line); border-radius:var(--s-r-card); padding:18px 20px; display:flex; flex-direction:column; gap:14px;}
+.x-field{display:flex; flex-direction:column; gap:5px;}
+.x-field > span{font-size:var(--s-fs-xs); font-weight:600; color:var(--s-fg2);}
+.x-field > span .req{color:var(--s-danger); margin-left:3px;}
+.x-input{width:100%; padding:9px 12px; font-size:var(--s-fs-sm); font-family:inherit; border:var(--s-stroke) solid var(--s-line-ctl); border-radius:var(--s-r-ctl); background:var(--s-surface); color:var(--s-fg1); transition:border-color var(--s-dur-fast) var(--s-curve), box-shadow var(--s-dur-fast) var(--s-curve);}
+.x-input::placeholder{color:var(--s-fg4);}
+.x-input:hover{border-color:var(--s-fg2);}
+.x-input:focus{outline:none; border-color:var(--s-brand); box-shadow:inset 0 -2px 0 0 var(--s-brand);}
+.x-input[aria-invalid="true"]{border-color:var(--s-danger);}
+.x-input:disabled{background:var(--s-bg3); color:var(--s-fg4); border-color:var(--s-line); cursor:not-allowed;}
+.x-msg{font-size:var(--s-fs-xs); display:flex; align-items:flex-start; gap:6px; line-height:1.5;}
+.x-msg.err{color:var(--s-danger);}
+.x-msg.ok{color:var(--s-teal);}
+.x-msg .ic{flex:none; width:14px; height:14px; margin-top:2px;}
+
+/* 버튼 */
+.x-btn{display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:var(--s-pad-btn); border-radius:var(--s-r-pill); font-family:inherit; font-weight:700; font-size:var(--s-fs-sm); cursor:pointer; border:var(--s-stroke-em) solid transparent; transition:background var(--s-dur) var(--s-curve), border-color var(--s-dur) var(--s-curve), color var(--s-dur) var(--s-curve), transform var(--s-dur) var(--s-curve), box-shadow var(--s-dur) var(--s-curve);}
+.x-btn.pri{background:var(--s-brand); color:#fff;}
+.x-btn.pri:hover{background:var(--s-brand-h);}
+.x-btn.pri:active{background:var(--s-brand-p);}
+.x-btn.gho{border-color:var(--s-line); color:var(--s-fg1); background:var(--s-surface);}
+.x-btn.gho:hover{border-color:var(--s-brand); color:var(--s-brand); background:var(--s-brand-tint);}
+.x-btn.gho:active{border-color:var(--s-brand-p); color:var(--s-brand-p);}
+.x-btn.dan{background:var(--s-danger); color:#fff;}
+.x-btn.dan:hover{background:var(--s-danger-h, var(--s-danger));}
+.x-btn:disabled{background:var(--s-bg3); color:var(--s-fg4); border-color:var(--s-line); cursor:not-allowed;}
+/* BEFORE 만의 버릇: 호버 시 들어올림 + 브랜드색 그대로 */
+[data-v="before"] .x-btn.pri:hover{transform:translateY(-2px); box-shadow:0 10px 24px -12px rgba(158,59,47,.6); background:var(--s-brand); filter:brightness(.93);}
+[data-v="before"] .x-btn.gho:hover{transform:translateY(-2px); background:var(--s-surface);}
+
+/* 탭 / 페이저 / 배지 */
+.x-tabs{display:flex; gap:8px; flex-wrap:wrap;}
+.x-tab{padding:8px 18px; border:var(--s-stroke) solid var(--s-line); border-radius:var(--s-r-pill); font-size:var(--s-fs-sm); font-weight:600; color:var(--s-fg3); background:var(--s-surface); cursor:pointer; font-family:inherit; transition:background var(--s-dur) var(--s-curve), color var(--s-dur) var(--s-curve), border-color var(--s-dur) var(--s-curve);}
+.x-tab:hover{border-color:var(--s-brand); color:var(--s-brand);}
+.x-tab[aria-selected="true"]{background:var(--s-brand); color:#fff; border-color:var(--s-brand);}
+.x-pager{display:flex; justify-content:center; align-items:center; gap:6px;}
+.x-pg{display:inline-flex; align-items:center; justify-content:center; min-width:36px; height:36px; padding:0 10px; border:var(--s-stroke) solid var(--s-line); border-radius:var(--s-r-ctl); font-size:var(--s-fs-sm); font-weight:600; color:var(--s-fg3); background:var(--s-surface); cursor:pointer; font-family:inherit; font-variant-numeric:tabular-nums; transition:background var(--s-dur-fast) var(--s-curve), border-color var(--s-dur-fast) var(--s-curve), color var(--s-dur-fast) var(--s-curve);}
+.x-pg:hover{border-color:var(--s-brand); color:var(--s-brand); background:var(--s-brand-tint);}
+.x-pg[aria-current="page"]{background:var(--s-brand); color:#fff; border-color:var(--s-brand);}
+.x-pg[aria-disabled="true"]{opacity:.4; pointer-events:none;}
+.x-badge{display:inline-block; font-size:var(--s-fs-xs); font-weight:700; padding:3px 10px; border-radius:var(--s-r-pill);}
+.x-badge.on{background:var(--s-teal-tint); color:var(--s-teal);}
+.x-badge.off{background:var(--s-bg3); color:var(--s-fg3);}
+.x-badge.pend{background:#fbf1e0; color:#b8860b;}
+[data-v="after"] .x-badge.pend{background:#f9f0dd; color:#906800;}
+
+/* 라디오 (법회 종류) */
+.x-radios{display:flex; gap:9px; flex-wrap:wrap;}
+.x-radio{display:inline-flex; align-items:center; gap:7px; padding:7px 16px; border:var(--s-stroke) solid var(--s-line-ctl); border-radius:var(--s-r-pill); background:var(--s-surface); font-size:var(--s-fs-sm); font-weight:600; cursor:pointer; transition:background var(--s-dur) var(--s-curve), border-color var(--s-dur) var(--s-curve), color var(--s-dur) var(--s-curve);}
+.x-radio:hover{border-color:var(--s-brand);}
+.x-radio.on{border-color:var(--s-brand); background:var(--s-brand-tint); color:var(--s-brand);}
+.x-radio input{accent-color:var(--s-brand); margin:0;}
+
+/* 관리자 목록 */
+.x-adm{background:var(--s-surface); border:var(--s-stroke) solid var(--s-line); border-radius:var(--s-r-card); overflow:hidden;}
+.x-adm table{width:100%; border-collapse:collapse; font-size:var(--s-fs-tbl);}
+.x-adm th, .x-adm td{padding:var(--s-pad-cell); text-align:left; border-bottom:var(--s-stroke) solid var(--s-line); vertical-align:middle;}
+.x-adm th{font-size:var(--s-fs-xs); color:var(--s-fg3); background:var(--s-bg2); font-weight:700;}
+.x-adm tr:last-child td{border-bottom:0;}
+.x-adm-acts{display:flex; gap:6px; white-space:nowrap;}
+.x-lbtn{background:none; border:var(--s-stroke) solid var(--s-line); border-radius:var(--s-r-sm); padding:5px 10px; font-size:var(--s-fs-xs); font-family:inherit; color:var(--s-fg1); cursor:pointer; transition:border-color var(--s-dur-fast) var(--s-curve), color var(--s-dur-fast) var(--s-curve), background var(--s-dur-fast) var(--s-curve);}
+.x-lbtn:hover{border-color:var(--s-brand); color:var(--s-brand); background:var(--s-brand-tint);}
+.x-lbtn.dan{color:var(--s-danger); border-color:var(--s-line);}
+.x-lbtn.dan:hover{border-color:var(--s-danger); background:color-mix(in srgb, var(--s-danger) 8%, transparent); color:var(--s-danger);}
+
+/* 캘린더 */
+.x-cal{background:var(--s-surface); border:var(--s-stroke) solid var(--s-line); border-radius:var(--s-r-card); padding:11px; box-shadow:var(--s-sh-card);}
+.x-cal table{width:100%; border-collapse:separate; border-spacing:5px; table-layout:fixed;}
+.x-cal th{font-size:var(--s-fs-xxs); color:var(--s-fg3); font-weight:700; letter-spacing:.08em; padding:2px 0 7px; text-transform:uppercase;}
+.x-cal th.sun{color:var(--s-sun, #c0574a);}
+.x-cal th.sat{color:var(--s-sat, #4a6fa5);}
+[data-v="after"]{--s-sun:#b95144; --s-sat:#456aa0;}
+.x-cal td{vertical-align:top; height:74px; padding:6px; background:var(--s-bg2); border-radius:var(--s-r-ctl); transition:background var(--s-dur-fast) var(--s-curve);}
+.x-cal td:hover{background:var(--s-bg3);}
+.x-cal .dnum{display:flex; align-items:center; justify-content:space-between;}
+.x-cal .day{font-size:var(--s-fs-xs); font-weight:700; font-variant-numeric:tabular-nums;}
+.x-cal .day.sun{color:var(--s-sun,#c0574a);} .x-cal .day.sat{color:var(--s-sat,#4a6fa5);}
+.x-cal .day.today{color:#fff; background:var(--s-brand); border-radius:var(--s-r-pill); min-width:20px; height:20px; display:inline-grid; place-items:center;}
+.x-cal .lunar{font-size:var(--s-fs-xxs); color:var(--s-lunar, #b3a892); font-weight:500;}
+[data-v="after"]{--s-lunar:#7d725e;}
+.x-cal .ev{display:flex; align-items:center; gap:4px; font-size:var(--s-fs-xxs); line-height:1.35; background:var(--s-brand-tint-2); border-radius:var(--s-r-sm); padding:2px 6px; margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--s-brand); font-weight:600; cursor:pointer;}
+.x-cal .ev.reg{background:var(--s-teal-tint); color:var(--s-teal);}
+[data-v="after"] .x-cal .ev.reg{background:#eef9f6; color:#28786f;}
+.x-cal .ev .dot{width:5px; height:5px; border-radius:50%; background:currentColor; flex:none;}
+[data-v="before"] .x-cal .ev .dot{display:none;}   /* 현재는 색만으로 구분 */
+
+/* 포커스 링 — AFTER 만 Fluent 2 방식 2겹 */
+[data-v="after"] .stage :is(a,button,input,select,textarea,[tabindex]):focus-visible{
+  outline:2px solid var(--s-fg1);
+  outline-offset:1px;
+  box-shadow:0 0 0 1px var(--s-surface), 0 0 0 1px var(--s-surface) inset;
+  border-radius:var(--s-r-ctl);
+}
+[data-v="after"] .stage .x-btn:focus-visible,
+[data-v="after"] .stage .x-tab:focus-visible,
+[data-v="after"] .stage .x-radio:focus-within,
+[data-v="after"] .stage .x-toplogin:focus-visible,
+[data-v="after"] .stage .x-toplink:focus-visible{ border-radius:var(--s-r-pill); }
+/* BEFORE: input 만 outline, 나머지는 브라우저 기본(사실상 안 보임) */
+[data-v="before"] .stage .x-input:focus{outline:2px solid var(--s-brand); outline-offset:1px; box-shadow:none; border-color:var(--s-line-ctl);}
+
+/* ── 상태 매트릭스 ── */
+.state-grid{overflow-x:auto;}
+.state-grid table{border-collapse:collapse; font-size:12.5px; min-width:640px; width:100%;}
+.state-grid th, .state-grid td{border:1px solid var(--t-line-soft); padding:7px 10px; text-align:center;}
+.state-grid th{background:var(--t-panel-2); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--t-dim); font-weight:700;}
+.state-grid td:first-child, .state-grid th:first-child{text-align:left; white-space:nowrap; font-family:var(--t-font-mono); font-size:11.5px;}
+.yes{color:var(--t-teal); font-weight:700;} .no{color:var(--t-accent); font-weight:700;}
+.state-grid tbody tr:nth-child(even){background:var(--t-panel-2);}
+
+/* ── 결정 카드 ── */
+.decide{display:flex; flex-direction:column; gap:12px;}
+.decide-item{border:1px solid var(--t-line); border-left:3px solid var(--t-accent); border-radius:0 8px 8px 0; padding:14px 16px; background:var(--t-panel);}
+.decide-item h4{margin-bottom:5px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+.decide-item .q{font-size:13.5px; color:var(--t-fg-2); margin-bottom:7px;}
+.decide-item .rec{font-size:12.5px; color:var(--t-dim);}
+.decide-item .rec b{color:var(--t-teal);}
+
+/* ── spacing / radius / motion 시각화 ── */
+.viz-row{display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:12px;}
+.viz-bar{height:16px; background:var(--t-accent); border-radius:2px; flex:none;}
+.viz-sq{background:var(--t-panel-2); border:2px solid var(--t-accent); flex:none; width:52px; height:52px; display:grid; place-items:center; font-family:var(--t-font-mono); font-size:10px; color:var(--t-dim);}
+.viz-el{background:var(--t-panel); border:1px solid var(--t-line); border-radius:6px; padding:12px 14px; font-family:var(--t-font-mono); font-size:10.5px; color:var(--t-dim); text-align:center;}
+.type-spec{display:flex; flex-direction:column; gap:2px; padding:8px 0; border-bottom:1px dashed var(--t-line-soft);}
+.type-spec .lbl{font-family:var(--t-font-mono); font-size:10px; color:var(--t-dim); letter-spacing:.05em;}
+.type-spec .smp{color:var(--t-fg); font-family:var(--t-font-ui);}
+
+hr.rule{border:0; border-top:1px solid var(--t-line); margin:34px 0 0;}
+
+@media (prefers-reduced-motion: reduce){
+  *{transition-duration:1ms !important; animation-duration:1ms !important;}
+  html{scroll-behavior:auto;}
+}
+</style>
+
+<div class="doc">
+
+<header class="masthead">
+  <p class="eyebrow">응선사 · 디자인 시안 검토</p>
+  <h1>Microsoft Fluent 2 의 <em style="font-style:normal;color:var(--t-accent)">구조</em>를<br>단청 팔레트에 이식한다</h1>
+  <p class="lede">
+    색은 한 톨도 바꾸지 않는다. 바꾸는 것은 눈에 잘 안 보이지만 화면 전체를 지배하는
+    <b>척도</b>다 — 글자 크기의 계단, 여백의 계단, 모서리와 그림자의 위계, 상태 표현, 키보드 포커스.
+    현재 이 사이트에는 그 척도가 없다.
+  </p>
+  <div class="meta">
+    <span class="chip keep">유지 · 한지 #FAF6EE</span>
+    <span class="chip keep">유지 · 석간주 #9E3B2F</span>
+    <span class="chip keep">유지 · 뇌록 #2E7D74</span>
+    <span class="chip keep">유지 · 금 #C8A24B</span>
+    <span class="chip keep">유지 · Pretendard + Noto Serif KR</span>
+    <span class="chip change">교체 · 타입 21종 → 램프 6단</span>
+    <span class="chip change">교체 · 그림자 15종 → 척도 3단</span>
+    <span class="chip change">신설 · pressed / disabled / focus</span>
+  </div>
+  <p class="note">
+    Fluent 2 원본 토큰 값은 <code>npm @fluentui/tokens@1.0.0-alpha.23</code> 에서 추출했다 —
+    Figma 의 Fluent 2 Web 킷이 생성되는 바로 그 소스다. 램프는 Fluent <code>brandWeb</code> 의
+    OKLCH 명도·채도 진행 곡선을 단청 색상각으로 옮겨 만들었고, 80 단계는 기존 색과 정확히 일치한다.
+    아래 모든 대비비는 WCAG 2.1 공식으로 실제 계산한 값이다.
+  </p>
+</header>
+
+<div class="controls" role="group" aria-label="시안 보기 설정">
+  <div class="ctl-group">
+    <span class="ctl-label">보기</span>
+    <div class="seg" role="group">
+      <button type="button" data-mode-btn="side" aria-pressed="true">나란히</button>
+      <button type="button" data-mode-btn="stack" aria-pressed="false">겹쳐서 전환</button>
+    </div>
+  </div>
+  <div class="ctl-group" data-only-stack hidden>
+    <span class="ctl-label">지금 보는 것</span>
+    <div class="seg" role="group">
+      <button type="button" data-show-btn="before" aria-pressed="true">BEFORE</button>
+      <button type="button" data-show-btn="after" aria-pressed="false">AFTER</button>
+    </div>
+  </div>
+  <div class="ctl-group">
+    <span class="ctl-label">카드 모서리</span>
+    <div class="seg" role="group">
+      <button type="button" data-knob="radius" data-val="4px" aria-pressed="false">4</button>
+      <button type="button" data-knob="radius" data-val="8px" aria-pressed="false">8</button>
+      <button type="button" data-knob="radius" data-val="12px" aria-pressed="true">12</button>
+      <button type="button" data-knob="radius" data-val="16px" aria-pressed="false">16</button>
+    </div>
+  </div>
+  <div class="ctl-group">
+    <span class="ctl-label">본문 크기</span>
+    <div class="seg" role="group">
+      <button type="button" data-knob="body" data-val="14" aria-pressed="false">14</button>
+      <button type="button" data-knob="body" data-val="16" aria-pressed="true">16</button>
+      <button type="button" data-knob="body" data-val="20" aria-pressed="false">20</button>
+    </div>
+  </div>
+  <div class="ctl-group">
+    <span class="ctl-label">그림자</span>
+    <div class="seg" role="group">
+      <button type="button" data-knob="elev" data-val="2" aria-pressed="true">2</button>
+      <button type="button" data-knob="elev" data-val="4" aria-pressed="false">4</button>
+      <button type="button" data-knob="elev" data-val="8" aria-pressed="false">8</button>
+    </div>
+  </div>
+  <p class="ctl-note">AFTER 쪽에만 적용됩니다 · Tab 키로 포커스 비교</p>
+</div>
+
+<!-- ══════════════ 1. 진단 ══════════════ -->
+<section id="diag">
+  <div class="sec-hd">
+    <span class="n">01 / 진단</span>
+    <h2>지금 무엇이 문제인가</h2>
+    <p class="note">CSS 3개 파일(globals 537줄 · admin 329줄 · login 62줄)을 전수 조사한 실측이다. Tailwind 유틸리티는 단 한 곳도 쓰이지 않아 <code>tailwind.config.js</code> 의 색 토큰은 죽은 설정이다.</p>
+  </div>
+  <div class="grid g3">
+    <div class="card">
+      <h4>타입 램프가 없다</h4>
+      <p class="note" style="margin-top:6px">
+        <b class="num" style="font-size:26px;color:var(--t-accent)">21</b> 종의 font-size 가
+        11 · 11.5 · 12 · 12.5 · 13 · 13.5 · 14 · 14.5 · 15 · 15.5 · 16 · 16.5 · 17 · 17.5 · 18 · 18.5 · 19 · 20 · 22 · 23 · 24px 로
+        0.5px 단위까지 흩어져 있다. 0.5px 차이는 사람이 구분하지 못하므로 위계가 아니라 잡음이다.
+      </p>
+    </div>
+    <div class="card">
+      <h4>모서리·그림자에 위계가 없다</h4>
+      <p class="note" style="margin-top:6px">
+        <b class="num" style="font-size:26px;color:var(--t-accent)">20</b> 종 radius —
+        <code>--radius:16px</code> 를 선언해두고 실제로는 7·8·9·10·12·16·18·999px 를 하드코딩했다.
+        그림자는 <b class="num">15</b> 종이고 전부 음수 spread 를 쓴 각자 다른 레시피다.
+      </p>
+    </div>
+    <div class="card">
+      <h4>상태가 hover 하나뿐이다</h4>
+      <p class="note" style="margin-top:6px">
+        <code>:focus-visible</code> <b class="num" style="color:var(--t-accent)">0</b>건 ·
+        <code>:active</code> <b class="num" style="color:var(--t-accent)">0</b>건 ·
+        <code>:disabled</code> <b class="num" style="color:var(--t-accent)">0</b>건.
+        버튼·대메뉴·페이저·탭·캐러셀 도트를 키보드로 이동하면 어디에 있는지 보이지 않는다 (WCAG 2.4.7 위반).
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 2. 램프 ══════════════ -->
+<section id="ramps">
+  <div class="sec-hd">
+    <span class="n">02 / 기반</span>
+    <h2>단청 램프 — 색은 그대로, 계단만 생긴다</h2>
+    <p class="note">
+      Fluent <code>brandWeb</code>(#0f6cbd 기준 16단)의 OKLCH 명도차·채도비 곡선을 그대로 떼어내
+      석간주·뇌록·금의 색상각에 적용했다. <b>80 단계는 현재 쓰는 색과 정확히 같은 hex</b> 이고,
+      나머지 단계가 hover·pressed·틴트·테두리를 공급한다. 흰 테두리로 표시한 칸이 앵커다.
+    </p>
+  </div>
+  <div class="grid" style="gap:22px">
+    <div class="ramp-row" data-ramp="seok">
+      <h4>석간주 <span class="mono">brand · H 29.7°</span> <span class="chip keep" style="padding:2px 8px;font-size:11px">앵커 80 = #9E3B2F 보존</span></h4>
+      <div class="ramp"></div>
+      <div class="ramp-legend"><span>10 · 어두움</span><span>80 · 앵커</span><span>160 · 틴트</span></div>
+    </div>
+    <div class="ramp-row" data-ramp="noe">
+      <h4>뇌록 <span class="mono">secondary · H 184.8°</span> <span class="chip keep" style="padding:2px 8px;font-size:11px">앵커 80 = #2E7D74 보존</span></h4>
+      <div class="ramp"></div>
+    </div>
+    <div class="ramp-row" data-ramp="gold">
+      <h4>금 <span class="mono">장식 스트로크 전용 · 축약 램프</span> <span class="chip change" style="padding:2px 8px;font-size:11px">밝은 단계는 sRGB 색역 밖</span></h4>
+      <div class="ramp"></div>
+      <p class="note" style="margin-top:4px">금은 흰 글씨 대비가 2.41 로 버튼 배경에 쓸 수 없다. 현재도 장식선(표 상단, 연혁 축, 인용)에만 쓰이므로 램프를 40~100 으로 줄인다.</p>
+    </div>
+    <div class="ramp-row" data-ramp="danger">
+      <h4>위험 <span class="mono">danger · 석간주에서 색상각 12° 분리</span> <span class="chip change" style="padding:2px 8px;font-size:11px">신설</span></h4>
+      <div class="ramp"></div>
+      <p class="note" style="margin-top:4px">
+        현재 삭제 버튼 색 <code>#b23b2c</code> 는 석간주 80 <code>#9e3b2f</code> 와 OKLCH 거리 0.04 로 사실상 같은 색이다.
+        즉 <b>되돌릴 수 없는 동작이 브랜드색과 구분되지 않는다.</b> 채도를 올리고 붉은 쪽으로 틀어 분리한다.
+      </p>
+    </div>
+    <div class="ramp-row" data-ramp="neutral">
+      <h4>중성 <span class="mono">Fluent 중성 램프를 한지 색상각(H 84.6°)으로 이식</span></h4>
+      <div class="ramp"></div>
+      <p class="note" style="margin-top:4px">
+        Fluent 의 무채색 회색(#ffffff → #e6e6e6, #242424 → #707070) 계단을 한지 톤으로 옮겼다.
+        현재 손으로 박아둔 <code>#f6efe3</code>(표 헤더) · <code>#f0ece3</code>(배지) · <code>#fcf9f3</code>(캘린더 셀) 이
+        모두 이 램프의 특정 단계와 OKLCH 거리 0.018 이내로 일치한다 — <b>거의 같은 색인데 이름이 없었을 뿐이다.</b>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 3. 척도 ══════════════ -->
+<section id="scales">
+  <div class="sec-hd">
+    <span class="n">03 / 기반</span>
+    <h2>척도 — 21종을 6단으로, 15종을 3단으로</h2>
+  </div>
+
+  <div class="grid g2">
+    <div class="card">
+      <h4>타입 램프</h4>
+      <p class="note" style="margin:6px 0 12px">
+        Fluent 램프에서 실제로 쓸 단계만 고른다. 한글은 Fluent 의 라틴 기준 lineHeight 로는 답답하므로
+        <b>단계는 유지하고 행간만 보정</b>한다 (16px 은 22 → 26px).
+      </p>
+      <div id="typespec"></div>
+    </div>
+
+    <div class="card">
+      <h4>간격 램프 <span class="mono" style="font-weight:400;color:var(--t-dim);font-size:11.5px">Fluent spacing</span></h4>
+      <p class="note" style="margin:6px 0 12px">2 · 4 · 6 · 8 · 10 · 12 · 16 · 20 · 24 · 32px. 현재 9 · 11 · 13 · 14 · 15 · 17 · 18 · 22 · 26px 같은 홀수값이 여기로 흡수된다.</p>
+      <div id="spacespec" class="grid" style="gap:6px"></div>
+      <p class="note" style="margin-top:12px">
+        <b style="color:var(--t-accent)">주의</b> — <code>--nav-h:94px</code> / <code>--foot-h:44px</code> 는
+        실측 보정값이고 <code>calc(100vh - var(--nav-h) - var(--foot-h))</code> 로 6개 화면의 높이를 결정한다.
+        간격을 바꾸면 이 값들이 어긋나므로 함께 재계산해야 한다.
+      </p>
+    </div>
+
+    <div class="card">
+      <h4>모서리 램프 <span class="mono" style="font-weight:400;color:var(--t-dim);font-size:11.5px">Fluent borderRadius</span></h4>
+      <p class="note" style="margin:6px 0 12px">
+        Fluent 램프에는 16px(3XLarge)·24px(4XLarge)도 있다. 즉 <b>램프를 따르면서도 지금의 부드러운 느낌을 유지할 수 있다</b> —
+        위 컨트롤바의 &ldquo;카드 모서리&rdquo;로 직접 비교해 보시라.
+      </p>
+      <div class="viz-row" id="radiusspec"></div>
+      <div class="tbl-wrap" style="margin-top:12px">
+        <table class="data">
+          <thead><tr><th>요소</th><th>현재</th><th>제안</th><th>Fluent 단계</th></tr></thead>
+          <tbody>
+            <tr><td>입력 · 셀렉트</td><td class="num">9~10px</td><td class="num">4px</td><td>Medium</td></tr>
+            <tr><td>작은 버튼 · 액션</td><td class="num">7px</td><td class="num">4px</td><td>Medium</td></tr>
+            <tr><td>카드 · 패널</td><td class="num">12~18px</td><td class="num" id="cardr">12px</td><td id="cardrl">2XLarge</td></tr>
+            <tr><td>드롭다운 · 시트</td><td class="num">12px</td><td class="num">8px</td><td>XLarge</td></tr>
+            <tr><td>알약형(탭·배지)</td><td class="num">999px</td><td class="num">10000px</td><td>Circular</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h4>엘리베이션 <span class="mono" style="font-weight:400;color:var(--t-dim);font-size:11.5px">ambient + key 2겹</span></h4>
+      <p class="note" style="margin:6px 0 12px">
+        Fluent 는 그림자를 늘 두 겹으로 쓴다 — 넓게 퍼지는 ambient 와 방향을 주는 key.
+        현재의 <code>0 18px 40px -30px</code> 처럼 음수 spread 한 겹으로는 부양 높이가 일정하지 않다.
+        그림자 색은 먹 계열 <code>rgba(35,33,30,·)</code> 로 유지한다.
+      </p>
+      <div class="grid g3" id="elevspec" style="gap:12px"></div>
+    </div>
+
+    <div class="card" style="grid-column:1/-1">
+      <h4>모션 <span class="mono" style="font-weight:400;color:var(--t-dim);font-size:11.5px">Fluent duration + curve</span></h4>
+      <p class="note" style="margin:6px 0 12px">
+        현재 <code>.15s</code>/<code>.18s</code>/<code>.2s</code>/<code>.25s</code> 가 혼용되고,
+        캐러셀은 <code>cubic-bezier(.4,0,.2,1)</code> 즉 <b>Material Design 커브</b>를 쓴다.
+        Fluent 원칙은 — 들어올 때 Decelerate, 나갈 때 Accelerate, 상태 전환은 EasyEase.
+      </p>
+      <div class="tbl-wrap">
+        <table class="data">
+          <thead><tr><th>쓰임</th><th>현재</th><th>제안</th><th>커브</th><th>근거</th></tr></thead>
+          <tbody>
+            <tr><td>호버·색 전환</td><td class="num">.15s / .18s / .2s / .25s</td><td class="num">150ms <span class="mono" style="color:var(--t-dim)">Fast</span></td><td class="mono">curveEasyEase</td><td class="wrap">상태 전환은 시작·끝이 대칭</td></tr>
+            <tr><td>드롭다운 열기</td><td class="num">없음(즉시)</td><td class="num">200ms <span class="mono" style="color:var(--t-dim)">Normal</span></td><td class="mono">curveDecelerateMid</td><td class="wrap">진입은 빠르게 시작해 부드럽게 정착</td></tr>
+            <tr><td>드롭다운 닫기</td><td class="num">없음</td><td class="num">100ms <span class="mono" style="color:var(--t-dim)">Faster</span></td><td class="mono">curveAccelerateMin</td><td class="wrap">이탈은 지체 없이</td></tr>
+            <tr><td>카드 부양</td><td class="num">.2s ease</td><td class="num">150ms <span class="mono" style="color:var(--t-dim)">Fast</span></td><td class="mono">curveEasyEase</td><td class="wrap">—</td></tr>
+            <tr><td>히어로 캐러셀</td><td class="num">.8s <span style="color:var(--t-accent)">Material 커브</span></td><td class="num">500ms <span class="mono" style="color:var(--t-dim)">UltraSlow</span></td><td class="mono">curveEasyEaseMax</td><td class="wrap">Fluent 램프 상한이 500ms — 800ms 는 램프 밖이라 상한으로 내린다</td></tr>
+            <tr><td>배경 교차 페이드</td><td class="num">1.6s</td><td class="num">500ms + 유지시간 분리</td><td class="mono">curveLinear</td><td class="wrap">1.6s 는 전환이 아니라 &lsquo;연출&rsquo; — duration 이 아니라 슬라이드 간격으로 표현해야 한다</td></tr>
+            <tr><td>스크롤 등장</td><td class="num">.6s</td><td class="num">300ms <span class="mono" style="color:var(--t-dim)">Slow</span></td><td class="mono">curveDecelerateMin</td><td class="wrap">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note" style="margin-top:10px"><b style="color:var(--t-accent)">누락</b> — <code>prefers-reduced-motion</code> 대응이 <code>.reveal</code> 과 스크롤에만 있다. 카드 부양·캐러셀·배경 페이드·드롭다운은 모두 빠져 있다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 4. 실물 시안 ══════════════ -->
+<section id="specimens">
+  <div class="sec-hd">
+    <span class="n">04 / 실물</span>
+    <h2>같은 마크업, 다른 척도</h2>
+    <p class="note">
+      아래 BEFORE 는 현재 CSS 값을 그대로 옮긴 것이고, AFTER 는 위 램프만 적용한 것이다.
+      마크업과 색은 동일하다. <b>Tab 키를 눌러 두 쪽의 포커스 표시를 비교해 보시라</b> — 이 차이가 가장 크다.
+    </p>
+  </div>
+
+  <!-- 헤더 -->
+  <div class="plate">
+    <div class="plate-hd"><h3>헤더 · 대메뉴</h3><p>모든 페이지 공통 — 상단바 46px + 대메뉴 바</p></div>
+    <div class="plate-body" data-specimen="nav"></div>
+  </div>
+
+  <!-- 홈 3패널 -->
+  <div class="plate">
+    <div class="plate-hd"><h3>홈 · 3패널</h3><p>소식 표 · 산신도 카드 · 법회 목록</p></div>
+    <div class="plate-body" data-specimen="home"></div>
+  </div>
+
+  <!-- 목록 표 -->
+  <div class="plate">
+    <div class="plate-hd"><h3>목록 표</h3><p>공지사항 · 게시판 · 묻고답하기 등 6개 화면이 공유</p></div>
+    <div class="plate-body" data-specimen="list"></div>
+  </div>
+
+  <!-- 폼 -->
+  <div class="plate">
+    <div class="plate-hd"><h3>폼 · 검증 메시지</h3><p>회원가입 · 로그인 · 글쓰기 — 입력 경계선 대비가 핵심</p></div>
+    <div class="plate-body" data-specimen="form"></div>
+  </div>
+
+  <!-- 컨트롤 -->
+  <div class="plate">
+    <div class="plate-hd"><h3>컨트롤 모음</h3><p>버튼 · 탭 · 페이저 · 배지 · 라디오 — pressed / disabled 포함</p></div>
+    <div class="plate-body" data-specimen="ctl"></div>
+  </div>
+
+  <!-- 관리자 -->
+  <div class="plate">
+    <div class="plate-hd"><h3>관리자 목록</h3><p>삭제 버튼이 브랜드색에서 분리된다</p></div>
+    <div class="plate-body" data-specimen="adm"></div>
+  </div>
+
+  <!-- 캘린더 -->
+  <div class="plate">
+    <div class="plate-hd"><h3>법회·행사 캘린더</h3><p>음력 표기 대비 · 일정 종류를 색만으로 구분하던 문제</p></div>
+    <div class="plate-body" data-specimen="cal"></div>
+  </div>
+
+  <!-- 상세 표 -->
+  <div class="plate">
+    <div class="plate-hd"><h3>상세 표</h3><p>행사·공지 상세 — 정해진 틀</p></div>
+    <div class="plate-body" data-specimen="detail"></div>
+  </div>
+</section>
+
+<!-- ══════════════ 5. 상태 ══════════════ -->
+<section id="states">
+  <div class="sec-hd">
+    <span class="n">05 / 상태</span>
+    <h2>6상태 규약 — 지금은 두 칸만 채워져 있다</h2>
+    <p class="note">Fluent 2 는 모든 상호작용 요소가 rest · hover · pressed · selected · disabled · focus 를 갖도록 규정한다. 현재 상태를 전수 조사한 결과다.</p>
+  </div>
+  <div class="card state-grid">
+    <table>
+      <thead><tr><th>요소</th><th>rest</th><th>hover</th><th>pressed</th><th>selected</th><th>disabled</th><th>focus</th></tr></thead>
+      <tbody id="stategrid"></tbody>
+    </table>
+  </div>
+  <p class="note" style="margin-top:12px">
+    <b style="color:var(--t-accent)">포커스가 특히 문제다.</b> 현재 입력 필드만
+    <code>outline:2px solid var(--accent); outline-offset:1px</code> 을 갖는데, 이것도
+    <code>:focus</code> 라서 마우스 클릭에도 뜨고(<code>:focus-visible</code> 이 아니다),
+    석간주 단색이라 흰 서피스와 한지 배경 중 한쪽에서 대비가 약해진다.
+    Fluent 2 방식은 <b>밝은 안쪽 선 + 어두운 바깥쪽 선 2겹</b>이라 어느 배경에서도 보인다.
+  </p>
+</section>
+
+<!-- ══════════════ 6. 접근성 ══════════════ -->
+<section id="a11y">
+  <div class="sec-hd">
+    <span class="n">06 / 접근성</span>
+    <h2>명도 대비 실측 — 현재 5건 위반</h2>
+    <p class="note">WCAG 2.1 공식(상대휘도 → 대비비)으로 실제 계산했다. 본문 4.5:1, 비텍스트 UI 요소 3:1 기준.</p>
+  </div>
+  <div class="tbl-wrap">
+    <table class="data">
+      <thead><tr><th>조합</th><th>전경</th><th>배경</th><th>대비</th><th>기준</th><th>판정</th><th>단청 유지 수정안</th></tr></thead>
+      <tbody id="a11ygrid"></tbody>
+    </table>
+  </div>
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card">
+      <h4>입력 필드 경계선 — 새로 드러난 위반</h4>
+      <p class="note" style="margin-top:6px">
+        현재 모든 입력이 <code>border:1px solid var(--line)</code> = <code>#E7DECF</code> 를 쓴다.
+        한지 배경 위 대비가 <b class="num" style="color:var(--t-accent)">1.20:1</b> 이다.
+        WCAG 1.4.11 은 <b>컨트롤의 경계선</b>에 3:1 을 요구한다 — 장식용 구분선은 면제지만
+        입력 필드 테두리는 그 컨트롤을 식별하는 요소라 면제 대상이 아니다.
+      </p>
+      <p class="note" style="margin-top:8px">
+        Fluent 2 는 이걸 위해 <code>colorNeutralStrokeAccessible</code> (#616161, 6.19:1) 을 별도로 둔다.
+        한지판은 <code>#63615d</code> — 대비 <b class="num pass">6.18:1</b>.
+      </p>
+    </div>
+    <div class="card">
+      <h4>제 임계값 오류를 밝혀둔다</h4>
+      <p class="note" style="margin-top:6px">
+        처음 검증에서 <code>Stroke1</code>/<code>Stroke2</code>/비활성 전경을 3:1 로 걸어 &ldquo;실패&rdquo;로 판정했는데
+        <b>기준을 잘못 적용한 것이다.</b> Fluent 자신의 <code>colorNeutralStroke1</code> <code>#d1d1d1</code> 도
+        흰 배경 대비 1.53 이고, WCAG 1.4.11 은 장식용 구분선을, 1.4.3 은 비활성 컨트롤을 명시적으로 면제한다.
+        장식선 1.5:1 은 결함이 아니다. 진짜 조치 항목은 위의 <b>입력 경계선</b> 하나다.
+      </p>
+    </div>
+    <div class="card" style="grid-column:1/-1">
+      <h4>대비 외 결손</h4>
+      <div class="tbl-wrap" style="margin-top:8px">
+        <table class="data">
+          <thead><tr><th>위치</th><th>문제</th><th>조치</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">.hcx-dots button</td><td class="wrap">캐러셀 도트가 9×9px — 터치 타깃 최소 24×24px 미달 (WCAG 2.5.8)</td><td class="wrap">시각 크기는 9px 유지하고 투명 패딩으로 히트 영역만 24px 확보</td></tr>
+            <tr><td class="mono">.cal-ev / .cal-ev.reg</td><td class="wrap">일정 종류(행사/정기법회)를 <b>배경색만으로</b> 구분 — 색각 이상에서 구분 불가 (WCAG 1.4.1)</td><td class="wrap">점 표식 또는 짧은 라벨을 병기 (AFTER 캘린더에 적용해 두었다)</td></tr>
+            <tr><td class="mono">.cal-grid th.sun / .sat</td><td class="wrap">주말을 색만으로 구분</td><td class="wrap">색 + 요일 약자 유지로 이미 이중화됨 — 대비만 보정</td></tr>
+            <tr><td class="mono">.gnb-group</td><td class="wrap">대메뉴가 <code>onMouseEnter</code> 로만 열림 — 키보드로 하위 항목 도달 경로가 불안정</td><td class="wrap"><code>:focus-within</code> 추가 + <code>aria-expanded</code> 는 이미 있음</td></tr>
+            <tr><td class="mono">.hmb</td><td class="wrap">모바일 햄버거가 <code>span</code> 3개 — 아이콘에 <code>aria-hidden</code> 없음</td><td class="wrap">장식 span 에 <code>aria-hidden="true"</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 7. 결정 ══════════════ -->
+<section id="decide">
+  <div class="sec-hd">
+    <span class="n">07 / 확정</span>
+    <h2>확정된 방향</h2>
+    <p class="note">
+      2026-07-30 승인. 아래 값이 시안의 AFTER 기본값으로 고정되어 있다.
+      컨트롤바의 노브는 남겨 두었으니 다른 단계와 계속 비교해 볼 수 있다.
+    </p>
+  </div>
+  <div class="decide">
+    <div class="decide-item">
+      <h4>1 · 카드 모서리<span class="chip keep" style="padding:2px 8px;font-size:11px">확정 12px · 2XLarge</span></h4>
+      <p class="q">4px 은 업무 도구처럼 단단하고, 16px 은 지금의 부드러움을 유지한다. 둘 다 Fluent 램프 안이다.</p>
+      <p class="rec">현재 16px 에서 한 단계만 조여 산사의 부드러움을 남기면서 Fluent 위계(입력 4 &lt; 카드 12 &lt; 드롭다운 8)를 만든다. 4px 은 사찰 홈페이지에 너무 사무적이라 채택하지 않았다.</p>
+    </div>
+    <div class="decide-item">
+      <h4>2 · 본문 크기<span class="chip keep" style="padding:2px 8px;font-size:11px">확정 16px / 행간 26px</span></h4>
+      <p class="q">현재 사이트는 18px / line-height 1.8(= 32px) 이다. Fluent 기본 본문 14px/20px 은 한글에 작다.</p>
+      <p class="rec">
+        Base400 단계를 쓰고 행간만 한글용으로 22 → 26px 보정한다.
+        <b style="color:var(--t-accent)">현재 18px 에서 2px 줄어드는 변화</b>이므로, 실제 화면에 얹은 뒤 본문 밀도를 한 번 더 확인한다.
+        답답하면 Base500(20px/32px)로 한 단계 올리는 것이 대안이다 — 램프 안이라 토큰 한 줄만 바꾸면 된다.
+      </p>
+    </div>
+    <div class="decide-item">
+      <h4>3 · 엘리베이션<span class="chip keep" style="padding:2px 8px;font-size:11px">확정 rest 2 · hover 4 · 드롭다운 16</span></h4>
+      <p class="q">현재 그림자는 음수 spread 로 아주 옅게 깔려 있어 실효 부양은 shadow2~4 사이다.</p>
+      <p class="rec">지금의 은은함을 유지하는 값이다. 그림자 색은 먹 계열 <code>rgba(35,33,30,·)</code> 로 유지해 검정 그림자의 차가움을 피한다.</p>
+    </div>
+    <div class="decide-item">
+      <h4>4 · 위험색 분리<span class="chip change" style="padding:2px 8px;font-size:11px">확정 신설 #af1937</span></h4>
+      <p class="q">삭제 버튼을 석간주에서 떼어내면 단청 팔레트에 없던 색이 하나 들어온다.</p>
+      <p class="rec">되돌릴 수 없는 동작이 브랜드색과 같으면 실수를 유발한다. 석간주에서 색상각 12° 를 틀고 채도를 1.35배 올려 분리했다. 흰 글씨 대비 6.96:1 로 AA 통과.</p>
+    </div>
+    <div class="decide-item">
+      <h4>5 · 적용 순서<span class="chip keep" style="padding:2px 8px;font-size:11px">확정 병행 이전</span></h4>
+      <p class="q">공통 토큰 → 공개 페이지 → 관리자/폼. 한 번에 갈지 나눠 갈지.</p>
+      <p class="rec">
+        토큰 레이어를 먼저 넣고 기존 값과 <b>병행</b>시킨다 — <code>--line</code> 을 <code>--n-stroke-2</code> 의 별칭으로 두는 방식.
+        그러면 화면별로 하나씩 옮기면서 언제든 <code>Ver1.1</code> 로 되돌릴 수 있고, 중간 상태에서도 사이트가 깨지지 않는다.
+      </p>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+<p class="note" style="margin-top:20px">
+  이 시안 자체는 코드베이스를 수정하지 않는다 — 독립 페이지이고, BEFORE 쪽은 현재 CSS 값을 그대로 옮긴 것이라 비교가 공정하다.
+  롤백 기준점은 <code>Ver1.1</code> 태그(<code>67a2ba0</code>)이고, 구현은 그 지점에서 갈라진 브랜치에서 진행한다.
+</p>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ── 램프 데이터 (OKLCH 이식 결과) ── */
+  var RAMPS = {
+    seok:   {anchor:80, stops:{10:'#190806',20:'#2a0f0b',30:'#3a1611',40:'#4c1f19',50:'#60261e',60:'#742e25',70:'#873329',80:'#9e3b2f',90:'#be5243',100:'#d66a5b',110:'#da7d6f',120:'#df8d80',130:'#e5a297',140:'#e8b9b1',150:'#ebcdc8',160:'#eee3e0'}},
+    noe:    {anchor:80, stops:{10:'#0e1b19',20:'#142826',30:'#1a3531',40:'#21433e',50:'#25514b',60:'#2a6059',70:'#2a6d65',80:'#2e7d74',90:'#44978d',100:'#60aea4',110:'#77b8af',120:'#8bc2ba',130:'#a4d0c9',140:'#c0ded9',150:'#d8eae7',160:'#f1f8f7'}},
+    gold:   {anchor:80, stops:{40:'#806e47',50:'#927b49',60:'#a4884c',70:'#b4944a',80:'#c8a24b',90:'#e6bc5f',100:'#fed57c'}},
+    danger: {anchor:80, stops:{50:'#6b1622',60:'#811a2b',70:'#961830',80:'#af1937',90:'#d2354b',150:'#f2c9ca',160:'#f1e2e0'}},
+    neutral:{anchor:null, stops:{'fg1':'#23211e','fg2':'#44423e','fg3':'#63615d','fg4':'#73706a','dis':'#c0bdb5','st1':'#d4d1c9','st2':'#e4e0d8','bg6':'#eae6de','bg5':'#efebe3','bg4':'#f4f0e8','bg3':'#f9f5ed','bg2':'#fefaf2','bg1':'#ffffff'}}
+  };
+
+  /* ── 대비비 계산 (WCAG 2.1) ── */
+  function lin(c){ return c <= 0.04045 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4); }
+  function lum(hex){
+    var h = hex.replace('#','');
+    var r = lin(parseInt(h.slice(0,2),16)/255), g = lin(parseInt(h.slice(2,4),16)/255), b = lin(parseInt(h.slice(4,6),16)/255);
+    return 0.2126*r + 0.7152*g + 0.0722*b;
+  }
+  function cr(a,b){ var x=lum(a), y=lum(b); return (Math.max(x,y)+0.05)/(Math.min(x,y)+0.05); }
+  function fg(bg){ return cr(bg,'#ffffff') >= 3.2 ? '#ffffff' : '#23211e'; }
+
+  /* ── 램프 렌더 ── */
+  Object.keys(RAMPS).forEach(function(key){
+    var row = document.querySelector('[data-ramp="'+key+'"] .ramp');
+    if(!row) return;
+    var R = RAMPS[key];
+    Object.keys(R.stops).forEach(function(step){
+      var hex = R.stops[step];
+      var d = document.createElement('div');
+      d.className = 'stop' + (String(step) === String(R.anchor) ? ' anchor' : '');
+      d.style.background = hex;
+      d.style.color = fg(hex);
+      d.title = step + ' · ' + hex + ' · 흰색 대비 ' + cr(hex,'#ffffff').toFixed(2);
+      d.innerHTML = '<span>' + step + '</span>';
+      row.appendChild(d);
+    });
+  });
+
+  /* ── 타입 램프 ── */
+  var TYPE = [
+    ['caption1',  12, 18, 400, '캡션 · 날짜 · 첨부 크기',        '11 / 11.5 / 12 / 12.5 / 13'],
+    ['body1',     14, 22, 400, '표 셀 · 보조 설명',              '13.5 / 14 / 14.5 / 15'],
+    ['body2',     16, 26, 400, '본문 — 한글 보정 행간',          '15.5 / 16 / 16.5 / 17 / 17.5'],
+    ['subtitle2', 16, 26, 600, '카드 제목 · 강조 본문',          '17 / 17.5 / 18 / 18.5'],
+    ['subtitle1', 20, 30, 600, '패널 제목 (Noto Serif KR)',      '18.5 / 19 / 20'],
+    ['title3',    24, 34, 600, '섹션 제목 (Noto Serif KR)',      '22 / 23 / 24']
+  ];
+  var ts = document.getElementById('typespec');
+  TYPE.forEach(function(t){
+    var el = document.createElement('div');
+    el.className = 'type-spec';
+    el.innerHTML =
+      '<span class="lbl">' + t[0] + ' · ' + t[1] + 'px / ' + t[2] + 'px / ' + t[3] +
+      '  <span style="color:var(--t-accent)">← ' + t[5] + '</span></span>' +
+      '<span class="smp" style="font-size:' + t[1] + 'px;line-height:' + t[2] + 'px;font-weight:' + t[3] +
+      (t[0].indexOf('title') === 0 || t[0] === 'subtitle1' ? ';font-family:var(--t-font-title)' : '') +
+      '">' + t[4] + '</span>';
+    ts.appendChild(el);
+  });
+
+  /* ── 간격 램프 ── */
+  var SPACE = [['XXS',2],['XS',4],['SNudge',6],['S',8],['MNudge',10],['M',12],['L',16],['XL',20],['XXL',24],['XXXL',32]];
+  var sp = document.getElementById('spacespec');
+  SPACE.forEach(function(s){
+    var r = document.createElement('div');
+    r.className = 'viz-row';
+    r.innerHTML = '<span class="mono" style="width:66px;color:var(--t-dim);font-size:10.5px">' + s[0] + '</span>' +
+                  '<span class="viz-bar" style="width:' + (s[1]*3) + 'px"></span>' +
+                  '<span class="num" style="color:var(--t-dim);font-size:11.5px">' + s[1] + 'px</span>';
+    sp.appendChild(r);
+  });
+
+  /* ── 모서리 램프 ── */
+  var RADII = [['Medium',4],['Large',6],['XLarge',8],['2XLarge',12],['3XLarge',16],['4XLarge',24]];
+  var rs = document.getElementById('radiusspec');
+  RADII.forEach(function(r){
+    var d = document.createElement('div');
+    d.className = 'viz-sq';
+    d.style.borderRadius = r[1] + 'px';
+    d.innerHTML = r[1];
+    d.title = r[0] + ' · ' + r[1] + 'px';
+    rs.appendChild(d);
+  });
+
+  /* ── 엘리베이션 ── */
+  var ELEV = [
+    ['shadow2',  '0 0 2px rgba(35,33,30,.12), 0 1px 2px rgba(35,33,30,.14)',   '카드 rest'],
+    ['shadow4',  '0 0 2px rgba(35,33,30,.12), 0 2px 4px rgba(35,33,30,.14)',   '카드 hover'],
+    ['shadow8',  '0 0 2px rgba(35,33,30,.12), 0 4px 8px rgba(35,33,30,.14)',   '떠 있는 패널'],
+    ['shadow16', '0 0 2px rgba(35,33,30,.12), 0 8px 16px rgba(35,33,30,.14)',  '드롭다운'],
+    ['shadow28', '0 0 8px rgba(35,33,30,.12), 0 14px 28px rgba(35,33,30,.14)', '시트'],
+    ['shadow64', '0 0 8px rgba(35,33,30,.12), 0 32px 64px rgba(35,33,30,.14)', '모달']
+  ];
+  var ev = document.getElementById('elevspec');
+  ELEV.forEach(function(e){
+    var d = document.createElement('div');
+    d.className = 'viz-el';
+    d.style.boxShadow = e[1];
+    d.innerHTML = e[0] + '<br><span style="opacity:.7">' + e[2] + '</span>';
+    ev.appendChild(d);
+  });
+
+  /* ── 상태 매트릭스 ── */
+  var STATES = [
+    ['.btn-primary',      1,1,0,0,0,0],
+    ['.btn-ghost',        1,1,0,0,0,0],
+    ['.top-login',        1,1,0,0,0,0],
+    ['.top-link',         1,1,0,0,0,0],
+    ['.top-admin',        1,1,0,0,0,0],
+    ['.gnb-top',          1,1,0,1,0,0],
+    ['.gnb-sub a',        1,1,0,0,0,0],
+    ['.hmb',              1,0,0,0,0,0],
+    ['.pg-num',           1,1,0,1,1,0],
+    ['.pg-arrow',         1,1,0,0,1,0],
+    ['.post-tabs a',      1,0,0,1,0,0],
+    ['.find-tab',         1,0,0,1,0,0],
+    ['.view-toggle a',    1,0,0,1,0,0],
+    ['.cal-nav a',        1,1,0,0,0,0],
+    ['.cal-ev',           1,1,0,0,0,0],
+    ['.hcx-dots button',  1,0,0,1,0,0],
+    ['.ncard / .gal-card',1,1,0,0,0,0],
+    ['.hcard / .hfade',   1,1,0,0,0,0],
+    ['.site-card',        1,1,0,0,0,0],
+    ['.list-table tr',    1,1,0,0,0,0],
+    ['.post-list a',      1,1,0,0,0,0],
+    ['.more / .more-btn', 1,1,0,0,0,0],
+    ['.adm-nav a',        1,1,0,0,0,0],
+    ['.adm-mainnav a',    1,1,0,0,0,0],
+    ['.adm-logout',       1,1,0,0,0,0],
+    ['.adm-link-btn',     1,1,0,0,0,0],
+    ['.adm-link-btn.danger',1,1,0,0,0,0],
+    ['.sns-btn',          1,0,0,0,1,0],
+    ['.ev-radio',         1,0,0,1,0,0],
+    ['.auth-field input', 1,0,0,0,0,2],
+    ['.adm-field input',  1,0,0,0,0,2],
+    ['.login-field input',1,0,0,0,0,2],
+    ['.qna-textarea',     1,0,0,0,0,2]
+  ];
+  var sg = document.getElementById('stategrid');
+  var counts = [0,0,0,0,0,0];
+  STATES.forEach(function(row){
+    var tr = document.createElement('tr');
+    var html = '<td>' + row[0] + '</td>';
+    for (var i = 1; i <= 6; i++){
+      var v = row[i];
+      if (v) counts[i-1]++;
+      html += '<td class="' + (v ? 'yes' : 'no') + '">' + (v === 2 ? '△' : v ? '●' : '○') + '</td>';
+    }
+    tr.innerHTML = html;
+    sg.appendChild(tr);
+  });
+  var tot = STATES.length;
+  var foot = document.createElement('tr');
+  foot.style.borderTop = '2px solid var(--t-line)';
+  foot.innerHTML = '<td style="font-weight:700;font-family:var(--t-font-ui)">채워진 비율</td>' +
+    counts.map(function(c){
+      var pct = Math.round(c/tot*100);
+      return '<td style="font-weight:700;color:' + (pct > 60 ? 'var(--t-teal)' : 'var(--t-accent)') + '">' + pct + '%</td>';
+    }).join('');
+  sg.appendChild(foot);
+  var legend = document.createElement('tr');
+  legend.innerHTML = '<td colspan="7" style="text-align:left;font-family:var(--t-font-ui);font-size:11.5px;color:var(--t-dim);background:var(--t-panel)">● 정의됨 · ○ 없음 · △ <code>:focus</code> 만 있음(<code>:focus-visible</code> 아님 — 마우스 클릭에도 링이 뜬다)</td>';
+  sg.appendChild(legend);
+
+  /* ── 접근성 표 ── */
+  var A11Y = [
+    ['음력 표기',            '#b3a892', '#fcf9f3', 4.5, '#7d725e'],
+    ['진행중 배지',          '#b8860b', '#fbf1e0', 4.5, '#906800'],
+    ['정기법회 일정',        '#2E7D74', '#e6f1ee', 4.5, '#28786f'],
+    ['일요일 요일머리',      '#c0574a', '#FAF6EE', 4.5, '#b95144'],
+    ['금색 장식선',          '#C8A24B', '#FFFFFF', 3.0, '#b58f37'],
+    ['입력 필드 경계선',     '#E7DECF', '#FAF6EE', 3.0, '#63615d'],
+    ['본문 보조 텍스트',     '#6B6258', '#FAF6EE', 4.5, null],
+    ['본문 보조 on 흰색',    '#6B6258', '#FFFFFF', 4.5, null],
+    ['브랜드 링크',          '#9E3B2F', '#FFFFFF', 4.5, null],
+    ['뇌록 링크',            '#2E7D74', '#FFFFFF', 4.5, null],
+    ['주 버튼 흰 글씨',      '#FFFFFF', '#9E3B2F', 4.5, null],
+    ['토요일 요일머리',      '#4a6fa5', '#FAF6EE', 4.5, null],
+    ['비활성 배지',          '#6B6258', '#f0ece3', 4.5, null],
+    ['행사 일정',            '#9E3B2F', '#fbe9e5', 4.5, null]
+  ];
+  var ag = document.getElementById('a11ygrid');
+  A11Y.sort(function(a,b){
+    var pa = cr(a[1],a[2]) >= a[3], pb = cr(b[1],b[2]) >= b[3];
+    if (pa !== pb) return pa ? 1 : -1;
+    return cr(a[1],a[2]) - cr(b[1],b[2]);
+  });
+  A11Y.forEach(function(r){
+    var v = cr(r[1], r[2]), ok = v >= r[3];
+    var fixTxt = '—';
+    if (!ok && r[4]) fixTxt = '<span class="sw" style="background:' + r[4] + '"></span><code>' + r[4] + '</code> → <b class="pass num">' + cr(r[4], r[2]).toFixed(2) + '</b>';
+    else if (ok) fixTxt = '<span style="color:var(--t-dim)">불필요</span>';
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td>' + r[0] + '</td>' +
+      '<td><span class="sw" style="background:' + r[1] + '"></span><code>' + r[1] + '</code></td>' +
+      '<td><span class="sw" style="background:' + r[2] + '"></span><code>' + r[2] + '</code></td>' +
+      '<td class="num ' + (ok ? 'pass' : 'fail') + '">' + v.toFixed(2) + '</td>' +
+      '<td class="num" style="color:var(--t-dim)">' + r[3].toFixed(1) + '</td>' +
+      '<td class="' + (ok ? 'pass' : 'fail') + '">' + (ok ? 'PASS' : 'FAIL') + '</td>' +
+      '<td class="wrap">' + fixTxt + '</td>';
+    ag.appendChild(tr);
+  });
+
+  /* ══════════════ 시안 마크업 ══════════════ */
+  var SPEC = {};
+
+  SPEC.nav =
+    '<div class="x-nav">' +
+      '<div style="padding:0 16px"><div class="x-topbar">' +
+        '<span class="x-brand"><span class="mark"></span>응선사</span>' +
+        '<span class="x-actions">' +
+          '<a class="x-toplink" href="#specimens" tabindex="0">홈</a>' +
+          '<a class="x-toplogin" href="#specimens" tabindex="0">로그인</a>' +
+          '<button type="button" class="x-topadmin">관리자</button>' +
+        '</span>' +
+      '</div></div>' +
+      '<div class="x-mainbar"><div style="padding:0 16px"><nav class="x-gnb">' +
+        '<button type="button" class="x-gnb-top">응선사 소개<i class="caret" aria-hidden="true">▾</i></button>' +
+        '<button type="button" class="x-gnb-top">안내/정보<i class="caret" aria-hidden="true">▾</i></button>' +
+        '<button type="button" class="x-gnb-top">회원정보<i class="caret" aria-hidden="true">▾</i></button>' +
+      '</nav></div></div>' +
+      '<div style="padding:0 16px 14px"><div class="x-drop">' +
+        '<a href="#specimens" tabindex="0">주지스님 인삿말</a>' +
+        '<a href="#specimens" tabindex="0">연혁</a>' +
+        '<a href="#specimens" tabindex="0">산신도</a>' +
+        '<a href="#specimens" tabindex="0">오시는 길</a>' +
+      '</div></div>' +
+    '</div>';
+
+  SPEC.home =
+    '<div class="x-panels">' +
+      '<div class="x-panel">' +
+        '<div class="x-panel-hd"><span class="k">Notice</span><h3>사찰 소식</h3></div>' +
+        '<table class="x-mini"><tbody>' +
+          '<tr><td class="d">07.24</td><td class="t"><a href="#specimens">칠석 기도 입재 안내</a></td></tr>' +
+          '<tr><td class="d">07.18</td><td class="t"><a href="#specimens">대웅전 단청 보수 경과</a></td></tr>' +
+          '<tr><td class="d">07.02</td><td class="t"><a href="#specimens">백중 우란분절 천도재 접수</a></td></tr>' +
+        '</tbody></table>' +
+        '<a class="x-more" href="#specimens">전체보기 →</a>' +
+      '</div>' +
+      '<a class="x-fade" href="#specimens"><span class="x-fade-in">' +
+        '<span class="k">Treasure</span><h3>대웅전 산신도</h3>' +
+        '<p>서울특별시 문화재자료 제14호</p>' +
+      '</span></a>' +
+      '<div class="x-panel">' +
+        '<div class="x-panel-hd"><span class="k">Dharma</span><h3>이달 법회</h3></div>' +
+        '<table class="x-mini"><tbody>' +
+          '<tr><td class="d">음 6.15</td><td class="t"><a href="#specimens">초하루 기도</a></td></tr>' +
+          '<tr><td class="d">음 6.18</td><td class="t"><a href="#specimens">지장재일 법회</a></td></tr>' +
+          '<tr><td class="d">음 6.24</td><td class="t"><a href="#specimens">관음재일 법회</a></td></tr>' +
+        '</tbody></table>' +
+        '<a class="x-more" href="#specimens">전체보기 →</a>' +
+      '</div>' +
+    '</div>';
+
+  SPEC.list =
+    '<table class="x-tbl">' +
+      '<thead><tr><th class="c-cat">구분</th><th>제목</th><th class="c-date">등록일</th></tr></thead>' +
+      '<tbody>' +
+        '<tr><td class="c-cat"><span class="x-badge-cat">공지</span></td><td class="c-title"><a href="#specimens">칠석 기도 입재 및 회향 일정 안내</a></td><td class="c-date">2026.07.24</td></tr>' +
+        '<tr><td class="c-cat"><span class="x-badge-cat">법회</span></td><td class="c-title"><a href="#specimens">백중 우란분절 천도재 접수를 시작합니다</a></td><td class="c-date">2026.07.18</td></tr>' +
+        '<tr><td class="c-cat"><span class="x-badge-cat">중창</span></td><td class="c-title"><a href="#specimens">대웅전 단청 보수 3차 경과 보고</a></td><td class="c-date">2026.07.02</td></tr>' +
+        '<tr><td class="c-cat"><span class="x-badge-cat">공지</span></td><td class="c-title"><a href="#specimens">여름철 백사실 계곡 통행 안내</a></td><td class="c-date">2026.06.28</td></tr>' +
+      '</tbody>' +
+    '</table>' +
+    '<div style="padding:16px 0 4px"><div class="x-pager">' +
+      '<a class="x-pg" href="#specimens" aria-disabled="true">‹</a>' +
+      '<a class="x-pg" href="#specimens" aria-current="page">1</a>' +
+      '<a class="x-pg" href="#specimens">2</a>' +
+      '<a class="x-pg" href="#specimens">3</a>' +
+      '<a class="x-pg" href="#specimens">›</a>' +
+    '</div></div>';
+
+  SPEC.form =
+    '<div class="x-form">' +
+      '<label class="x-field"><span>아이디<b class="req">*</b></span>' +
+        '<input class="x-input" type="text" value="eungseon" autocomplete="off"></label>' +
+      '<label class="x-field"><span>비밀번호<b class="req">*</b></span>' +
+        '<input class="x-input" type="password" value="1234" aria-invalid="true" aria-describedby="pwmsg">' +
+        '<span class="x-msg err" id="pwmsg"><svg class="ic" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 3.2a.8.8 0 01.8.8v3.2a.8.8 0 01-1.6 0V5a.8.8 0 01.8-.8zM8 12a1 1 0 110-2 1 1 0 010 2z"/></svg>' +
+        '비밀번호는 8자 이상이어야 합니다. 현재 4자입니다.</span></label>' +
+      '<label class="x-field"><span>연락처</span>' +
+        '<input class="x-input" type="tel" placeholder="010-0000-0000"></label>' +
+      '<label class="x-field"><span>법명 <span style="font-weight:400;color:var(--s-fg4)">(선택)</span></span>' +
+        '<input class="x-input" type="text" value="관리자가 부여합니다" disabled></label>' +
+      '<div class="x-msg ok"><svg class="ic" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm3.5 5.3l-4 4.2a.8.8 0 01-1.15 0L4.5 8.75a.8.8 0 011.15-1.1L7 9.05l3.35-3.5a.8.8 0 011.15 1.1z"/></svg>아이디를 사용할 수 있습니다.</div>' +
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;padding-top:2px">' +
+        '<button type="button" class="x-btn pri">가입하기</button>' +
+        '<button type="button" class="x-btn gho">취소</button>' +
+      '</div>' +
+    '</div>';
+
+  SPEC.ctl =
+    '<div style="display:flex;flex-direction:column;gap:18px">' +
+      '<div>' +
+        '<p style="font-size:var(--s-fs-xs);font-weight:700;color:var(--s-fg3);margin:0 0 8px">버튼 — rest / hover(마우스) / pressed(누름) / disabled</p>' +
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">' +
+          '<button type="button" class="x-btn pri">기도 접수</button>' +
+          '<button type="button" class="x-btn gho">오시는 길</button>' +
+          '<button type="button" class="x-btn dan">삭제</button>' +
+          '<button type="button" class="x-btn pri" disabled>접수 마감</button>' +
+        '</div>' +
+      '</div>' +
+      '<div>' +
+        '<p style="font-size:var(--s-fs-xs);font-weight:700;color:var(--s-fg3);margin:0 0 8px">탭 — selected 상태</p>' +
+        '<div class="x-tabs">' +
+          '<button type="button" class="x-tab" aria-selected="true">전체</button>' +
+          '<button type="button" class="x-tab">공지</button>' +
+          '<button type="button" class="x-tab">법회</button>' +
+          '<button type="button" class="x-tab">중창기</button>' +
+        '</div>' +
+      '</div>' +
+      '<div>' +
+        '<p style="font-size:var(--s-fs-xs);font-weight:700;color:var(--s-fg3);margin:0 0 8px">라디오 — 법회 종류</p>' +
+        '<div class="x-radios">' +
+          '<label class="x-radio on"><input type="radio" name="k" checked>정기법회</label>' +
+          '<label class="x-radio"><input type="radio" name="k">특별기도</label>' +
+          '<label class="x-radio"><input type="radio" name="k">행사</label>' +
+        '</div>' +
+      '</div>' +
+      '<div>' +
+        '<p style="font-size:var(--s-fs-xs);font-weight:700;color:var(--s-fg3);margin:0 0 8px">배지</p>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">' +
+          '<span class="x-badge on">노출</span>' +
+          '<span class="x-badge off">숨김</span>' +
+          '<span class="x-badge pend">승인 대기</span>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+  SPEC.adm =
+    '<div class="x-adm"><table>' +
+      '<thead><tr><th>제목</th><th style="width:1%">노출</th><th style="width:1%">등록일</th><th style="width:1%">관리</th></tr></thead>' +
+      '<tbody>' +
+        '<tr><td>칠석 기도 입재 안내</td><td><span class="x-badge on">노출</span></td><td class="num">07.24</td>' +
+          '<td><span class="x-adm-acts"><button type="button" class="x-lbtn">수정</button><button type="button" class="x-lbtn">숨김</button><button type="button" class="x-lbtn dan">삭제</button></span></td></tr>' +
+        '<tr><td>백중 우란분절 천도재 접수</td><td><span class="x-badge on">노출</span></td><td class="num">07.18</td>' +
+          '<td><span class="x-adm-acts"><button type="button" class="x-lbtn">수정</button><button type="button" class="x-lbtn">숨김</button><button type="button" class="x-lbtn dan">삭제</button></span></td></tr>' +
+        '<tr><td>대웅전 단청 보수 3차 경과</td><td><span class="x-badge off">숨김</span></td><td class="num">07.02</td>' +
+          '<td><span class="x-adm-acts"><button type="button" class="x-lbtn">수정</button><button type="button" class="x-lbtn">노출</button><button type="button" class="x-lbtn dan">삭제</button></span></td></tr>' +
+      '</tbody>' +
+    '</table></div>';
+
+  SPEC.cal = (function(){
+    var days = ['일','월','화','수','목','금','토'];
+    var head = days.map(function(d,i){
+      return '<th class="' + (i===0?'sun':i===6?'sat':'') + '">' + d + '</th>';
+    }).join('');
+    var lunar = ['','','','초하루','','','','','','','','','','','','지장재일','','','','','관음재일'];
+    var rows = '';
+    var day = 1;
+    for (var w = 0; w < 3; w++){
+      rows += '<tr>';
+      for (var i = 0; i < 7; i++){
+        var isToday = (day === 15);
+        var ev = '';
+        if (day === 3)  ev = '<span class="ev reg"><span class="dot"></span>초하루 기도</span>';
+        if (day === 15) ev = '<span class="ev"><span class="dot"></span>지장재일 법회</span>';
+        if (day === 21) ev = '<span class="ev reg"><span class="dot"></span>관음재일</span>';
+        rows += '<td><span class="dnum">' +
+          '<span class="day ' + (i===0?'sun':i===6?'sat':'') + (isToday?' today':'') + '">' + day + '</span>' +
+          '<span class="lunar">' + (lunar[day] ? lunar[day] : '') + '</span></span>' + ev + '</td>';
+        day++;
+      }
+      rows += '</tr>';
+    }
+    return '<div class="x-cal"><table><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table>' +
+      '<p style="font-size:var(--s-fs-xxs);color:var(--s-fg3);margin:8px 2px 0;display:flex;gap:12px;flex-wrap:wrap">' +
+      '<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:14px;height:11px;border-radius:3px;background:var(--s-brand-tint-2);display:inline-block"></span>행사</span>' +
+      '<span style="display:inline-flex;align-items:center;gap:5px"><span style="width:14px;height:11px;border-radius:3px;background:var(--s-teal-tint);display:inline-block"></span>정기법회</span>' +
+      '</p></div>';
+  })();
+
+  SPEC.detail =
+    '<table class="x-detail"><tbody>' +
+      '<tr><th>행사명</th><td style="font-weight:700" class="u-serif">백중 우란분절 천도재</td></tr>' +
+      '<tr><th>일시</th><td>2026년 8월 28일 (금) 오전 10시 · <span style="color:var(--s-fg3)">음력 7월 15일</span></td></tr>' +
+      '<tr><th>장소</th><td>대웅전</td></tr>' +
+      '<tr><th>접수</th><td>8월 20일까지 종무소 또는 전화 접수</td></tr>' +
+      '<tr><th>안내</th><td>조상님의 극락왕생을 기원하는 백중 천도재를 봉행합니다. 위패에 올릴 명단은 접수 시 함께 적어 주십시오.</td></tr>' +
+    '</tbody></table>';
+
+  /* ── 플레이트 렌더 ── */
+  Object.keys(SPEC).forEach(function(key){
+    var host = document.querySelector('[data-specimen="' + key + '"]');
+    if (!host) return;
+    [['before','현재 코드'],['after','Fluent 2 구조']].forEach(function(pair){
+      var fig = document.createElement('figure');
+      fig.className = 'spec';
+      fig.setAttribute('data-v', pair[0]);
+      fig.innerHTML = '<figcaption>' + pair[0].toUpperCase() + ' <em>' + pair[1] + '</em></figcaption>' +
+                      '<div class="spec-frame"><div class="stage">' + SPEC[key] + '</div></div>';
+      host.appendChild(fig);
+    });
+  });
+
+  /* ── 컨트롤 ── */
+  function press(group, val, attr){
+    group.forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute(attr) === val)); });
+  }
+  var body = document.body;
+  body.setAttribute('data-mode','side');
+  body.setAttribute('data-show','before');
+
+  var modeBtns = [].slice.call(document.querySelectorAll('[data-mode-btn]'));
+  var stackCtl = document.querySelector('[data-only-stack]');
+  modeBtns.forEach(function(b){
+    b.addEventListener('click', function(){
+      var v = b.getAttribute('data-mode-btn');
+      body.setAttribute('data-mode', v);
+      press(modeBtns, v, 'data-mode-btn');
+      stackCtl.hidden = (v !== 'stack');
+    });
+  });
+  var showBtns = [].slice.call(document.querySelectorAll('[data-show-btn]'));
+  showBtns.forEach(function(b){
+    b.addEventListener('click', function(){
+      var v = b.getAttribute('data-show-btn');
+      body.setAttribute('data-show', v);
+      press(showBtns, v, 'data-show-btn');
+    });
+  });
+
+  /* knob: AFTER 스코프에만 override 를 얹는다 */
+  var knobStyle = document.createElement('style');
+  document.head ? document.head.appendChild(knobStyle) : document.body.appendChild(knobStyle);
+  var knobs = { radius:'12px', body:'16', elev:'2' };
+  var LH = { '14':'22px', '16':'26px', '20':'32px' };
+  var SM = { '14':'12px', '16':'14px', '20':'16px' };
+  var EL = {
+    '2':['0 0 2px rgba(35,33,30,.12), 0 1px 2px rgba(35,33,30,.14)','0 0 2px rgba(35,33,30,.12), 0 2px 4px rgba(35,33,30,.14)'],
+    '4':['0 0 2px rgba(35,33,30,.12), 0 2px 4px rgba(35,33,30,.14)','0 0 2px rgba(35,33,30,.12), 0 4px 8px rgba(35,33,30,.14)'],
+    '8':['0 0 2px rgba(35,33,30,.12), 0 4px 8px rgba(35,33,30,.14)','0 0 2px rgba(35,33,30,.12), 0 8px 16px rgba(35,33,30,.14)']
+  };
+  var RLBL = { '4px':'Medium', '8px':'XLarge', '12px':'2XLarge', '16px':'3XLarge' };
+  function applyKnobs(){
+    knobStyle.textContent =
+      '[data-v="after"]{' +
+        '--s-r-card:' + knobs.radius + ';' +
+        '--s-fs-body:' + knobs.body + 'px;' +
+        '--s-lh-body:' + LH[knobs.body] + ';' +
+        '--s-fs-sm:' + SM[knobs.body] + ';' +
+        '--s-sh-card:' + EL[knobs.elev][0] + ';' +
+        '--s-sh-card-hover:' + EL[knobs.elev][1] + ';' +
+      '}';
+    var cr_ = document.getElementById('cardr'), crl = document.getElementById('cardrl');
+    if (cr_) cr_.textContent = knobs.radius;
+    if (crl) crl.textContent = RLBL[knobs.radius] || '—';
+  }
+  [].slice.call(document.querySelectorAll('[data-knob]')).forEach(function(b){
+    b.addEventListener('click', function(){
+      var k = b.getAttribute('data-knob'), v = b.getAttribute('data-val');
+      knobs[k] = v;
+      press([].slice.call(document.querySelectorAll('[data-knob="' + k + '"]')), v, 'data-val');
+      applyKnobs();
+    });
+  });
+  applyKnobs();
+})();
+</script>
