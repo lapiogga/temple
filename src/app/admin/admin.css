@@ -33,9 +33,6 @@
 .adm-nav a:hover {
   color: var(--accent);
 }
-.adm-nav a:active {
-  color: var(--brand-pressed);
-}
 .adm-user {
   display: flex;
   align-items: center;
@@ -57,11 +54,6 @@
 .adm-logout:hover {
   border-color: var(--accent);
   color: var(--accent);
-}
-.adm-logout:active {
-  border-color: var(--brand-pressed);
-  color: var(--brand-pressed);
-  background: var(--brand-tint);
 }
 .adm-main {
   padding-top: 28px;

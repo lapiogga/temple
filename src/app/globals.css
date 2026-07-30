@@ -673,7 +673,7 @@ footer.site{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--s
   outline-offset:var(--st-thick);
 }
 /* overflow:hidden / 스크롤 컨테이너 안에서는 바깥 오프셋 링이 잘리므로 안쪽으로 그린다 */
-.ncard :focus-visible,.gal-card :focus-visible,.photo-grid :focus-visible,
+.gal-card :focus-visible,.photo-grid :focus-visible,
 .hero-cx :focus-visible,.cal-scroll :focus-visible,.adm-table-wrap :focus-visible,
 .adm-photo :focus-visible,.screen-scroll :focus-visible,.guide-map :focus-visible,
 .treasure-detail :focus-visible,.agree-scroll-box :focus-visible{
@@ -708,11 +708,10 @@ footer.site{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--s
 
 /* ── 목록 행 ── */
 .list-table tbody tr:active{background:var(--n-bg-2-pressed);}
-.post-list a:active .p-title{color:var(--brand-pressed);}
 .mini-table tr:active td.t a,.mini-list li a:active .t{color:var(--brand-pressed);}
 
 /* ── 카드 ── */
-.ncard:active,.gal-card:active,.hcard:active,.hfade:active,.site-card:active{
+.gal-card:active,.hfade:active,.site-card:active{
   transform:none;box-shadow:var(--sh-card);
 }
 
@@ -758,8 +757,8 @@ input:disabled::placeholder,textarea:disabled::placeholder{color:var(--n-fg-disa
 @media(prefers-reduced-motion:reduce){
   .hcx-track{transition:none;}
   .hero-bg-img{transition:none;}
-  .ncard,.gal-card,.hcard,.hfade,.site-card{transition:none;}
-  .ncard:hover,.gal-card:hover,.hcard:hover,.hfade:hover,.site-card:hover{transform:none;}
+  .gal-card,.hfade,.site-card{transition:none;}
+  .gal-card:hover,.hfade:hover,.site-card:hover{transform:none;}
   .btn-primary:hover,.btn-ghost:hover{transform:none;}
   .hcx-dots button,.hcx-dots button.on{transition:none;}
 }
