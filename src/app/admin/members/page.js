@@ -10,7 +10,7 @@ import {
 } from "./actions";
 
 const GENDER = { male: "남", female: "여", other: "기타" };
-const STATUS = { approved: "승인", pending: "대기", rejected: "거절", suspended: "정지" };
+const STATUS = { approved: "승인", pending: "대기", rejected: "거절", suspended: "정지", withdrawn: "탈퇴" };
 
 // 가입일은 '언제 일어났는가' 라 KST, 생년월일은 시각 없는 DATE 라 변환을 태우지 않는다.
 const fmt = (v) => (v ? formatDateCompact(v) : "");
@@ -72,8 +72,12 @@ export default async function MembersAdmin() {
                       </>
                     )}
                   </td>
+                  {/* 탈퇴한 회원에게는 아무 조치도 두지 않는다. 익명화로 성명·휴대폰·
+                      비밀번호가 이미 지워졌으므로, 되살려도 본인이 쓸 수 없는 껍데기
+                      계정이 될 뿐이다. 되살리려면 새로 가입하는 것이 맞다. */}
                   <td className="adm-actions">
-                    {m.status !== "approved" && (
+                    {m.status === "withdrawn" && <span className="adm-muted">—</span>}
+                    {m.status !== "withdrawn" && m.status !== "approved" && (
                       <form action={approveMemberAction}>
                         <input type="hidden" name="id" value={m.id} />
                         <button className="adm-link-btn" type="submit">승인</button>
@@ -91,7 +95,7 @@ export default async function MembersAdmin() {
                         <button className="adm-link-btn danger" type="submit">정지</button>
                       </form>
                     )}
-                    {!m.must_reset_password && (
+                    {m.status !== "withdrawn" && !m.must_reset_password && (
                       <form action={resetMemberPasswordAction}>
                         <input type="hidden" name="id" value={m.id} />
                         <button className="adm-link-btn" type="submit">비번 초기화</button>

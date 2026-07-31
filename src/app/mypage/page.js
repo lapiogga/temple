@@ -7,12 +7,13 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
 import { formatDate, formatWallDate } from "@/lib/format";
+import ProfileForms from "./ProfileForms";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "내 정보 | 응선사" };
 
 const GENDER = { male: "남", female: "여", other: "기타" };
-const STATUS = { approved: "승인", pending: "승인 대기", rejected: "거절", suspended: "정지" };
+const STATUS = { approved: "승인", pending: "승인 대기", rejected: "거절", suspended: "정지", withdrawn: "탈퇴" };
 
 // 가입일은 '언제 일어났는가' 라 KST 로 본다.
 // 생년월일은 DATE 컬럼(시각 없는 달력상의 날짜)이라 시간대 변환을 태우면 안 된다.
@@ -48,10 +49,15 @@ export default async function MyPage() {
               </dl>
               {/* 로그아웃은 상단바로 옮겼다 — 어느 화면에서든 바로 되어야 하는데
                   예전에는 이 화면 안에만 있었다. (components/SiteHeaderNav.js) */}
+              <p className="mypage-help">
+                성명 · 생년월일 · 성별은 본인 확인의 근거라 이 화면에서 바꾸지 않습니다.
+                정정이 필요하시면 종무소로 알려 주세요.
+              </p>
             </div>
           ) : (
             <p className="adm-empty">회원 정보를 찾을 수 없습니다.</p>
           )}
+          {m ? <ProfileForms nickname={m.nickname} phone={m.phone} /> : null}
         </div>
       </section>
       <SiteFooter />

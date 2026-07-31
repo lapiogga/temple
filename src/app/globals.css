@@ -763,6 +763,36 @@ footer.site{position:fixed;left:0;right:0;bottom:0;z-index:40;
 .status-badge.approved{background:var(--sec-tint);color:var(--sec);}
 .status-badge.pending{background:var(--warn-bg);color:var(--warn-fg);}
 .status-badge.rejected,.status-badge.suspended{background:var(--danger-tint);color:var(--brand);}
+.status-badge.withdrawn{background:var(--n-bg-3);color:var(--n-fg-3);}
+
+/* ── 폼 알림 (공개 화면) ──
+   이 두 클래스는 admin.css 에만 있었는데, 공개 화면 8곳이 쓰고 있었다
+   (member-login·join·board/write·qna/write·qna 비밀글·mypage). admin.css 는
+   admin/layout.js 에서만 import 되므로 공개 번들에는 규칙이 0개였고, 로그인 실패
+   문구를 포함한 모든 공개 폼 오류가 스타일 없는 맨 글자로 나오고 있었다.
+   값은 admin.css 와 같게 맞춘다 — 같은 것이 두 군데서 다르게 보이면 안 된다.
+   (이름의 adm- 접두사는 공개 화면에 어울리지 않지만, 8개 파일을 한꺼번에 고치는
+    것은 이번 변경의 범위가 아니라 남겨 둔다.) */
+.adm-form-err,.adm-form-ok{
+  font-size:var(--fs-300);line-height:var(--lh-300);
+  padding:var(--sp-mnudge) var(--sp-m);border-radius:var(--r-md);
+  margin-bottom:var(--sp-l);
+}
+.adm-form-err{background:var(--danger-tint);border:var(--st-thin) solid var(--danger-150);color:var(--brand);}
+.adm-form-ok{background:var(--sec-tint);border:var(--st-thin) solid var(--sec-tint-2);color:var(--sec);}
+
+/* ── 내 정보 — 본인이 고치는 자리 ── */
+.mypage-edit{display:flex;flex-direction:column;gap:var(--sp-l);margin-top:var(--sp-l);max-width:520px;}
+.mypage-card{background:var(--n-bg-1);border:var(--st-thin) solid var(--n-stroke-2);border-radius:var(--r-card);padding:var(--sp-xxl);}
+.mypage-card h2{font-family:var(--font-title);font-size:var(--fs-400);line-height:var(--lh-400);font-weight:var(--fw-bold);margin-bottom:var(--sp-xs);}
+/* 되돌릴 수 없는 자리라 테두리로 구분한다. 색만으로 구분하지 않도록 제목도 함께 물들인다. */
+.mypage-card.danger{border-color:var(--danger-150);}
+.mypage-card.danger h2{color:var(--danger);}
+.mypage-help{font-size:var(--fs-300);line-height:var(--lh-ko-300);color:var(--n-fg-3);margin-bottom:var(--sp-l);}
+.mypage-info .mypage-help{margin-top:var(--sp-l);margin-bottom:0;}
+.btn-danger{background:var(--danger);color:var(--n-fg-on-brand);}
+.btn-danger:hover{transform:translateY(-2px);box-shadow:var(--sh-8);}
+.btn-danger:active{background:var(--danger-70);transform:none;box-shadow:none;}
 
 /* 리치 텍스트 에디터 */
 .rich-editor .ql-toolbar{border-color:var(--n-stroke-2);border-radius:var(--r-ctl) var(--r-ctl) 0 0;background:var(--n-bg-2);}

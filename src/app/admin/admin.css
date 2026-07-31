@@ -49,6 +49,9 @@
 }
 
 /* 목록 테이블 */
+/* 조치할 것이 없는 칸(탈퇴 회원 등). 빈 칸으로 두면 표가 깨져 보인다. */
+.adm-muted { color: var(--n-fg-3); }
+
 .adm-empty {
   color: var(--n-fg-3);
   background: var(--n-bg-1);

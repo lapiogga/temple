@@ -113,7 +113,11 @@ CREATE TABLE IF NOT EXISTS members (
   gender         TEXT,                               -- male | female | other
   phone          TEXT,
   phone_verified BOOLEAN NOT NULL DEFAULT false,
-  status         TEXT NOT NULL DEFAULT 'pending',    -- pending | approved | rejected | suspended
+  -- pending | approved | rejected | suspended | withdrawn
+  -- withdrawn 은 본인이 탈퇴한 상태다. 행을 지우지 않고 개인정보만 지운다(익명화) —
+  -- posts.author_member_id 가 ON DELETE SET NULL 이라 행을 지우면 글의 author_name 에
+  -- 표시명이 남고 그것을 지울 연결고리만 사라진다. lib/members.js withdrawMember 참고.
+  status         TEXT NOT NULL DEFAULT 'pending',
   agreed_terms   BOOLEAN NOT NULL DEFAULT false,
   agreed_privacy BOOLEAN NOT NULL DEFAULT false,
   agreed_at      TIMESTAMPTZ,
