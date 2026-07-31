@@ -2,9 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { listPosts, listPostsWithThumb } from "@/lib/posts";
 import { getCategoryBySlug, canWrite } from "@/lib/board-categories";
-import { getSession } from "@/lib/session";
-import { getMemberSession } from "@/lib/member-session";
-import { getMemberById } from "@/lib/members";
+import { getViewer } from "@/lib/viewer";
 import Pager from "@/components/Pager";
 
 // 소개 메뉴에 딸린 게시판(법문·휴심선원)을 자기 주소에서 보여 준다.
@@ -25,19 +23,14 @@ export default async function CategoryBoard({ slug, kicker, basePath, page = 1 }
 
   const isCard = category.layout === "card";
 
-  const [posts, adminSession, memberSession] = await Promise.all([
+  const [posts, viewer] = await Promise.all([
     isCard ? listPostsWithThumb({ board: slug }) : listPosts({ board: slug }),
-    getSession(),
-    getMemberSession(),
+    getViewer(),
   ]);
-
-  const isAdmin = !!adminSession.isLoggedIn;
-  let isApprovedMember = false;
-  if (!isAdmin && memberSession.isLoggedIn) {
-    const m = await getMemberById(memberSession.memberId);
-    isApprovedMember = !!m && m.status === "approved";
-  }
-  const writable = canWrite(category, { isAdmin, isApprovedMember });
+  const writable = canWrite(category, {
+    isAdmin: viewer.isAdmin,
+    isApprovedMember: viewer.isApprovedMember,
+  });
 
   const totalPages = Math.max(1, Math.ceil(posts.length / PER_PAGE));
   const cur = Math.min(totalPages, Math.max(1, Number(page) || 1));

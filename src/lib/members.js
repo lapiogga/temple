@@ -42,8 +42,9 @@ export async function setMemberPassword(id, passwordHash) {
 
 export async function getMemberById(id) {
   const { rows } = await query(
+    // must_reset_password 가 빠져 있어서, 호출부가 검사하고 싶어도 할 수 없었다.
     `SELECT id, login_id, name, nickname, birth_date, gender, phone, status,
-            created_at, approved_at, last_login_at
+            must_reset_password, created_at, approved_at, last_login_at
        FROM members WHERE id = $1`,
     [id]
   );

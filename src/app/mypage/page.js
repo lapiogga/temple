@@ -22,6 +22,8 @@ function fmt(v) {
 export default async function MyPage() {
   const session = await requireMember();
   const m = await getMemberById(session.memberId);
+  // 비밀번호가 초기화된 계정은 새 비밀번호를 정하기 전까지 개인정보를 보여주지 않는다.
+  if (m?.must_reset_password) redirect("/member-login/reset");
   // 발급 후 종무소가 정지/거절했을 수 있으므로 최신 상태 재검증.
   if (!m || m.status !== "approved") redirect("/member-login");
 

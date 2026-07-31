@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DharmaWheel } from "@/components/Icons";
 import { SITE } from "@/content/site";
 import { memberLogout } from "@/app/auth-actions";
@@ -38,7 +38,42 @@ const MENU = [
   },
 ];
 
-export default function SiteHeaderNav({ auth }) {
+export default function SiteHeaderNav({ auth: initialAuth }) {
+  // 서버가 준 값은 첫 페인트용 초기값으로만 쓴다.
+  //
+  // Next 의 Router Cache 때문에 <Link> 이동은 30초, 브라우저 뒤로가기는 만료
+  // 없이 옛 화면을 그대로 복원한다. 그래서 로그인/로그아웃 뒤 돌아오면 상단바가
+  // 옛 상태로 남는다. 클라이언트 fetch 는 그 캐시를 타지 않으므로, 화면이
+  // 되살아나는 시점마다 실제 상태로 덮어쓴다.
+  const [auth, setAuth] = useState(initialAuth);
+
+  useEffect(() => {
+    let alive = true;
+    const sync = async () => {
+      try {
+        const res = await fetch("/api/session", { cache: "no-store" });
+        if (!res.ok) return;
+        const d = await res.json();
+        if (alive) setAuth(d);
+      } catch {
+        // 네트워크 실패 시에는 서버가 준 초기값을 그대로 둔다.
+      }
+    };
+    sync();
+    // pageshow(persisted) 는 bfcache 복원, popstate 는 뒤로/앞으로,
+    // focus 는 다른 탭에서 로그인/로그아웃하고 돌아온 경우를 덮는다.
+    const onPageShow = (e) => { if (e.persisted) sync(); };
+    window.addEventListener("popstate", sync);
+    window.addEventListener("pageshow", onPageShow);
+    window.addEventListener("focus", sync);
+    return () => {
+      alive = false;
+      window.removeEventListener("popstate", sync);
+      window.removeEventListener("pageshow", onPageShow);
+      window.removeEventListener("focus", sync);
+    };
+  }, []);
+
   const [menuOpen, setMenuOpen] = useState(false); // 모바일 드로어
   const [openGroup, setOpenGroup] = useState(null); // 열린 대메뉴 index
 

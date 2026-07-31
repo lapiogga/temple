@@ -8,7 +8,8 @@ export async function middleware(request) {
   const res = NextResponse.next();
   const session = await getIronSession(request, res, sessionOptions);
 
-  if (!session.isLoggedIn) {
+  // role 까지 본다. Edge 라 DB 를 못 보므로 계정 존재 확인은 requireSession() 몫이다.
+  if (!session.isLoggedIn || !session.role) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);

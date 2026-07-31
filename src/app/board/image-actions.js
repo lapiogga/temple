@@ -1,8 +1,6 @@
 "use server";
 
-import { getSession } from "@/lib/session";
-import { getMemberSession } from "@/lib/member-session";
-import { getMemberById } from "@/lib/members";
+import { getViewer } from "@/lib/viewer";
 import { saveImage } from "@/lib/upload";
 
 // 본문 에디터에서 부르는 이미지 업로드.
@@ -12,16 +10,11 @@ import { saveImage } from "@/lib/upload";
 // 글쓰기와 같은 권한을 요구한다. 이 액션은 페이지 트리 밖의 독립 엔드포인트라,
 // 화면에서 버튼을 감추는 것만으로는 막히지 않는다.
 export async function uploadPostImageAction(formData) {
-  const [adminSession, memberSession] = await Promise.all([getSession(), getMemberSession()]);
-
-  let allowed = false;
-  if (adminSession.isLoggedIn) {
-    allowed = true;
-  } else if (memberSession.isLoggedIn) {
-    const m = await getMemberById(memberSession.memberId);
-    allowed = !!m && m.status === "approved";
+  // 글쓰기와 같은 권한을 요구한다. 계정이 지금도 유효한지까지 본다(lib/viewer.js).
+  const viewer = await getViewer();
+  if (!viewer.isAdmin && !viewer.isApprovedMember) {
+    return { error: "이미지를 올릴 권한이 없습니다." };
   }
-  if (!allowed) return { error: "이미지를 올릴 권한이 없습니다." };
 
   const file = formData.get("file");
   try {
