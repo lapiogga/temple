@@ -4,14 +4,28 @@ import { query, pool } from "@/lib/db";
 // 파라미터화 쿼리만 사용.
 
 const COLS =
-  "id, slug, label, sort_order, is_hidden, write_role, layout, show_in_board, created_at";
+  "id, slug, label, sort_order, is_hidden, write_role, layout, show_in_board, group_key, created_at";
 
-// 관리자용 — 숨김 포함 전부.
-export async function listCategories() {
+// 관리자용 — 숨김 포함. group 을 주면 그 묶음만.
+//   board = /board 의 구분 탭      intro = 응선사 소개 메뉴의 독립 화면
+// 두 묶음은 서로 다른 관리 화면에서 다룬다(/admin/board/categories · /admin/intro).
+export async function listCategories(group) {
+  if (group) {
+    const { rows } = await query(
+      `SELECT ${COLS} FROM board_categories WHERE group_key = $1 ORDER BY sort_order, id`,
+      [group]
+    );
+    return rows;
+  }
   const { rows } = await query(
     `SELECT ${COLS} FROM board_categories ORDER BY sort_order, id`
   );
   return rows;
+}
+
+// 소개 메뉴에 딸린 게시판(법문·휴심선원). 게시판 카테고리와는 별개다.
+export async function listIntroCategories() {
+  return listCategories("intro");
 }
 
 // 공개 화면용 — 숨김을 뺀 전부. 글쓰기 선택지가 여기서 나온다.
@@ -26,7 +40,7 @@ export async function listVisibleCategories() {
 export async function listBoardTabCategories() {
   const { rows } = await query(
     `SELECT ${COLS} FROM board_categories
-      WHERE is_hidden = false AND show_in_board = true
+      WHERE is_hidden = false AND show_in_board = true AND group_key = 'board'
       ORDER BY sort_order, id`
   );
   return rows;
@@ -60,11 +74,11 @@ export async function countPostsBySlug(slug) {
   return rows[0].n;
 }
 
-export async function createCategory({ slug, label, sortOrder, writeRole, layout, showInBoard }) {
+export async function createCategory({ slug, label, sortOrder, writeRole, layout, showInBoard, groupKey = 'board' }) {
   const { rows } = await query(
-    `INSERT INTO board_categories (slug, label, sort_order, write_role, layout, show_in_board)
-     VALUES ($1, $2, $3, $4, $5, $6) RETURNING ${COLS}`,
-    [slug, label, sortOrder, writeRole, layout, showInBoard]
+    `INSERT INTO board_categories (slug, label, sort_order, write_role, layout, show_in_board, group_key)
+     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING ${COLS}`,
+    [slug, label, sortOrder, writeRole, layout, showInBoard, groupKey]
   );
   return rows[0];
 }

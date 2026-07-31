@@ -17,6 +17,7 @@ const NAV = [
   { href: "/admin/gallery", label: "갤러리" },
   { href: "/admin/members", label: "회원" },
   { href: "/admin/board", label: "게시판" },
+  { href: "/admin/intro", label: "소개 게시판" },
   { href: "/admin/qna", label: "Q&A" },
 ];
 

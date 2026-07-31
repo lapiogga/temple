@@ -144,6 +144,11 @@ CREATE TABLE IF NOT EXISTS board_categories (
 ALTER TABLE board_categories ADD COLUMN IF NOT EXISTS write_role    TEXT    NOT NULL DEFAULT 'member';
 ALTER TABLE board_categories ADD COLUMN IF NOT EXISTS layout        TEXT    NOT NULL DEFAULT 'list';
 ALTER TABLE board_categories ADD COLUMN IF NOT EXISTS show_in_board BOOLEAN NOT NULL DEFAULT true;
+-- 게시판(/board)의 카테고리와, 소개 메뉴에 딸린 게시판을 갈라 놓는다.
+--   board = /board 의 구분 탭   intro = 응선사 소개 메뉴의 독립 화면
+-- 서로 다른 화면에서 관리한다. 섞어 두면 게시판 탭을 손보다 소개 메뉴를
+-- 건드리거나 그 반대가 되기 쉽다.
+ALTER TABLE board_categories ADD COLUMN IF NOT EXISTS group_key TEXT NOT NULL DEFAULT 'board';
 
 -- 이전에 코드에 하드코딩돼 있던 두 개를 옮겨 심는다.
 INSERT INTO board_categories (slug, label, sort_order) VALUES
@@ -151,11 +156,14 @@ INSERT INTO board_categories (slug, label, sort_order) VALUES
   ('story', '신행수기', 2)
 ON CONFLICT (slug) DO NOTHING;
 
--- 소개 메뉴에 딸린 세 게시판. 자기 주소(/about/*)가 따로 있어 /board 탭에는 넣지 않는다.
-INSERT INTO board_categories (slug, label, sort_order, write_role, layout, show_in_board) VALUES
-  ('teaching',        '법문-살며 생각하며',   10, 'admin', 'list', false),
-  ('hyusim-tapjeon',  '휴심선원(탑전)',       11, 'admin', 'card', false),
-  ('hyusim-jirisan',  '휴심선원(지리산 휴심)', 12, 'admin', 'card', false)
+-- 소개 메뉴에 딸린 세 게시판. 자기 주소(/about/*)가 따로 있고 게시판 카테고리와는
+-- 별개로 관리한다(group_key='intro').
+-- 탑전을 'pagoda' 로 둔 이유: 게시판 쪽에 'tower'(휴심 선원(탑전))가 따로 있어
+-- 주소값이 헷갈린다. 둘은 서로 다른 게시판이며 합치지 않는다.
+INSERT INTO board_categories (slug, label, sort_order, write_role, layout, show_in_board, group_key) VALUES
+  ('teaching',       '법문-살며 생각하며',    10, 'admin', 'list', false, 'intro'),
+  ('pagoda',         '휴심선원(탑전)',        11, 'admin', 'card', false, 'intro'),
+  ('hyusim-jirisan', '휴심선원(지리산 휴심)',  12, 'admin', 'card', false, 'intro')
 ON CONFLICT (slug) DO NOTHING;
 
 -- 게시판 글

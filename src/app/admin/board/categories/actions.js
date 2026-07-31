@@ -48,10 +48,6 @@ function revalidate() {
   revalidatePath("/admin/board/categories");
   revalidatePath("/board");
   revalidatePath("/board/write");
-  // 소개 메뉴에 딸린 게시판들도 카테고리 설정을 그대로 읽는다.
-  revalidatePath("/about/teaching");
-  revalidatePath("/about/hyusim-tapjeon");
-  revalidatePath("/about/hyusim-jirisan");
 }
 
 export async function createCategoryAction(prevState, formData) {

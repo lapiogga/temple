@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireSession } from "@/lib/session";
 import { listAllPosts } from "@/lib/posts";
-import { getLabelMap } from "@/lib/board-categories";
+import { getLabelMap, listCategories } from "@/lib/board-categories";
 import { deletePostAction } from "./actions";
 
 function fmt(v) {
@@ -12,7 +12,14 @@ function fmt(v) {
 
 export default async function BoardAdmin() {
   await requireSession();
-  const [posts, labelMap] = await Promise.all([listAllPosts(), getLabelMap()]);
+  const [allPosts, labelMap, boardCats] = await Promise.all([
+    listAllPosts(),
+    getLabelMap(),
+    listCategories("board"),
+  ]);
+  // 소개 메뉴 게시판(법문·휴심선원)의 글은 '소개 게시판' 메뉴에서 따로 다룬다.
+  const boardSlugs = new Set(boardCats.map((c) => c.slug));
+  const posts = allPosts.filter((p) => boardSlugs.has(p.board));
 
   return (
     <section>
