@@ -328,7 +328,11 @@ header.nav{position:sticky;top:0;z-index:50;background:rgba(var(--n-bg-2-rgb),.9
 .hcx-sub{margin-top:var(--sp-m);color:var(--n-fg-2);font-size:clamp(var(--fs-300),1.15vw,var(--fs-400));
   line-height:var(--lh-ko-400);}
 .hcx-caption h1 em{font-style:normal;color:var(--brand);}
-.hcx-dots{position:absolute;right:18px;bottom:16px;display:flex;gap:var(--sp-snudge);}
+/* gap 은 아래 :hcx-dots button::after 의 24px 히트영역과 묶여 있다.
+   도트 9px + gap 16px = 중심 간격 25px 이라 24px 확장영역이 서로 닿지 않는다.
+   6px 이던 때는 간격이 15px 이라 확장영역이 9px 겹쳐, 보이는 도트의 오른쪽 끝을
+   누르면 이웃(다음 슬라이드)이 눌렸다. 둘 중 하나를 고치면 다른 쪽도 확인할 것. */
+.hcx-dots{position:absolute;right:18px;bottom:16px;display:flex;gap:var(--sp-l);}
 .hcx-dots button{width:9px;height:9px;padding:0;border:0;border-radius:var(--r-circular);background:var(--gold-60);cursor:pointer;transition:var(--t-state);}
 .hcx-dots button.on{background:var(--brand);transform:scale(1.2);}
 .home-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--sp-l);flex:0 0 auto;height:clamp(250px,33vh,338px);}
@@ -534,7 +538,10 @@ footer.site{margin-top:var(--sp-xl);}
 .cal-ev{display:block;font-size:var(--fs-200);line-height:var(--lh-200);background:var(--brand-tint);border-radius:var(--r-md);padding:var(--sp-xxs) var(--sp-snudge);margin-top:var(--sp-xxs);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--brand);font-weight:var(--fw-semibold);}
 .cal-ev:hover{filter:brightness(.97);}
 .cal-ev.reg{background:var(--sec-tint);color:var(--sec);}
-.cal-ev .ev-time{margin-right:var(--sp-xs);font-weight:var(--fw-bold);opacity:.8;}
+/* opacity 를 걸지 않는다 — .8 이면 12px 굵은 글자가 3.19:1 로 AA(4.5:1) 미달이었다.
+   불투명이면 행사 5.35:1 · 정기법회 4.54:1 로 둘 다 넘긴다. 시각을 약하게 보이려면
+   opacity 대신 대비가 검증된 색 토큰을 지정할 것. */
+.cal-ev .ev-time{margin-right:var(--sp-xs);font-weight:var(--fw-bold);}
 .cal-legend{display:flex;align-items:center;gap:var(--sp-snudge);flex-wrap:wrap;margin-top:var(--sp-s);font-size:var(--fs-200);color:var(--n-fg-3);}
 .lg-dot{display:inline-block;width:16px;height:12px;border-radius:var(--r-md);margin-left:var(--sp-mnudge);}
 .lg-dot.ev{background:var(--brand-tint);}
