@@ -3,7 +3,8 @@ import BackLink from "@/components/BackLink";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs, LanternIcon } from "@/components/Icons";
-import { listEventsInMonth, listRegular, listAllEvents } from "@/lib/events";
+import { listEventsInMonth, listRegular, listRecurring, listAllEvents } from "@/lib/events";
+import { WEEK, parseRec, recMatches, inRecurrenceWindow, toMin } from "@/lib/recurrence";
 import { monthMatrix, ymNav, parseYm, ymString } from "@/lib/calendar";
 import { solarToLunar, lunarLabel } from "@/lib/lunar";
 import { SITE } from "@/content/site";
@@ -11,7 +12,6 @@ import { SITE } from "@/content/site";
 export const dynamic = "force-dynamic";
 export const metadata = { title: `법회·행사 | ${SITE.name}` };
 
-const WEEK = ["일", "월", "화", "수", "목", "금", "토"];
 const KIND_LABEL = { regular: "정기법회", event: "행사" };
 
 function eventDay(startsAt) {
@@ -26,36 +26,6 @@ function fmtDateTime(startsAt) {
 
 const pad = (n) => String(n).padStart(2, "0");
 
-// 반복 규칙 파싱: daily:HH:MM / weekly:N[:HH:MM] / monthly:D[:HH:MM] / lunar:D(구형)
-function parseRec(rec) {
-  const r = (rec || "").trim();
-  if (r.startsWith("daily:")) return { type: "daily", time: r.slice(6) || null };
-  if (r.startsWith("weekly:")) {
-    const [, n, hh, mm] = r.split(":");
-    return { type: "weekly", weekday: Number(n), time: hh != null ? `${hh}:${mm}` : null };
-  }
-  if (r.startsWith("monthly:")) {
-    const [, d, hh, mm] = r.split(":");
-    return { type: "monthly", day: Number(d), time: hh != null ? `${hh}:${mm}` : null };
-  }
-  if (r.startsWith("lunar:")) return { type: "lunar", lday: Number(r.slice(6)), time: null };
-  return null;
-}
-function recMatches(p, weekday, lunarDay, solarDay) {
-  if (!p) return false;
-  if (p.type === "daily") return true;
-  if (p.type === "weekly") return p.weekday === weekday;
-  if (p.type === "monthly") return p.day === solarDay;
-  if (p.type === "lunar") return lunarDay != null && p.lday === lunarDay;
-  return false;
-}
-// "HH:MM" → 분(정렬용). 시간 없으면 맨 뒤.
-function toMin(t) {
-  if (!t) return 100000;
-  const [hh, mm] = t.split(":").map(Number);
-  return hh * 60 + mm;
-}
-
 export default async function EventsPage({ searchParams }) {
   const now = new Date();
   const parsed = parseYm(searchParams?.ym) ?? { y: now.getFullYear(), m: now.getMonth() + 1 };
@@ -65,9 +35,13 @@ export default async function EventsPage({ searchParams }) {
   const regular = await listRegular();
   let monthEvents = [];
   let allEvents = [];
+  let recurring = [];
   try {
     if (view === "list") allEvents = await listAllEvents();
-    else monthEvents = await listEventsInMonth(y, m);
+    else {
+      monthEvents = await listEventsInMonth(y, m);
+      recurring = await listRecurring();
+    }
   } catch (err) {
     console.error("행사 조회 실패:", err);
   }
@@ -78,8 +52,8 @@ export default async function EventsPage({ searchParams }) {
     (byDay[d] ||= []).push(e);
   });
 
-  const recurringRegular = regular.filter((e) => (e.recurrence || "").trim());
-  // 특정 날짜의 일정(행사 + 반복법회)을 시간순으로 모아 반환
+  // 특정 날짜의 일정(일회성 + 반복)을 시간순으로 모아 반환.
+  // 반복은 법회뿐 아니라 행사도 될 수 있고, 시작일~종료일 안에서만 그린다.
   function dayItems(day) {
     const weekday = new Date(y, m - 1, day).getDay();
     const lun = solarToLunar(y, m, day);
@@ -88,10 +62,13 @@ export default async function EventsPage({ searchParams }) {
       const time = d.getHours() === 0 && d.getMinutes() === 0 ? null : `${pad(d.getHours())}:${pad(d.getMinutes())}`;
       return { key: `e${e.id}`, href: `/events/${e.id}`, title: e.title, time, reg: false, sort: d.getHours() * 60 + d.getMinutes() };
     });
-    const recs = recurringRegular
+    const recs = recurring
       .map((e) => ({ e, p: parseRec(e.recurrence) }))
-      .filter(({ p }) => recMatches(p, weekday, lun?.lDay, day))
-      .map(({ e, p }) => ({ key: `r${e.id}`, href: `/events/${e.id}`, title: e.title, time: p.time, reg: true, sort: toMin(p.time) }));
+      .filter(({ e, p }) => recMatches(p, weekday, lun?.lDay, day) && inRecurrenceWindow(e, y, m, day))
+      .map(({ e, p }) => ({
+        key: `r${e.id}`, href: `/events/${e.id}`, title: e.title, time: p.time,
+        reg: e.kind === "regular", sort: toMin(p.time),
+      }));
     return [...dated, ...recs].sort((a, b) => a.sort - b.sort);
   }
 

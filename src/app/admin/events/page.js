@@ -12,6 +12,13 @@ function fmt(v) {
   return `${d.getFullYear()}. ${p(d.getMonth() + 1)}. ${p(d.getDate())}. ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
+function fmtDay(v) {
+  if (!v) return "";
+  const d = new Date(v);
+  const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}. ${p(d.getMonth() + 1)}. ${p(d.getDate())}.`;
+}
+
 export default async function EventsAdmin() {
   await requireSession();
   const events = await listAllEvents();
@@ -33,6 +40,7 @@ export default async function EventsAdmin() {
                 <th>구분</th>
                 <th>제목</th>
                 <th>일정</th>
+                <th>반복</th>
                 <th className="adm-th-actions">관리</th>
               </tr>
             </thead>
@@ -43,7 +51,21 @@ export default async function EventsAdmin() {
                   <td className="adm-title-cell">
                     <Link href={`/admin/events/${e.id}/edit`}>{e.title}</Link>
                   </td>
-                  <td>{e.starts_at ? fmt(e.starts_at) : e.when_text ?? ""}</td>
+                  <td>{e.recurrence ? e.when_text ?? "" : e.starts_at ? fmt(e.starts_at) : e.when_text ?? ""}</td>
+                  <td>
+                    {e.recurrence ? (
+                      <span className="ev-rep">
+                        반복
+                        <em>
+                          {e.starts_at ? fmtDay(e.starts_at) : "제한 없음"}
+                          {" ~ "}
+                          {e.recurrence_until ? fmtDay(e.recurrence_until) : "종료일 없음"}
+                        </em>
+                      </span>
+                    ) : (
+                      <span className="ev-once">1회</span>
+                    )}
+                  </td>
                   <td className="adm-actions">
                     <Link className="adm-link-btn" href={`/admin/events/${e.id}/edit`}>수정</Link>
                     <DeleteButton id={e.id} title={e.title} />

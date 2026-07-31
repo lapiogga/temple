@@ -15,6 +15,7 @@ const eventSchema = z.object({
   whenText: z.string().trim().max(120),
   startsAt: z.string().trim().max(40),
   recurrence: z.string().trim().max(40),
+  recurrenceUntil: z.string().trim().max(10),
   description: z.string().trim().max(5000),
   sortOrder: z.coerce.number().int().min(0).max(9999),
 });
@@ -26,6 +27,7 @@ function readForm(formData) {
     whenText: formData.get("whenText") ?? "",
     startsAt: formData.get("startsAt") ?? "",
     recurrence: formData.get("recurrence") ?? "",
+    recurrenceUntil: formData.get("recurrenceUntil") ?? "",
     description: formData.get("description") ?? "",
     sortOrder: formData.get("sortOrder") ?? "0",
   };
@@ -38,9 +40,39 @@ function toRecord(d) {
     whenText: d.whenText === "" ? null : d.whenText,
     startsAt: d.startsAt === "" ? null : new Date(d.startsAt),
     recurrence: d.recurrence === "" ? null : d.recurrence,
+    recurrenceUntil: d.recurrenceUntil === "" ? null : d.recurrenceUntil,
     description: d.description === "" ? null : d.description,
     sortOrder: d.sortOrder,
   };
+}
+
+// 반복 종료일 유효성.
+// 최대 2년으로 잡는 이유 — 신규는 시작일 + 1년까지지만 수정 화면에서 '1년 연장'
+// 을 한 번 더 할 수 있게 했다. 화면 제한은 우회할 수 있으므로 서버가 상한을 쥔다.
+// 기준일은 시작일, 시작일이 없으면 오늘이다.
+const RECUR_MAX_YEARS = 2;
+function validUntil(d) {
+  const raw = d.recurrenceUntil;
+  if (raw === "") return { ok: true };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return { ok: false, msg: "종료일 형식이 올바르지 않습니다." };
+  if (d.recurrence === "") return { ok: false, msg: "반복 일정이 아니면 종료일을 둘 수 없습니다." };
+
+  const [Y, M, D] = raw.split("-").map(Number);
+  const until = new Date(Y, M - 1, D);
+  if (until.getFullYear() !== Y || until.getMonth() !== M - 1 || until.getDate() !== D) {
+    return { ok: false, msg: "종료일이 실제로 없는 날짜입니다." };
+  }
+
+  const base = d.startsAt ? new Date(d.startsAt) : new Date();
+  if (Number.isNaN(base.getTime())) return { ok: false, msg: "시작일이 올바르지 않습니다." };
+  const baseDay = new Date(base.getFullYear(), base.getMonth(), base.getDate());
+  if (until < baseDay) return { ok: false, msg: "종료일이 시작일보다 앞설 수 없습니다." };
+
+  const cap = new Date(baseDay.getFullYear() + RECUR_MAX_YEARS, baseDay.getMonth(), baseDay.getDate());
+  if (until > cap) {
+    return { ok: false, msg: `종료일은 시작일로부터 ${RECUR_MAX_YEARS}년 이내여야 합니다.` };
+  }
+  return { ok: true };
 }
 
 // startsAt 유효성(빈 값 허용, 값이 있으면 유효한 날짜여야).
@@ -65,6 +97,8 @@ export async function createEventAction(prevState, formData) {
   if (!validDate(rec, parsed.data.startsAt)) {
     return { error: "행사 일시 형식이 올바르지 않습니다." };
   }
+  const until = validUntil(parsed.data);
+  if (!until.ok) return { error: until.msg };
   try {
     await createEvent(rec);
   } catch (err) {
@@ -86,6 +120,8 @@ export async function updateEventAction(id, prevState, formData) {
   if (!validDate(rec, parsed.data.startsAt)) {
     return { error: "행사 일시 형식이 올바르지 않습니다." };
   }
+  const until = validUntil(parsed.data);
+  if (!until.ok) return { error: until.msg };
   try {
     await updateEvent(id, rec);
   } catch (err) {

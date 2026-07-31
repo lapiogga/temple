@@ -289,6 +289,31 @@
 .ev-lunar-row { display: flex; gap: var(--sp-s); }
 .ev-lunar-row select { flex: 1; }
 .ev-prev { padding: var(--sp-mnudge) var(--sp-m); background: var(--sec-tint); border: var(--st-thin) solid var(--sec-tint-2); border-radius: var(--r-drop); font-size:var(--fs-300); font-weight: var(--fw-semibold); color: var(--sec); }
+
+/* 시각 입력 — 오전/오후 라디오 + 시·분 직접 입력.
+   <input type="time"> 은 브라우저마다 생김새가 다르고 크롬은 스피너를 눌러야 해서
+   마우스 없이는 답답하다. 여기서는 숫자만 치면 된다. */
+.ev-time-row { display: flex; align-items: center; gap: var(--sp-m); flex-wrap: wrap; }
+.ev-time-nums { display: inline-flex; align-items: center; gap: var(--sp-xs); }
+.ev-time-nums input { width: 68px; text-align: center; font-variant-numeric: tabular-nums; }
+.ev-time-nums b { font-size:var(--fs-300); font-weight: var(--fw-semibold); color: var(--n-fg-3); }
+
+/* 반복 종료일 — 날짜 + '1년 연장' + 지우기가 한 줄에 온다. */
+.ev-until-row { display: flex; align-items: center; gap: var(--sp-s); flex-wrap: wrap; }
+.ev-until-row input[type="date"] { flex: 1 1 170px; min-width: 0; }
+
+/* 체크박스 옆 보조 설명. 켜고 끄는 기준이 구분(행사/법회)마다 달라 적어 둔다. */
+.ev-hint { display: block; margin-top: 2px; font-style: normal; font-weight: var(--fw-regular);
+  font-size:var(--fs-200); line-height: var(--lh-200); color: var(--n-fg-3); }
+.adm-check-row { align-items: flex-start; }
+.adm-check-row input { margin-top: 2px; flex: 0 0 auto; }
+
+/* 목록의 반복 열 — 언제부터 언제까지인지가 한눈에 보여야 종료일이 지난 일정을
+   찾아 연장할 수 있다. */
+.ev-rep { font-size:var(--fs-300); font-weight: var(--fw-bold); color: var(--brand); white-space: nowrap; }
+.ev-rep em { display: block; font-style: normal; font-weight: var(--fw-regular);
+  font-size:var(--fs-200); line-height: var(--lh-200); color: var(--n-fg-3); }
+.ev-once { font-size:var(--fs-300); color: var(--n-fg-3); }
 @media (max-width: 900px) { .ev-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 620px) { .ev-grid { grid-template-columns: 1fr; } }
 

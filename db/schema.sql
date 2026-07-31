@@ -214,3 +214,8 @@ CREATE TABLE IF NOT EXISTS site_content (
   value       JSONB NOT NULL,
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- 반복 종료일. 반복 일정이 언제까지인지 지정한다(달력이 그 뒤로는 그리지 않는다).
+-- 신규 등록은 시작일 + 1년까지, 수정 화면에서 1년 더 연장할 수 있으므로
+-- 서버 허용 한도는 시작일 + 2년이다(admin/events/actions.js).
+ALTER TABLE events ADD COLUMN IF NOT EXISTS recurrence_until DATE;
