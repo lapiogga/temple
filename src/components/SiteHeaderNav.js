@@ -120,6 +120,13 @@ export default function SiteHeaderNav({ auth: initialAuth, introItems = [] }) {
 
   return (
     <header className="nav">
+      {/* 본문 바로가기(WCAG 2.4.1 — 블록 건너뛰기).
+          대메뉴가 3개 그룹에 소메뉴 17개라, 키보드나 스크린리더로 다니는 사람은
+          화면을 옮길 때마다 그 전부를 지나야 본문에 닿는다. 평소에는 보이지 않고
+          Tab 을 처음 눌렀을 때만 나타난다. 목표(#main)는 이 헤더 끝에 둔다 —
+          거기로 옮기면 다음 Tab 이 곧장 본문으로 들어간다. */}
+      <a className="skip-link" href="#main">본문 바로가기</a>
+
       {/* 최상단: 타이틀 · 홈 · 로그인 */}
       <div className="topbar">
         <div className="wrap topbar-in">
@@ -183,6 +190,9 @@ export default function SiteHeaderNav({ auth: initialAuth, introItems = [] }) {
           </nav>
         </div>
       </div>
+      {/* 위 skip-link 가 데려오는 자리. tabIndex=-1 이라야 링크로 이동했을 때
+          실제로 포커스가 옮겨 간다(그냥 앵커면 스크롤만 되고 포커스는 안 따라온다). */}
+      <span id="main" tabIndex={-1} />
     </header>
   );
 }

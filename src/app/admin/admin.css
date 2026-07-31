@@ -34,6 +34,20 @@
   border: var(--st-thin) solid var(--n-stroke-2);
   border-radius: var(--r-card);
   padding: var(--sp-xl) var(--sp-xl);
+  display: block;
+  transition: var(--t-state);
+}
+.adm-card:hover { border-color: var(--brand); }
+
+/* 손대야 할 것이 있는 카드.
+   색만으로 구분하지 않는다 — 숫자 아래에 이유를 글로 함께 적는다(WCAG 1.4.1). */
+.adm-card.urgent { border-color: var(--warn-fg); background: var(--warn-bg); }
+.adm-card.urgent .adm-card-n { color: var(--warn-fg); }
+.adm-card-note {
+  font-size: var(--fs-200);
+  line-height: var(--lh-200);
+  color: var(--warn-fg);
+  margin-top: var(--sp-xs);
 }
 .adm-card-n {
   font-size:var(--fs-800);

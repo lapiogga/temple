@@ -209,6 +209,14 @@ a{color:inherit;text-decoration:none;}
 .serif{font-family:var(--font-title);}
 
 /* Nav — 상단바 + 대메뉴 바 (스크롤해도 상단 고정) */
+/* 본문 바로가기 — 평소에는 화면 밖, Tab 으로 닿으면 나타난다.
+   display:none 이나 visibility:hidden 으로 숨기면 초점을 받을 수 없어 소용이 없다. */
+.skip-link{position:absolute;left:var(--sp-s);top:calc(-1 * var(--sp-xxxl) * 2);z-index:100;
+  background:var(--brand);color:var(--n-fg-on-brand);
+  font-size:var(--fs-300);line-height:var(--lh-300);font-weight:var(--fw-bold);
+  padding:var(--sp-s) var(--sp-l);border-radius:var(--r-ctl);
+  transition:top var(--t-state);}
+.skip-link:focus{top:var(--sp-s);}
 header.nav{position:sticky;top:0;z-index:50;background:rgba(var(--n-bg-2-rgb),.92);
   backdrop-filter:blur(10px);border-bottom:var(--st-thin) solid var(--n-stroke-2);}
 /* 최상단 — 뇌문(雷紋). 글자 뒤라 알파 10% 짜리 타일을 쓴다.
@@ -335,6 +343,16 @@ header.nav{position:sticky;top:0;z-index:50;background:rgba(var(--n-bg-2-rgb),.9
 .hcx-dots{position:absolute;right:18px;bottom:16px;display:flex;gap:var(--sp-l);}
 .hcx-dots button{width:9px;height:9px;padding:0;border:0;border-radius:var(--r-circular);background:var(--gold-60);cursor:pointer;transition:var(--t-state);}
 .hcx-dots button.on{background:var(--brand);transform:scale(1.2);}
+/* 일시정지 버튼은 도트와 같은 줄에 두되 원형 점이 아니다.
+   배경을 --brand 로 둔 이유: 도트와 같은 --gold-60 은 흰 글자와 3.38:1 이라
+   10px 기호에는 모자란다(AA 4.5:1). --brand 는 6.73:1 이다. 도트는 글자가 아니라
+   1.4.11(비텍스트 3:1)이 기준이지만 이 버튼 안에는 기호가 들어간다. */
+.hcx-dots button.hcx-pause{
+  width:auto;height:auto;padding:var(--sp-xxs) var(--sp-snudge);
+  border-radius:var(--r-md);background:var(--brand);color:var(--n-fg-on-brand);
+  font-size:var(--fs-100);line-height:var(--lh-100);margin-right:var(--sp-xs);
+}
+.hcx-dots button.hcx-pause:hover{background:var(--brand-hover);}
 .home-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--sp-l);flex:0 0 auto;height:clamp(250px,33vh,338px);}
 /* 소식/법회 패널 */
 .hpanel{display:flex;flex-direction:column;background:var(--n-bg-1);border:var(--st-thin) solid var(--n-stroke-2);border-radius:var(--r-card);
