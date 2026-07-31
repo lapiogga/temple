@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireSession } from "@/lib/session";
 import { formatPhone } from "@/lib/phone";
 import { listMembers } from "@/lib/members";
@@ -94,6 +95,13 @@ export default async function MembersAdmin() {
                         <input type="hidden" name="id" value={m.id} />
                         <button className="adm-link-btn danger" type="submit">정지</button>
                       </form>
+                    )}
+                    {/* 정정 — 본인이 못 바꾸는 값(성명·생년월일)과, 비밀번호를 잊은 채
+                        번호까지 바뀌어 본인확인이 막힌 경우의 유일한 구제 경로다. */}
+                    {m.status !== "withdrawn" && (
+                      <Link className="adm-link-btn" href={`/admin/members/${m.id}/edit`}>
+                        정정
+                      </Link>
                     )}
                     {m.status !== "withdrawn" && !m.must_reset_password && (
                       <form action={resetMemberPasswordAction}>

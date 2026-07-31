@@ -140,6 +140,31 @@ export async function updateMemberPhone(id, phone) {
   );
 }
 
+// ── 종무소가 대신 고치는 것 ────────────────────────────────────
+//
+// 회원 본인이 못 바꾸는 값(성명·생년월일)과, 바꿔야 하는데 바꿀 수 없게 된 값을
+// 종무소가 확인 후 정정한다. 방침 §7 이 "종무소로 알려 주시면 정정해 드립니다" 로
+// 약속하고 있는 자리다.
+//
+// 이 화면이 없으면 막다른 길이 생긴다. 비밀번호 재설정은 휴대폰 + 생년월일로 본인을
+// 확인하는데(member-login/reset), 가입할 때 잘못 적었거나 번호가 바뀌었으면 그 확인을
+// 영영 통과하지 못한다. 그러면 로그인도 재설정도 안 되어 계정이 잠긴 채로 남는다.
+//
+// 닉네임은 게시판 표시명이라 지난 글까지 함께 바꾼다(본인이 바꿀 때와 같은 규칙).
+export async function updateMemberByAdmin(id, d) {
+  const { name, nickname, birthDate, gender, phone } = d;
+  await withTransaction(async (q) => {
+    await q(
+      `UPDATE members
+          SET name = $2, nickname = $3, birth_date = $4, gender = $5,
+              phone = $6, phone_verified = false
+        WHERE id = $1`,
+      [id, name, nickname, birthDate, gender, phone]
+    );
+    await q("UPDATE posts SET author_name = $2 WHERE author_member_id = $1", [id, nickname]);
+  });
+}
+
 // 탈퇴 — 행을 지우지 않고 개인정보만 지운다(익명화).
 //
 // DELETE 를 쓰지 않는 이유가 두 가지다.

@@ -87,6 +87,14 @@ export function formatWallDateTimeFull(value) {
   return p ? `${p.year}. ${p.month}. ${p.day}. ${p.hour}:${p.minute}` : "";
 }
 
+// <input type="date"> 가 요구하는 "YYYY-MM-DD".
+// DATE 컬럼(생년월일 등)을 폼에 되돌려 넣을 때 쓴다. 시간대 변환을 태우면 안 되는 값이라
+// UTC 로 꺼낸다 — 로컬로 꺼내면 서버 TZ 에 따라 하루 어긋난다.
+export function wallDateInput(value) {
+  const p = partsIn(value, "UTC");
+  return p ? `${p.year}-${p.month}-${p.day}` : "";
+}
+
 // 벽시계 값의 '일(日)' 만 — 달력이 날짜 칸을 고를 때 쓴다.
 export function wallDayOfMonth(value) {
   const p = partsIn(value, "UTC");
