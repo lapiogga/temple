@@ -7,7 +7,11 @@ import { getMemberByLoginId, touchMemberLogin } from "@/lib/members";
 import { getMemberSession } from "@/lib/member-session";
 
 const schema = z.object({
-  loginId: z.string().min(1).max(30),
+  // 가입(join/actions.js)이 loginId 를 trim 해서 저장하므로 조회할 때도 똑같이 다듬는다.
+  // 한쪽만 trim 하면 앞뒤 공백이 섞인 입력이 DB 조회에서 빗나가고, 아래 GENERIC 때문에
+  // 사용자에게는 "비밀번호가 틀렸다"로 보인다. 모바일 자동완성·복사붙여넣기에서 흔하다.
+  // 비밀번호는 trim 하지 않는다 — 앞뒤 공백도 비밀번호의 일부다.
+  loginId: z.string().trim().min(1).max(30),
   password: z.string().min(1).max(72),
 });
 

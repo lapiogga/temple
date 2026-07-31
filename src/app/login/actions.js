@@ -7,7 +7,9 @@ import { query } from "@/lib/db";
 import { getSession } from "@/lib/session";
 
 const loginSchema = z.object({
-  loginId: z.string().min(1).max(100),
+  // 앞뒤 공백을 다듬는다. 다듬지 않으면 조회가 빗나가고, 실패 문구가 아래 GENERIC_ERROR
+  // 하나뿐이라 사용자에게는 비밀번호 오류로 보인다. 비밀번호는 trim 하지 않는다.
+  loginId: z.string().trim().min(1).max(100),
   // bcrypt 는 72바이트에서 절단되므로 상한을 72로(초과분 무시로 인한 혼동 방지).
   password: z.string().min(1).max(72),
 });

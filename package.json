@@ -9,7 +9,8 @@
     "start": "next start -p 3000",
     "lint": "next lint",
     "db:init": "psql \"$DATABASE_URL\" -f db/schema.sql",
-    "db:seed": "node --env-file=.env scripts/seed-admin.mjs"
+    "db:seed": "node --env-file=.env scripts/seed-admin.mjs",
+    "member:passwd": "node --env-file=.env scripts/reset-member-password.mjs"
   },
   "dependencies": {
     "bcryptjs": "3.0.3",
