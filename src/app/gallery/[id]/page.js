@@ -5,6 +5,7 @@ import SiteFooter from "@/components/SiteFooter";
 import Reveal from "@/components/Reveal";
 import { DancheongDefs } from "@/components/Icons";
 import { getAlbum, listPhotos } from "@/lib/gallery";
+import PhotoGrid from "@/components/PhotoGrid";
 import { SITE } from "@/content/site";
 
 export const dynamic = "force-dynamic";
@@ -59,15 +60,7 @@ export default async function AlbumPage({ params }) {
           {photos.length === 0 ? (
             <p className="reveal" style={{ color: "var(--n-fg-3)" }}>등록된 사진이 없습니다.</p>
           ) : (
-            <div className="photo-grid">
-              {photos.map((p) => (
-                <figure className="reveal" key={p.id}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={p.image_url} alt={p.caption ?? album.title} />
-                  {p.caption && <figcaption>{p.caption}</figcaption>}
-                </figure>
-              ))}
-            </div>
+            <PhotoGrid photos={photos} albumTitle={album.title} />
           )}
         </div>
       </section>

@@ -18,13 +18,19 @@ export default function LoginForm({ action }) {
     <form action={formAction} className="auth-card">
       {state?.error ? <p className="adm-form-err" role="alert">{state.error}</p> : null}
       {state?.needsReset ? (
-        <p className="adm-form-err" role="alert">
-          종무소에서 이 계정의 비밀번호를 초기화했습니다. 가입할 때 적으신 휴대폰 번호와
-          생년월일을 확인한 뒤 새 비밀번호를 정해 주세요.{" "}
-          <Link href={`/member-login/reset?loginId=${encodeURIComponent(state.loginId)}`}>
+        <div className="adm-form-err" role="alert">
+          <p style={{ marginBottom: "var(--sp-m)" }}>
+            종무소에서 이 계정의 비밀번호를 초기화했습니다. 가입할 때 적으신 휴대폰 번호와
+            생년월일을 확인한 뒤 새 비밀번호를 정해 주세요.
+          </p>
+          {/* 문장 속 링크는 눈에 띄지 않아 버튼으로 둔다 — 여기서 갈 곳은 이 하나뿐이다. */}
+          <Link
+            className="btn btn-primary"
+            href={`/member-login/reset?loginId=${encodeURIComponent(state.loginId)}`}
+          >
             새 비밀번호 설정하기 →
           </Link>
-        </p>
+        </div>
       ) : null}
       <label className="auth-field">
         <span>아이디</span>

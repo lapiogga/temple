@@ -68,24 +68,39 @@ export async function deleteAlbumAction(formData) {
   redirect("/admin/gallery");
 }
 
-export async function addPhotoAction(albumId, prevState, formData) {
+// 여러 장을 한 번에. 파일 하나씩 올리던 흐름이 사진 수십 장에서는 감당이 안 됐다.
+// 한 장이 실패해도 나머지는 올리고, 어떤 파일이 왜 실패했는지 돌려준다.
+const MAX_BATCH = 15;
+
+export async function addPhotosAction(albumId, prevState, formData) {
   await requireSession();
-  const caption = (formData.get("caption") ?? "").toString().trim() || null;
-  let imageUrl;
-  try {
-    imageUrl = await saveImage(formData.get("image"));
-  } catch (err) {
-    return { error: err.message || "이미지 업로드에 실패했습니다." };
+  const files = formData.getAll("images").filter((f) => f && typeof f.arrayBuffer === "function" && f.size > 0);
+  if (files.length === 0) return { error: "사진을 선택하세요." };
+  if (files.length > MAX_BATCH) {
+    return { error: `한 번에 최대 ${MAX_BATCH}장까지 올릴 수 있습니다. (선택 ${files.length}장)` };
   }
-  try {
-    await addPhoto(albumId, { imageUrl, caption });
-  } catch (err) {
-    console.error("addPhoto 실패:", err);
-    return { error: "저장 중 오류가 발생했습니다." };
+  // 파일 순서와 같은 순서로 온 설명. 비어 있으면 null.
+  const captions = formData.getAll("captions").map((c) => (c ?? "").toString().trim() || null);
+
+  let added = 0;
+  const failed = [];
+  for (let i = 0; i < files.length; i++) {
+    try {
+      const imageUrl = await saveImage(files[i]);
+      await addPhoto(albumId, { imageUrl, caption: captions[i] ?? null });
+      added++;
+    } catch (err) {
+      // saveImage 는 형식·용량 위반을 사용자용 문구로 throw 한다.
+      failed.push(`${files[i].name || "이름없음"}: ${err?.message ?? "실패"}`);
+    }
   }
   revalidatePath(`/admin/gallery/${albumId}`);
   revalidatePath("/admin/gallery");
-  return { ok: true };
+  revalidatePath(`/gallery/${albumId}`);
+  if (added === 0) return { error: `모두 실패했습니다. ${failed.join(" / ")}` };
+  return failed.length
+    ? { ok: true, added, warn: `${added}장 등록. 실패 ${failed.length}장 — ${failed.join(" / ")}` }
+    : { ok: true, added };
 }
 
 export async function deletePhotoAction(formData) {

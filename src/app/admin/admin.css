@@ -163,6 +163,9 @@
 }
 
 /* 폼 */
+/* 리치에디터나 사진 미리보기가 들어가는 폼은 640px 로는 답답하다.
+   .adm-form-wide 를 함께 주면 화면 폭을 다 쓴다(게시판 글쓰기와 같은 정책). */
+.adm-form.adm-form-wide { max-width: 100%; }
 .adm-form {
   max-width: 640px;
   background: var(--n-bg-1);

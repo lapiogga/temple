@@ -19,7 +19,7 @@ export default function NoticeForm({ action, initial = {}, submitLabel = "저장
   const isNew = initial.id == null;
 
   return (
-    <form action={formAction} className="adm-form">
+    <form action={formAction} className="adm-form adm-form-wide">
       {state?.error ? (
         <p className="adm-form-err" role="alert">
           {state.error}
