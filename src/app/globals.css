@@ -575,6 +575,11 @@ footer.site{margin-top:var(--sp-xl);}
 .gal-card .cover-empty{font-size:var(--fs-200);color:var(--n-fg-4);}
 .gal-card .meta{padding:var(--sp-m) var(--sp-l);}
 .gal-card .meta h3{font-size:var(--fs-400);font-weight:var(--fw-bold);line-height:var(--lh-400);}
+/* '회원 전용' 표시. 이 앨범이 왜 남에게는 안 보이는지 관리자·회원이 알 수 있어야 한다. */
+.gal-badge{display:inline-block;margin-left:var(--sp-s);vertical-align:middle;
+  font-size:var(--fs-200);line-height:var(--lh-200);font-weight:var(--fw-bold);
+  color:var(--sec);background:var(--sec-tint);
+  padding:var(--sp-xxs) var(--sp-s);border-radius:var(--r-circular);}
 .gal-card .meta .cnt{font-size:var(--fs-200);color:var(--n-fg-3);margin-top:var(--sp-xxs);}
 .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-m);}
 .photo-grid figure{background:var(--n-bg-1);border:var(--st-thin) solid var(--n-stroke-2);border-radius:var(--r-card);overflow:hidden;}

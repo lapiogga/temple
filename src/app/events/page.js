@@ -225,9 +225,6 @@ export default async function EventsPage({ searchParams }) {
             </aside>
           </div>
 
-          <p className="note-small" style={{ marginTop: "8px" }}>
-            ※ 표시된 일정은 예시(리뷰용)입니다. 관리자에서 실제 일정으로 등록·수정합니다.
-          </p>
         </div>
       </section>
 

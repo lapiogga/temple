@@ -43,7 +43,9 @@ export default async function PostDetail({ params }) {
       <article className="screen top">
         <div className="wrap wide">
           <div className="head-back"><BackLink href={backHref} label={backLabel} /></div>
-          {/* 정해진 틀(표): 타이틀·게시자·게시일시·게시내용·첨부자료 */}
+          {/* 정해진 틀(표): 타이틀·게시자·게시일시·게시내용.
+              첨부자료 행은 뺐다 — 게시판에는 첨부 기능이 없어(event_attachments 만 존재)
+              영원히 "첨부파일 없음" 만 찍히는 죽은 행이었다. */}
           <table className="detail-table">
             <tbody>
               <tr>
@@ -66,10 +68,6 @@ export default async function PostDetail({ params }) {
                 <td className="detail-body">
                   <div className="rich-content" dangerouslySetInnerHTML={{ __html: p.body }} />
                 </td>
-              </tr>
-              <tr>
-                <th scope="row">첨부자료</th>
-                <td><span style={{ color: "var(--n-fg-3)" }}>첨부파일 없음</span></td>
               </tr>
             </tbody>
           </table>

@@ -48,7 +48,9 @@ export default async function NoticeDetail({ params }) {
       <article className="screen top">
         <div className="wrap wide">
           <div className="head-back"><BackLink href="/notices" label="공지사항" /></div>
-          {/* 게시판과 동일한 표 틀: 타이틀·게시자·게시일시·게시내용·첨부자료 */}
+          {/* 게시판과 동일한 표 틀: 타이틀·게시자·게시일시·게시내용.
+              첨부자료 행은 뺐다 — 소식에는 첨부 기능이 없어(event_attachments 만 존재)
+              영원히 "첨부파일 없음" 만 찍히는 죽은 행이었다. */}
           <table className="detail-table">
             <tbody>
               <tr>
@@ -76,10 +78,6 @@ export default async function NoticeDetail({ params }) {
                   )}
                   <div className="rich-content" dangerouslySetInnerHTML={{ __html: n.body }} />
                 </td>
-              </tr>
-              <tr>
-                <th scope="row">첨부자료</th>
-                <td><span style={{ color: "var(--n-fg-3)" }}>첨부파일 없음</span></td>
               </tr>
             </tbody>
           </table>

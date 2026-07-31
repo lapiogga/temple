@@ -5,6 +5,7 @@ import SiteFooter from "@/components/SiteFooter";
 import Reveal from "@/components/Reveal";
 import { DancheongDefs, PhotoIcon } from "@/components/Icons";
 import { listAlbums } from "@/lib/gallery";
+import { getViewer } from "@/lib/viewer";
 import { SITE } from "@/content/site";
 import Pager from "@/components/Pager";
 
@@ -14,9 +15,13 @@ export const metadata = { title: `갤러리 | ${SITE.name}` };
 const PER_PAGE = 6;
 
 export default async function GalleryPage({ searchParams }) {
+  // 승인된 회원과 운영자에게는 '회원 전용' 앨범도 보인다.
+  const { isAdmin, isApprovedMember } = await getViewer();
+  const canSeeMember = isAdmin || isApprovedMember;
+
   let albums = [];
   try {
-    albums = await listAlbums({ publicOnly: true });
+    albums = await listAlbums({ publicOnly: true, includeMember: canSeeMember });
   } catch (err) {
     console.error("갤러리 조회 실패:", err);
   }
@@ -52,7 +57,14 @@ export default async function GalleryPage({ searchParams }) {
                     )}
                   </div>
                   <div className="meta">
-                    <h3>{a.title}</h3>
+                    <h3>
+                      {a.title}
+                      {/* 회원에게만 보이는 앨범임을 알린다. 표시가 없으면 로그아웃한 뒤
+                          같은 주소가 404 가 되는 이유를 알 수 없다. */}
+                      {a.visibility === "member" ? (
+                        <span className="gal-badge">회원 전용</span>
+                      ) : null}
+                    </h3>
                     <div className="cnt">사진 {a.photo_count}장</div>
                   </div>
                 </Link>
