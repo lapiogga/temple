@@ -34,7 +34,11 @@ Next.js 14 App Router · JavaScript · PostgreSQL. Hostinger VPS 한 대에 prod
   `grep --include="*.tsx"` 는 오류 없이 0건을 돌려주므로, 다 훑었다고 착각하기 쉽다.
   실제로 디자인 토큰 이전 때 이 함정에 걸려 인라인 `fontSize` 17개 값을 놓친 적이 있다.
   **전수 조사에는 반드시 `--include="*.js"` 를 넣을 것.**
-- ESLint 설정 파일이 없다. `next lint` 는 대화형 설치를 물어보므로 무인 실행에 쓸 수 없다.
+- **Lint 는 `npm run lint` 로 무인 실행된다**(`.eslintrc.json` + `eslint-config-next`).
+  `next lint` 는 설정이 없으면 대화형 설치를 물어보므로 예전에는 못 썼는데, 2026-07-31 에
+  설정을 넣었다. 현재 src 135개 파일 지적 0건 — 새로 0건이 아닌 상태로 만들지 말 것.
+  `<img>` 경고는 파일마다 `eslint-disable-next-line @next/next/no-img-element` 로 끈다
+  (업로드 이미지는 크기를 모르므로 `next/image` 를 쓰지 않는다).
 - CSS 는 `src/app/globals.css` · `src/app/admin/admin.css` · `src/app/login/login.css` 셋뿐이다.
 - 인라인 `style={{}}` 이 여기저기 있다. CSS 만 고치면 화면이 안 따라오는 경우가 있다.
 
