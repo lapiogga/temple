@@ -59,7 +59,20 @@ export default function EventForm({ action, initial = {}, submitLabel = "저장"
   // 날짜(일회성) / 반복 시작일 — 아래 time 초기화가 이 값을 쓰므로 먼저 계산한다.
   const initStarts = initial.starts_at ? new Date(initial.starts_at) : null;
 
-  const [freq, setFreq] = useState(ir.type === "daily" || ir.type === "monthly" ? ir.type : "weekly");
+  // 구형 lunar 규칙(음력 매월 D일)은 폼이 만들어 내지 못한다. recurrence.js 가
+  // "읽기만 지원한다" 고 적어 둔 형식이고, 달력은 제대로 그린다(recMatches 의 lunar 분기).
+  //
+  // 예전에는 여기서 lunar 이 "weekly" 로 떨어졌다. 그러면 그 일정을 수정 화면에 한 번
+  // 열어 저장하는 것만으로 규칙이 `weekly:0:…`(매주 일요일)로 덮여 버린다. 제목 하나
+  // 고치려다 음력 법회가 양력 일요일 법회가 되는 것이다.
+  //
+  // 그렇다고 monthly 로 옮기는 것도 답이 아니다. 음력 D일과 양력 D일은 다른 날이라
+  // 조용히 의미가 바뀐다. 그래서 'lunar' 를 상태로 그대로 들고 있다가 저장할 때
+  // 원래 문자열을 되돌려 준다. 운영자가 세 주기 중 하나를 직접 고르면 그때 바뀐다 —
+  // 바뀌는 것이 명시적 선택일 때만 바뀌게 하는 것이다.
+  const [freq, setFreq] = useState(
+    ir.type === "daily" || ir.type === "monthly" || ir.type === "lunar" ? ir.type : "weekly"
+  );
   const [weekday, setWeekday] = useState(ir.weekday ?? 0);
   const [monthDay, setMonthDay] = useState(ir.day ?? ir.lday ?? 1);
 
@@ -100,10 +113,12 @@ export default function EventForm({ action, initial = {}, submitLabel = "저장"
 
   const recurrence = useMemo(() => {
     if (!repeat) return "";
+    // 구형 음력 규칙은 손대지 않고 원래 문자열을 그대로 되돌린다(위 freq 주석).
+    if (freq === "lunar") return (initial.recurrence ?? "").trim();
     if (freq === "daily") return `daily:${time}`;
     if (freq === "weekly") return `weekly:${weekday}:${time}`;
     return `monthly:${monthDay}:${time}`;
-  }, [repeat, freq, weekday, monthDay, time]);
+  }, [repeat, freq, weekday, monthDay, time, initial.recurrence]);
 
   const whenText = useMemo(() => {
     const t = timeLabel(time);
@@ -111,10 +126,14 @@ export default function EventForm({ action, initial = {}, submitLabel = "저장"
       if (!evValues.startsAt) return "";
       return `${evValues.dateOnly} ${t}${evValues.conv ? ` (${evValues.conv})` : ""}`;
     }
+    // 음력 규칙에는 시각이 없다(형식이 lunar:D 뿐이다). 없는 시각을 붙여 적지 않는다.
+    if (freq === "lunar") {
+      return `음력 매월 ${ir.lday}일${until ? ` (~${until})` : ""}`;
+    }
     const head =
       freq === "daily" ? "매일" : freq === "weekly" ? `매주 ${WEEK[weekday]}요일` : `매월 ${monthDay}일`;
     return `${head} ${t}${until ? ` (~${until})` : ""}`;
-  }, [repeat, freq, weekday, monthDay, time, until, evValues]);
+  }, [repeat, freq, weekday, monthDay, time, until, evValues, ir.lday]);
 
   // 반복이면 startsAt 은 '첫 회' 날짜다. 비워 두면 예전부터 있던 것으로 본다.
   const startsAt = repeat ? (solarDate ? `${solarDate}T${time}` : "") : evValues.startsAt;
@@ -168,12 +187,25 @@ export default function EventForm({ action, initial = {}, submitLabel = "저장"
             <div className="adm-field ev-span">
               <span>반복 주기</span>
               <div className="ev-radios">
+                {/* 구형 음력 규칙으로 등록된 일정이면 그 자리를 하나 더 보여 준다.
+                    선택돼 있는 동안에는 규칙을 건드리지 않고 그대로 저장한다. */}
+                {freq === "lunar" && (
+                  <label className="ev-radio on">
+                    <input type="radio" name="_freq" checked readOnly /> 음력 매월 {ir.lday}일
+                  </label>
+                )}
                 {[["daily", "매일"], ["weekly", "매주"], ["monthly", "매월"]].map(([v, l]) => (
                   <label key={v} className={`ev-radio${freq === v ? " on" : ""}`}>
                     <input type="radio" name="_freq" checked={freq === v} onChange={() => setFreq(v)} /> {l}
                   </label>
                 ))}
               </div>
+              {freq === "lunar" && (
+                <em className="adm-hint">
+                  예전 방식으로 등록된 음력 반복입니다. 그대로 두면 유지됩니다.
+                  위에서 매일·매주·매월을 고르면 <b>양력 기준으로 바뀌고 되돌릴 수 없습니다.</b>
+                </em>
+              )}
             </div>
 
             {freq === "weekly" && (
@@ -192,7 +224,9 @@ export default function EventForm({ action, initial = {}, submitLabel = "저장"
               </label>
             )}
 
-            <TimeField value={time} onChange={setTime} />
+            {/* 음력 규칙(lunar:D)에는 시각 자리가 없다. 입력칸을 두면 고쳐도 저장되지
+                않아 "고쳤는데 안 바뀐다" 가 된다. 그 경우에는 아예 감춘다. */}
+            {freq !== "lunar" && <TimeField value={time} onChange={setTime} />}
 
             <label className="adm-field">
               <span>시작일 (비우면 제한 없음)</span>
@@ -235,7 +269,10 @@ export default function EventForm({ action, initial = {}, submitLabel = "저장"
             {calType === "solar" ? (
               <label className="adm-field">
                 <span>양력 날짜</span>
-                <input type="date" value={solarDate} onChange={(e) => setSolarDate(e.target.value)} />
+                {/* 반복이 아니면 날짜가 있어야 한다. 없으면 달력에 나오지 않는다.
+                    서버도 같은 조건으로 거절한다(actions.js hasWhen) — 이 required 는
+                    거기까지 가기 전에 알려 주기 위한 것이다. */}
+                <input type="date" required value={solarDate} onChange={(e) => setSolarDate(e.target.value)} />
               </label>
             ) : (
               <div className="adm-field">

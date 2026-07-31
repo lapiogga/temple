@@ -287,7 +287,11 @@ header.nav{position:sticky;top:0;z-index:50;background:rgba(var(--n-bg-2-rgb),.9
   font-size:var(--fs-200);font-weight:var(--fw-bold);line-height:var(--lh-200);
   vertical-align:middle;letter-spacing:0;}
 .list-table tr.row-pinned{background:var(--brand-tint);}
-.list-table tr.row-pinned .c-cat{color:var(--n-fg-4);}
+/* 상단 고정 글의 번호 칸.
+   --n-fg-4 는 흰 배경 기준 4.94:1 로 잡힌 토큰이라 AA 하한에 겨우 걸쳐 있다.
+   여기 배경은 흰색이 아니라 --brand-tint(#eee3e0) 라 3.92:1 로 떨어진다.
+   --n-fg-3 이면 같은 배경에서 4.91:1 이다(직접 계산). 12px 글자라 큰 글자 면제도 안 된다. */
+.list-table tr.row-pinned .c-cat{color:var(--n-fg-3);}
 @media(max-width:760px){
   .list-table{font-size:var(--fs-300);}
   .list-table thead th,.list-table tbody td{padding:var(--sp-mnudge) var(--sp-s);}

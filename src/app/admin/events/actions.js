@@ -85,6 +85,20 @@ function validUntil(d) {
   return { ok: true };
 }
 
+// 언제 하는 일정인지가 있어야 한다.
+//
+// 반복도 아니고 날짜도 없으면 그 행은 뜻이 없다. 달력은 starts_at 범위로 뽑으므로
+// 안 나오고, 반복 목록·정기법회 패널도 recurrence 로 거르므로 안 나온다. 남는 자리는
+// 목록 뷰뿐인데 거기서는 일시 칸이 빈 채로 제목만 뜬다. 등록한 사람은 올렸다고 믿고
+// 신도는 언제인지 알 수 없다.
+//
+// 화면에도 required 를 달았지만 그것만으로는 부족하다 — 숨은 필드로 조립해 보내는
+// 구조라 브라우저 검사를 우회할 수 있다. 서버가 같은 조건을 쥔다(종료일 상한과 같은 이유).
+const NO_WHEN = "반복 주기를 켜거나 날짜를 골라 주세요. 언제 하는지가 없으면 달력에 나오지 않습니다.";
+function hasWhen(d) {
+  return d.recurrence !== "" || d.startsAt !== "";
+}
+
 // startsAt 유효성(빈 값 허용, 값이 있으면 유효한 날짜여야).
 function validDate(rec, raw) {
   if (raw === "") return true;
@@ -107,6 +121,7 @@ export async function createEventAction(prevState, formData) {
   if (!validDate(rec, parsed.data.startsAt)) {
     return { error: "행사 일시 형식이 올바르지 않습니다." };
   }
+  if (!hasWhen(parsed.data)) return { error: NO_WHEN };
   const until = validUntil(parsed.data);
   if (!until.ok) return { error: until.msg };
   try {
@@ -130,6 +145,7 @@ export async function updateEventAction(id, prevState, formData) {
   if (!validDate(rec, parsed.data.startsAt)) {
     return { error: "행사 일시 형식이 올바르지 않습니다." };
   }
+  if (!hasWhen(parsed.data)) return { error: NO_WHEN };
   const until = validUntil(parsed.data);
   if (!until.ok) return { error: until.msg };
   try {
