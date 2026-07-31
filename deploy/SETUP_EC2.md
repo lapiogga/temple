@@ -1,4 +1,22 @@
-# AWS EC2 셋업 & 배포 가이드
+> # ⛔ 폐기된 문서 — 따라 하지 말 것
+>
+> 이 사이트는 **AWS EC2 에서 돌지 않는다.** Hostinger VPS 한 대에서 prod(`/var/www/temple`)와
+> dev(`/home/ubuntu/temple-dev`)를 같이 띄운다. 아래 내용은 2026-07 이전 EC2 시절 기준이라
+> 경로·명령이 전부 어긋나 있고, **그대로 따라 하면 운영이 죽는다.**
+>
+> - `§5` 가 `deploy/temple.service` 를 `/etc/systemd/system/` 에 복사하라고 안내했는데,
+>   그 파일의 `WorkingDirectory` 는 없는 경로(`/home/ubuntu/projects/temple`)였다.
+>   복사하면 prod 가 **다음 재시작에서 기동 실패**한다. 그래서 그 파일은 2026-07-31 에
+>   삭제했다(유닛은 `bootstrap-hostinger.sh` 가 인라인으로 만든다).
+> - `§9` 의 재배포 경로도 없는 디렉터리다. 재배포는 `deploy/deploy.sh` 를 체크아웃 안에서
+>   실행하면 되고, 스크립트가 스스로 대상 서비스를 알아낸다.
+>
+> **현행 문서는 `deploy/HOSTINGER_SETUP.md` 와 `docs/10_잔여작업_로드맵.md` 다.**
+> 이 파일은 EC2 시절 이력을 남겨 두려고 보관할 뿐이다.
+
+---
+
+# AWS EC2 셋업 & 배포 가이드 (폐기)
 
 대상: Ubuntu EC2 (서울 리전 ap-northeast-2 권장) · 자체 PostgreSQL · Nginx · Next.js · Let's Encrypt
 

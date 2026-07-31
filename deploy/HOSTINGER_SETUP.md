@@ -234,6 +234,21 @@ healthchecks.io 쪽 설정은 **Period 1 day / Grace 2 hours**. 백업은 19:00�
 ---
 
 ## 재배포(코드 수정 후)
+
+체크아웃 안에서 실행하면 된다. 경로를 적을 필요가 없다 — 스크립트가 자기가 놓인
+체크아웃을 기준으로 대상 서비스를 systemd 에서 역산한다(prod 면 `temple`, dev 면
+`temple-dev`). 대응하는 유닛이 없으면 아무것도 하지 않고 멈춘다.
+
 ```bash
-cd /home/ubuntu/projects/temple && ./deploy/deploy.sh   # git pull → npm ci → build → restart
+cd /var/www/temple && ./deploy/deploy.sh      # prod
+cd /home/ubuntu/temple-dev && ./deploy/deploy.sh   # dev (빌드 없음)
 ```
+
+주의 두 가지.
+
+- **체크아웃 소유자로 실행할 것.** root 로 돌리면 `.git`·`.next` 가 root 소유로 생겨
+  서비스(`User=ubuntu`)가 쓰지 못하고, 다음번 git 이 "dubious ownership" 으로 거부한다.
+  스크립트가 먼저 검사해서 막고 `runuser -u ubuntu -- ...` 를 안내한다.
+- **재시작은 sudo 가 필요하다.** 이 환경의 sudo 는 비밀번호를 요구하므로 무인 실행에서는
+  거기서 멈추고 실행할 명령을 알려 준다(종료코드 2). 빌드는 됐는데 재시작이 안 된 상태를
+  방치하면 새 빌드와 옛 서버가 어긋나 정적 자산 일부가 404 가 된다.
