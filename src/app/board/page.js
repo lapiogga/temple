@@ -3,8 +3,10 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import Reveal from "@/components/Reveal";
 import { DancheongDefs } from "@/components/Icons";
-import { listPosts, BOARD_LABEL } from "@/lib/posts";
+import { listPosts } from "@/lib/posts";
+import { listVisibleCategories, getLabelMap } from "@/lib/board-categories";
 import { getMemberSession } from "@/lib/member-session";
+import { getSession } from "@/lib/session";
 import { SITE } from "@/content/site";
 import Pager from "@/components/Pager";
 
@@ -20,18 +22,28 @@ function fmt(v) {
 }
 
 export default async function BoardPage({ searchParams }) {
-  const board =
-    searchParams?.board === "story" ? "story" : searchParams?.board === "free" ? "free" : null;
+  // 카테고리는 board_categories 가 갖는다. 목록 탭에는 숨김을 뺀 것만 쓰되,
+  // 이름표는 숨긴 카테고리의 글에도 붙어야 하므로 전체 맵을 따로 받는다.
+  let categories = [];
+  let labelMap = {};
+  try {
+    [categories, labelMap] = await Promise.all([listVisibleCategories(), getLabelMap()]);
+  } catch (err) {
+    console.error("게시판 카테고리 조회 실패:", err);
+  }
+  // 없는 slug 로 들어오면 전체 목록으로 떨어뜨린다.
+  const q = searchParams?.board;
+  const board = categories.some((c) => c.slug === q) ? q : null;
 
-  // 열람은 공개, 글쓰기는 회원 전용. 작성자는 닉네임으로 표시된다.
+  // 열람은 공개. 글쓰기는 승인 회원 또는 운영자.
   let posts = [];
   try {
     posts = await listPosts(board ? { board } : {});
   } catch (err) {
     console.error("게시판 조회 실패:", err);
   }
-  const session = await getMemberSession();
-  const loggedIn = !!session.isLoggedIn;
+  const [memberSession, adminSession] = await Promise.all([getMemberSession(), getSession()]);
+  const loggedIn = !!memberSession.isLoggedIn || !!adminSession.isLoggedIn;
 
   const totalPages = Math.max(1, Math.ceil(posts.length / PER_PAGE));
   const page = Math.min(totalPages, Math.max(1, Number(searchParams?.page) || 1));
@@ -55,8 +67,15 @@ export default async function BoardPage({ searchParams }) {
 
           <div className="post-tabs">
             <Link className={board === null ? "on" : ""} href="/board">전체</Link>
-            <Link className={board === "free" ? "on" : ""} href="/board?board=free">자유게시판</Link>
-            <Link className={board === "story" ? "on" : ""} href="/board?board=story">신행수기</Link>
+            {categories.map((c) => (
+              <Link
+                key={c.slug}
+                className={board === c.slug ? "on" : ""}
+                href={`/board?board=${encodeURIComponent(c.slug)}`}
+              >
+                {c.label}
+              </Link>
+            ))}
           </div>
 
           <table className="list-table">
@@ -72,7 +91,7 @@ export default async function BoardPage({ searchParams }) {
               {paged.length > 0 ? (
                 paged.map((p) => (
                   <tr key={p.id}>
-                    <td className="c-cat"><span className="post-badge">{BOARD_LABEL[p.board] ?? ""}</span></td>
+                    <td className="c-cat"><span className="post-badge">{labelMap[p.board] ?? ""}</span></td>
                     <td className="c-title"><Link href={`/board/${p.id}`}>{p.title}</Link></td>
                     <td className="c-author">{p.author_name}</td>
                     <td className="c-date">{fmt(p.created_at)}</td>

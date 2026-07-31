@@ -1,6 +1,11 @@
 import { requireSession } from "@/lib/session";
 import { listMembers } from "@/lib/members";
-import { approveMemberAction, rejectMemberAction, suspendMemberAction } from "./actions";
+import {
+  approveMemberAction,
+  rejectMemberAction,
+  suspendMemberAction,
+  resetMemberPasswordAction,
+} from "./actions";
 
 const GENDER = { male: "남", female: "여", other: "기타" };
 const STATUS = { approved: "승인", pending: "대기", rejected: "거절", suspended: "정지" };
@@ -39,7 +44,7 @@ export default async function MembersAdmin() {
                 <th>생년월일</th>
                 <th>가입일</th>
                 <th>상태</th>
-                <th className="adm-th-actions">승인</th>
+                <th className="adm-th-actions">관리</th>
               </tr>
             </thead>
             <tbody>
@@ -56,6 +61,17 @@ export default async function MembersAdmin() {
                     <span className={`adm-badge ${m.status === "approved" ? "on" : "off"}`}>
                       {STATUS[m.status] ?? m.status}
                     </span>
+                    {m.must_reset_password && (
+                      <>
+                        {" "}
+                        <span
+                          className="adm-badge off"
+                          title="회원이 가입정보 확인 후 새 비밀번호를 정해야 로그인됩니다"
+                        >
+                          비번 재설정 대기
+                        </span>
+                      </>
+                    )}
                   </td>
                   <td className="adm-actions">
                     {m.status !== "approved" && (
@@ -74,6 +90,12 @@ export default async function MembersAdmin() {
                       <form action={suspendMemberAction}>
                         <input type="hidden" name="id" value={m.id} />
                         <button className="adm-link-btn danger" type="submit">정지</button>
+                      </form>
+                    )}
+                    {!m.must_reset_password && (
+                      <form action={resetMemberPasswordAction}>
+                        <input type="hidden" name="id" value={m.id} />
+                        <button className="adm-link-btn" type="submit">비번 초기화</button>
                       </form>
                     )}
                   </td>

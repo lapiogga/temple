@@ -7,7 +7,8 @@ import { memberLoginAction } from "./actions";
 
 export const metadata = { title: `회원 로그인 | ${SITE.name}` };
 
-export default function MemberLogin() {
+export default function MemberLogin({ searchParams }) {
+  const justReset = searchParams?.reset === "done";
   return (
     <>
       <DancheongDefs />
@@ -17,6 +18,11 @@ export default function MemberLogin() {
           <div className="sec-head">
             <div><div className="ki">Login</div><h2>회원 로그인</h2></div>
           </div>
+          {justReset && (
+            <p className="adm-form-ok" style={{ marginBottom: "var(--sp-l)" }}>
+              새 비밀번호가 설정되었습니다. 새 비밀번호로 로그인해 주세요.
+            </p>
+          )}
           <LoginForm action={memberLoginAction} />
         </div>
       </section>

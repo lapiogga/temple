@@ -4,7 +4,10 @@ import { query } from "@/lib/db";
 const COLS =
   "id, board, title, body, author_member_id, author_name, published, created_at";
 
-export const BOARD_LABEL = { free: "자유게시판", story: "신행수기" };
+// 카테고리 이름은 board_categories 테이블이 갖는다(운영자가 관리 화면에서 바꾼다).
+// 예전에는 여기에 { free:"자유게시판", story:"신행수기" } 가 하드코딩돼 있었고
+// 같은 목록이 board/page.js · BoardWriteForm.js 에도 복사돼 있었다.
+// 이름표가 필요하면 lib/board-categories.js 의 getLabelMap() 을 쓴다.
 
 export async function listPosts({ board } = {}) {
   if (board) {

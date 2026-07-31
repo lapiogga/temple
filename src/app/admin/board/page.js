@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireSession } from "@/lib/session";
-import { listAllPosts, BOARD_LABEL } from "@/lib/posts";
+import { listAllPosts } from "@/lib/posts";
+import { getLabelMap } from "@/lib/board-categories";
 import { deletePostAction } from "./actions";
 
 function fmt(v) {
@@ -11,11 +12,14 @@ function fmt(v) {
 
 export default async function BoardAdmin() {
   await requireSession();
-  const posts = await listAllPosts();
+  const [posts, labelMap] = await Promise.all([listAllPosts(), getLabelMap()]);
 
   return (
     <section>
-      <h1 className="adm-h1">게시판 관리</h1>
+      <div className="adm-head">
+        <h1 className="adm-h1">게시판 글 관리</h1>
+        <Link href="/admin/board/categories" className="btn btn-ghost btn-sm">게시판(카테고리) 관리</Link>
+      </div>
       {posts.length === 0 ? (
         <p className="adm-empty">등록된 글이 없습니다.</p>
       ) : (
@@ -33,7 +37,7 @@ export default async function BoardAdmin() {
             <tbody>
               {posts.map((p) => (
                 <tr key={p.id}>
-                  <td>{BOARD_LABEL[p.board] ?? p.board}</td>
+                  <td>{labelMap[p.board] ?? p.board}</td>
                   <td className="adm-title-cell">
                     <Link href={`/board/${p.id}`} target="_blank">{p.title}</Link>
                   </td>

@@ -34,7 +34,15 @@ export async function memberLoginAction(prevState, formData) {
     return { error: "처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요." };
   }
 
+  // 계정 유무와 무관하게 항상 compare 를 태워 타이밍으로 존재가 새지 않게 한다.
   const ok = await bcrypt.compare(parsed.data.password, m?.password_hash ?? DUMMY_HASH);
+
+  // 관리자가 초기화한 계정은 기존 해시가 난수로 덮여 있어 어떤 비밀번호도 맞지 않는다.
+  // 여기서 걸러주지 않으면 "비밀번호가 틀렸다"만 반복되어 회원이 길을 못 찾는다.
+  if (m?.must_reset_password) {
+    return { needsReset: true, loginId: m.login_id };
+  }
+
   if (!m || !ok) return { error: GENERIC };
 
   if (m.status !== "approved") {

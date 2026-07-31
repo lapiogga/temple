@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
-import { getPost, BOARD_LABEL } from "@/lib/posts";
+import { getPost } from "@/lib/posts";
+import { getLabelMap } from "@/lib/board-categories";
 import { SITE } from "@/content/site";
 
 export const dynamic = "force-dynamic";
@@ -32,6 +33,9 @@ export default async function PostDetail({ params }) {
   let p = null;
   try { p = await getPost(id); } catch (err) { console.error("글 조회 실패:", err); }
   if (!p || !p.published) notFound();
+  // 숨긴 카테고리의 글도 이름표가 보여야 하므로 전체 맵을 쓴다.
+  let labelMap = {};
+  try { labelMap = await getLabelMap(); } catch (err) { console.error("카테고리 조회 실패:", err); }
 
   return (
     <>
@@ -47,7 +51,7 @@ export default async function PostDetail({ params }) {
               <tr>
                 <th scope="row">타이틀</th>
                 <td>
-                  {BOARD_LABEL[p.board] && <span className="post-badge">{BOARD_LABEL[p.board]}</span>}
+                  {labelMap[p.board] && <span className="post-badge">{labelMap[p.board]}</span>}
                   <span className="detail-title">{p.title}</span>
                 </td>
               </tr>

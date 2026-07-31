@@ -560,6 +560,8 @@ footer.site{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--n
 /* 인증(회원) 폼 */
 .auth-card{background:var(--n-bg-1);border:var(--st-thin) solid var(--n-stroke-2);border-radius:var(--r-card);padding:var(--sp-xxxl) var(--sp-xxxl) var(--sp-xxxl);max-width:460px;}
 .auth-card.auth-wide{max-width:560px;}
+/* 게시판 글쓰기처럼 리치 에디터가 들어가는 폼. 460·560px 로는 본문 쓰기가 답답하다. */
+.auth-card.auth-full{max-width:100%;}
 .auth-field{display:block;margin-bottom:var(--sp-l);}
 .auth-field > span{display:block;font-size:var(--fs-300);font-weight:var(--fw-semibold);margin-bottom:var(--sp-xs);}
 .auth-field input,.auth-field select{width:100%;padding:var(--sp-s) var(--sp-m);font-size:var(--fs-400);font-family:inherit;border:var(--st-thin) solid var(--n-stroke-acc);border-radius:var(--r-ctl);background:var(--n-bg-1);color:var(--n-fg-1);transition:border-color var(--t-state),box-shadow var(--t-state);}

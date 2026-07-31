@@ -121,11 +121,32 @@ CREATE TABLE IF NOT EXISTS members (
   last_login_at  TIMESTAMPTZ,
   created_at     TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+-- 관리자가 비밀번호를 초기화하면 true. 이 값이 true 면 로그인이 막히고
+-- 회원은 가입정보(휴대폰·생년월일) 확인 후 새 비밀번호를 설정해야 한다.
+ALTER TABLE members ADD COLUMN IF NOT EXISTS must_reset_password BOOLEAN NOT NULL DEFAULT false;
 
--- 게시판 (자유/신행수기) — 회원 전용 글쓰기
+-- 게시판 카테고리 — 운영자가 추가·수정·숨김 한다.
+-- posts.board 가 slug 를 문자열로 참조한다. FK 를 걸지 않은 이유: 카테고리를
+-- 지울 때 글이 함께 사라지는 사고를 막으려고, 글이 남아 있으면 삭제 자체를
+-- 거부하고 '숨김'만 제공하기 때문이다(lib/board-categories.js).
+CREATE TABLE IF NOT EXISTS board_categories (
+  id         BIGSERIAL PRIMARY KEY,
+  slug       TEXT NOT NULL UNIQUE,              -- posts.board 에 저장되는 값
+  label      TEXT NOT NULL,                     -- 화면에 보이는 이름
+  sort_order INT  NOT NULL DEFAULT 0,
+  is_hidden  BOOLEAN NOT NULL DEFAULT false,    -- 숨김: 탭·글쓰기 선택지에서 제외
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+-- 이전에 코드에 하드코딩돼 있던 두 개를 옮겨 심는다.
+INSERT INTO board_categories (slug, label, sort_order) VALUES
+  ('free', '자유게시판', 1),
+  ('story', '신행수기', 2)
+ON CONFLICT (slug) DO NOTHING;
+
+-- 게시판 글
 CREATE TABLE IF NOT EXISTS posts (
   id               BIGSERIAL PRIMARY KEY,
-  board            TEXT NOT NULL DEFAULT 'free',     -- free | story
+  board            TEXT NOT NULL DEFAULT 'free',     -- board_categories.slug
   title            TEXT NOT NULL,
   body             TEXT NOT NULL,
   author_member_id BIGINT REFERENCES members(id) ON DELETE SET NULL,

@@ -13,17 +13,19 @@ function SubmitButton() {
   );
 }
 
-export default function BoardWriteForm({ action, defaultBoard = "free" }) {
+export default function BoardWriteForm({ action, defaultBoard, categories = [] }) {
   const [state, formAction] = useFormState(action, {});
   return (
-    <form action={formAction} className="auth-card auth-wide">
+    // auth-full: 이 폼만 화면 폭을 다 쓴다(.auth-card 기본 460px, .auth-wide 560px).
+    <form action={formAction} className="auth-card auth-full">
       {state?.error ? <p className="adm-form-err" role="alert">{state.error}</p> : null}
 
       <label className="auth-field">
         <span>게시판</span>
         <select name="board" defaultValue={defaultBoard}>
-          <option value="free">자유게시판</option>
-          <option value="story">신행수기</option>
+          {categories.map((c) => (
+            <option key={c.slug} value={c.slug}>{c.label}</option>
+          ))}
         </select>
       </label>
 
