@@ -13,12 +13,19 @@ function SubmitButton() {
   );
 }
 
-export default function BoardWriteForm({ action, defaultBoard, categories = [] }) {
+export default function BoardWriteForm({ action, defaultBoard, categories = [], authorName }) {
   const [state, formAction] = useFormState(action, {});
   return (
     // auth-full: 이 폼만 화면 폭을 다 쓴다(.auth-card 기본 460px, .auth-wide 560px).
     <form action={formAction} className="auth-card auth-full">
       {state?.error ? <p className="adm-form-err" role="alert">{state.error}</p> : null}
+
+      {/* 운영자·회원 쿠키가 동시에 살아 있을 수 있어, 어떤 이름으로 올라가는지 먼저 알린다. */}
+      {authorName && (
+        <p className="find-desc" style={{ marginBottom: "var(--sp-l)" }}>
+          작성자 <b>{authorName}</b> 로 등록됩니다.
+        </p>
+      )}
 
       <label className="auth-field">
         <span>게시판</span>

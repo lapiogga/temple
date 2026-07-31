@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { digitsOnly, isValidPhone } from "@/lib/phone";
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 import { createQuestion, getQuestion } from "@/lib/qna";
@@ -26,7 +27,8 @@ const schema = z.object({
   authorName: z.string().trim().min(1, "이름을 입력하세요.").max(50),
   title: z.string().trim().min(1, "제목을 입력하세요.").max(200),
   body: z.string().trim().min(1, "내용을 입력하세요.").max(10000),
-  phone: z.string().trim().regex(/^01[0-9]-?\d{3,4}-?\d{4}$/, "휴대폰 번호 형식을 확인하세요."),
+  phone: z.string().trim().transform(digitsOnly)
+    .refine(isValidPhone, "휴대폰 번호 형식을 확인하세요."),
 });
 
 export async function createQuestionAction(prevState, formData) {

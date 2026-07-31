@@ -4,6 +4,7 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 import { createMember, loginIdExists } from "@/lib/members";
+import { digitsOnly, isValidPhone } from "@/lib/phone";
 
 const schema = z.object({
   loginId: z
@@ -12,9 +13,17 @@ const schema = z.object({
   password: z.string().min(8, "비밀번호는 8자 이상입니다.").max(72),
   name: z.string().trim().min(1, "성명을 입력하세요.").max(50),
   nickname: z.string().trim().min(1, "닉네임을 입력하세요.").max(30),
-  birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "생년월일을 선택하세요."),
+  // 연도 범위를 막지 않으면 1064 같은 값이 그대로 저장된다(실제로 그런 가입 건이 있었다).
+  // 본인 확인에 쓰이는 값이라 한 번 잘못 들어가면 회원이 영영 확인을 통과하지 못한다.
+  birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "생년월일을 선택하세요.")
+    .refine((v) => {
+      const y = Number(v.slice(0, 4));
+      return y >= 1900 && y <= new Date().getFullYear();
+    }, "생년월일의 연도를 확인하세요."),
   gender: z.enum(["male", "female", "other"]),
-  phone: z.string().trim().regex(/^01[0-9]-?\d{3,4}-?\d{4}$/, "휴대폰 번호 형식을 확인하세요."),
+  // 화면에서 하이픈이 자동으로 붙지만 전송되는 값은 숫자만이다. 서버에서도 숫자만 받는다.
+  phone: z.string().trim().transform(digitsOnly)
+    .refine(isValidPhone, "휴대폰 번호 형식을 확인하세요."),
 });
 
 export async function joinAction(prevState, formData) {

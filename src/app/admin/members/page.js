@@ -1,4 +1,5 @@
 import { requireSession } from "@/lib/session";
+import { formatPhone } from "@/lib/phone";
 import { listMembers } from "@/lib/members";
 import {
   approveMemberAction,
@@ -53,7 +54,7 @@ export default async function MembersAdmin() {
                   <td>{m.name}</td>
                   <td>{m.nickname ?? "-"}</td>
                   <td>{m.login_id}</td>
-                  <td>{m.phone ?? "-"}</td>
+                  <td>{m.phone ? formatPhone(m.phone) : "-"}</td>
                   <td>{GENDER[m.gender] ?? "-"}</td>
                   <td>{fmt(m.birth_date)}</td>
                   <td>{fmt(m.created_at)}</td>

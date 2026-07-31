@@ -23,7 +23,14 @@ export async function createPostAction(prevState, formData) {
   let authorMemberId = null;
   let authorName = null;
 
-  if (memberSession.isLoggedIn) {
+  // 운영자 세션이 우선이다. 두 쿠키(temple_admin · temple_member)는 서로 독립이라
+  // 같은 브라우저에 동시에 살아 있을 수 있는데, 회원을 먼저 보면 관리자 화면에서
+  // 글을 써도 회원 닉네임으로 기록된다(실제로 그렇게 올라간 글이 있었다).
+  if (adminSession.isLoggedIn) {
+    // 운영자는 members 행이 없으므로 author_member_id 는 null 로 둔다(컬럼이 nullable).
+    // 운영자 개인 이름 대신 기관명으로 적는다.
+    authorName = "종무소";
+  } else if (memberSession.isLoggedIn) {
     const m = await getMemberById(memberSession.memberId);
     if (!m || m.status !== "approved") {
       return { error: "승인된 회원만 글을 쓸 수 있습니다." };
@@ -31,10 +38,6 @@ export async function createPostAction(prevState, formData) {
     authorMemberId = m.id;
     // 실명은 비공개다. 게시판에는 닉네임만 노출한다.
     authorName = m.nickname || m.name;
-  } else if (adminSession.isLoggedIn) {
-    // 운영자는 members 행이 없으므로 author_member_id 는 null 로 둔다(컬럼이 nullable).
-    // 운영자 개인 이름 대신 기관명으로 적는다.
-    authorName = "종무소";
   } else {
     redirect("/member-login");
   }

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useFormState, useFormStatus } from "react-dom";
+import PhoneInput from "@/components/PhoneInput";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -29,11 +30,11 @@ export default function ResetForm({ action, defaultLoginId = "" }) {
       </label>
       <label className="auth-field">
         <span>휴대폰 번호</span>
-        <input name="phone" maxLength={20} required placeholder="010-1234-5678" inputMode="tel" />
+        <PhoneInput name="phone" required />
       </label>
       <label className="auth-field">
         <span>생년월일</span>
-        <input name="birthDate" type="date" required />
+        <input name="birthDate" type="date" required min="1900-01-01" max={new Date().toISOString().slice(0, 10)} />
       </label>
       <label className="auth-field">
         <span>새 비밀번호 (8자 이상)</span>

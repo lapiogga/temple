@@ -4,6 +4,7 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 import { getMemberForReset, setMemberPassword } from "@/lib/members";
+import { digitsOnly } from "@/lib/phone";
 
 const schema = z
   .object({
@@ -17,9 +18,6 @@ const schema = z
     message: "새 비밀번호가 서로 다릅니다.",
     path: ["passwordConfirm"],
   });
-
-// 하이픈 유무·공백 차이로 어긋나지 않게 숫자만 남겨 비교한다.
-const digits = (s) => String(s ?? "").replace(/\D/g, "");
 
 // 어떤 항목이 틀렸는지 알려주지 않는다. 알려주면 가입정보를 하나씩 맞춰볼 수 있다.
 const GENERIC = "입력하신 정보가 가입 정보와 맞지 않습니다. 종무소에 문의해 주세요.";
@@ -47,7 +45,8 @@ export async function resetPasswordAction(prevState, formData) {
   // 이 경로는 '종무소가 초기화해 준 계정' 에만 열린다. 아무 계정이나 가입정보만
   // 맞으면 비밀번호를 바꿀 수 있으면 안 되기 때문이다.
   if (!m || !m.must_reset_password) return { error: GENERIC };
-  if (digits(m.phone) !== digits(parsed.data.phone)) return { error: GENERIC };
+  // 하이픈 유무·공백 차이로 어긋나지 않게 양쪽 다 숫자만 남겨 비교한다.
+  if (digitsOnly(m.phone) !== digitsOnly(parsed.data.phone)) return { error: GENERIC };
   if (m.birth_date !== parsed.data.birthDate) return { error: GENERIC };
 
   try {

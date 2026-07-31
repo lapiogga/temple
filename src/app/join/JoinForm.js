@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { useFormState, useFormStatus } from "react-dom";
+import PhoneInput from "@/components/PhoneInput";
+import { isValidPhone } from "@/lib/phone";
 
 function SubmitButton({ disabled }) {
   const { pending } = useFormStatus();
@@ -54,7 +56,6 @@ function AgreeScroll({ title, text, name, checked, onChange }) {
   );
 }
 
-const PHONE_RE = /^01[0-9]-?\d{3,4}-?\d{4}$/;
 
 export default function JoinForm({ action, terms, privacy }) {
   const [state, formAction] = useFormState(action, {});
@@ -69,7 +70,7 @@ export default function JoinForm({ action, terms, privacy }) {
   const allAgree = agreeT && agreeP;
 
   const sendCode = () => {
-    if (!PHONE_RE.test(phone)) { alert("휴대폰 번호를 정확히 입력하세요."); return; }
+    if (!isValidPhone(phone)) { alert("휴대폰 번호를 정확히 입력하세요."); return; }
     const code = String(Math.floor(100000 + Math.random() * 900000));
     setSentCode(code); setCodeSent(true); setVerified(false); setCodeInput("");
   };
@@ -101,7 +102,7 @@ export default function JoinForm({ action, terms, privacy }) {
               <input name="nickname" maxLength={30} required placeholder="게시판 표시명" />
             </label>
             <label className="auth-field"><span>생년월일</span>
-              <input name="birthDate" type="date" required />
+              <input name="birthDate" type="date" required min="1900-01-01" max={new Date().toISOString().slice(0, 10)} />
             </label>
             <label className="auth-field"><span>성별</span>
               <select name="gender" defaultValue="male">
@@ -115,7 +116,7 @@ export default function JoinForm({ action, terms, privacy }) {
           <div className="auth-field">
             <span>휴대폰 본인인증</span>
             <div className="phone-row">
-              <input name="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="010-1234-5678" maxLength={13} required />
+              <PhoneInput name="phone" required onChangeDigits={setPhone} />
               <button type="button" className="btn btn-ghost btn-sm" onClick={sendCode}>인증번호 발송</button>
               {codeSent && !verified && (
                 <>

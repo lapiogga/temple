@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { formatPhone } from "@/lib/phone";
 import { requireMember } from "@/lib/member-session";
 import { getMemberById } from "@/lib/members";
 import SiteHeader from "@/components/SiteHeader";
@@ -42,7 +43,7 @@ export default async function MyPage() {
                 <dt>닉네임</dt><dd>{m.nickname ?? "-"}</dd>
                 <dt>생년월일</dt><dd>{fmt(m.birth_date)}</dd>
                 <dt>성별</dt><dd>{GENDER[m.gender] ?? "-"}</dd>
-                <dt>휴대폰</dt><dd>{m.phone ?? "-"}</dd>
+                <dt>휴대폰</dt><dd>{m.phone ? formatPhone(m.phone) : "-"}</dd>
                 <dt>상태</dt><dd><span className={`status-badge ${m.status}`}>{STATUS[m.status] ?? m.status}</span></dd>
                 <dt>가입일</dt><dd>{fmt(m.created_at)}</dd>
               </dl>

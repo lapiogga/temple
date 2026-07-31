@@ -1,4 +1,5 @@
 import { requireSession } from "@/lib/session";
+import { formatPhone } from "@/lib/phone";
 import { listAllQuestions } from "@/lib/qna";
 import { answerQuestionAction, deleteQuestionAction } from "./actions";
 
@@ -30,7 +31,7 @@ export default async function QnaAdmin() {
                 <div>
                   <b>{q.is_secret ? "🔒 " : ""}{q.title}</b>{" "}
                   <span style={{ color: "var(--n-fg-3)", fontSize: "var(--fs-300)" }}>
-                    · {q.author_name} · {q.phone ?? ""} · {fmt(q.created_at)}
+                    · {q.author_name} · {q.phone ? formatPhone(q.phone) : ""} · {fmt(q.created_at)}
                   </span>
                 </div>
                 <form action={deleteQuestionAction}>

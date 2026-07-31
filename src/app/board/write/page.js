@@ -5,6 +5,7 @@ import { DancheongDefs } from "@/components/Icons";
 import { SITE } from "@/content/site";
 import { getMemberSession } from "@/lib/member-session";
 import { getSession } from "@/lib/session";
+import { getMemberById } from "@/lib/members";
 import { listVisibleCategories } from "@/lib/board-categories";
 import BoardWriteForm from "../BoardWriteForm";
 import { createPostAction } from "../actions";
@@ -17,6 +18,14 @@ export default async function BoardWrite({ searchParams }) {
   // 상태에서 글쓰기를 누르면 회원 로그인 화면으로 튕겼다.
   const [memberSession, adminSession] = await Promise.all([getMemberSession(), getSession()]);
   if (!memberSession.isLoggedIn && !adminSession.isLoggedIn) redirect("/member-login");
+
+  // 두 쿠키가 동시에 살아 있을 수 있으므로 어떤 이름으로 올라가는지 미리 보여준다.
+  // 우선순위는 createPostAction 과 같아야 한다 — 운영자 우선.
+  let authorName = "종무소";
+  if (!adminSession.isLoggedIn) {
+    const m = await getMemberById(memberSession.memberId);
+    authorName = m?.nickname || m?.name || "회원";
+  }
 
   let categories = [];
   try {
@@ -48,6 +57,7 @@ export default async function BoardWrite({ searchParams }) {
               action={createPostAction}
               defaultBoard={defaultBoard}
               categories={categories}
+              authorName={authorName}
             />
           )}
         </div>
