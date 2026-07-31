@@ -23,7 +23,6 @@ function isBlankOrHttpsUrl(v) {
 }
 
 const noticeSchema = z.object({
-  category: z.enum(["notice", "news"]),
   title: z.string().trim().min(1, "제목을 입력하세요.").max(200),
   body: z.string().max(60000),
   coverUrl: z
@@ -37,7 +36,6 @@ const noticeSchema = z.object({
 
 function readForm(formData) {
   return {
-    category: formData.get("category") ?? "news",
     title: formData.get("title") ?? "",
     body: formData.get("body") ?? "",
     coverUrl: formData.get("coverUrl") ?? "",
@@ -49,7 +47,8 @@ function readForm(formData) {
 // zod 결과 → DB 레코드(빈 coverUrl 은 null). visibility 는 1차 'public' 고정(스키마 기본값).
 function toRecord(data) {
   return {
-    category: data.category,
+    // 공지사항으로 통일했다. 컬럼은 남겨 두되 값은 하나만 쓴다.
+    category: "notice",
     title: data.title,
     body: sanitizeHtml(data.body),
     coverUrl: data.coverUrl === "" ? null : data.coverUrl,

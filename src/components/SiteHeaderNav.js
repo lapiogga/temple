@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { DharmaWheel } from "@/components/Icons";
 import { SITE } from "@/content/site";
+import { memberLogout } from "@/app/auth-actions";
 
 // 대메뉴(그룹) + 하위 항목. 스크롤해도 상단 고정.
 const MENU = [
@@ -64,8 +65,13 @@ export default function SiteHeaderNav({ auth }) {
               <a className="top-admin" href="/admin" onClick={closeAll}>관리자 화면</a>
             ) : auth?.member ? (
               <>
-                <a className="top-link" href="/mypage" onClick={closeAll}>내 정보</a>
                 <span className="top-who">{auth.memberName}</span>
+                <a className="top-link" href="/mypage" onClick={closeAll}>내 정보</a>
+                {/* 로그아웃은 어느 화면에서든 상단바에서 바로 되게 둔다.
+                    예전에는 /mypage 안에만 있어 거기까지 들어가야 했다. */}
+                <form action={memberLogout}>
+                  <button type="submit" className="top-admin">로그아웃</button>
+                </form>
               </>
             ) : (
               <>

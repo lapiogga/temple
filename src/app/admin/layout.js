@@ -12,7 +12,7 @@ export const metadata = {
 
 const NAV = [
   { href: "/admin/site", label: "홈페이지" },
-  { href: "/admin/notices", label: "소식" },
+  { href: "/admin/notices", label: "공지사항" },
   { href: "/admin/events", label: "법회·행사" },
   { href: "/admin/gallery", label: "갤러리" },
   { href: "/admin/members", label: "회원" },

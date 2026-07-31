@@ -16,14 +16,14 @@ function parseId(raw) {
 
 export async function generateMetadata({ params }) {
   const id = parseId(params.id);
-  if (!id) return { title: `소식 | ${SITE.name}` };
+  if (!id) return { title: `공지사항 | ${SITE.name}` };
   let n = null;
   try {
     n = await getNotice(id);
   } catch {
     n = null;
   }
-  return { title: n ? `${n.title} | ${SITE.name}` : `소식 | ${SITE.name}` };
+  return { title: n ? `${n.title} | ${SITE.name}` : `공지사항 | ${SITE.name}` };
 }
 
 export default async function NoticeDetail({ params }) {
@@ -34,9 +34,9 @@ export default async function NoticeDetail({ params }) {
   try {
     n = await getNotice(id);
   } catch (err) {
-    console.error("소식 조회 실패:", err);
+    console.error("공지사항 조회 실패:", err);
   }
-  // 미공개(비공개/초안) 소식은 공개 열람 불가.
+  // 미공개(비공개/초안) 공지사항은 공개 열람 불가.
   if (!n || !n.published) notFound();
 
   return (
@@ -46,7 +46,7 @@ export default async function NoticeDetail({ params }) {
 
       <article className="screen top">
         <div className="wrap wide">
-          <Link className="more" href="/notices">← 소식 목록</Link>
+          <Link className="more" href="/notices">← 공지사항 목록</Link>
 
           {/* 게시판과 동일한 표 틀: 타이틀·게시자·게시일시·게시내용·첨부자료 */}
           <table className="detail-table">

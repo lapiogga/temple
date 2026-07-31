@@ -18,7 +18,7 @@ export default async function EditNotice({ params }) {
 
   return (
     <section>
-      <h1 className="adm-h1">소식 수정</h1>
+      <h1 className="adm-h1">공지사항 수정</h1>
       <NoticeForm action={action} initial={notice} submitLabel="수정 저장" />
     </section>
   );

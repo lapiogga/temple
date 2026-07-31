@@ -13,7 +13,7 @@ export default async function AdminHome() {
       <div className="adm-cards">
         <div className="adm-card">
           <div className="adm-card-n">{notices.length}</div>
-          <div className="adm-card-l">전체 소식</div>
+          <div className="adm-card-l">전체 공지사항</div>
         </div>
         <div className="adm-card">
           <div className="adm-card-n">{publishedCount}</div>
@@ -22,7 +22,7 @@ export default async function AdminHome() {
       </div>
       <p className="adm-quick">
         <Link className="btn btn-primary" href="/admin/notices">
-          소식 관리로 이동
+          공지사항 관리로 이동
         </Link>
       </p>
     </section>

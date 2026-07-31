@@ -8,7 +8,7 @@ export default function DeleteButton({ id, title }) {
     <form
       action={deleteNoticeAction}
       onSubmit={(e) => {
-        if (!confirm(`"${title}" 소식을 삭제할까요?`)) e.preventDefault();
+        if (!confirm(`"${title}" 공지사항을 삭제할까요?`)) e.preventDefault();
       }}
     >
       <input type="hidden" name="id" value={id} />

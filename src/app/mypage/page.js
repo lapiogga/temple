@@ -5,7 +5,6 @@ import { getMemberById } from "@/lib/members";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
-import { memberLogout } from "./actions";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "내 정보 | 응선사" };
@@ -47,9 +46,8 @@ export default async function MyPage() {
                 <dt>상태</dt><dd><span className={`status-badge ${m.status}`}>{STATUS[m.status] ?? m.status}</span></dd>
                 <dt>가입일</dt><dd>{fmt(m.created_at)}</dd>
               </dl>
-              <form action={memberLogout} style={{ marginTop: "18px" }}>
-                <button type="submit" className="btn btn-ghost">로그아웃</button>
-              </form>
+              {/* 로그아웃은 상단바로 옮겼다 — 어느 화면에서든 바로 되어야 하는데
+                  예전에는 이 화면 안에만 있었다. (components/SiteHeaderNav.js) */}
             </div>
           ) : (
             <p className="adm-empty">회원 정보를 찾을 수 없습니다.</p>

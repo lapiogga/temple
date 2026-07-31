@@ -27,14 +27,6 @@ export default function NoticeForm({ action, initial = {}, submitLabel = "저장
       ) : null}
 
       <label className="adm-field">
-        <span>분류</span>
-        <select name="category" defaultValue={initial.category ?? "news"}>
-          <option value="news">사찰 소식</option>
-          <option value="notice">공지사항</option>
-        </select>
-      </label>
-
-      <label className="adm-field">
         <span>제목</span>
         <input name="title" defaultValue={initial.title ?? ""} maxLength={200} required />
       </label>

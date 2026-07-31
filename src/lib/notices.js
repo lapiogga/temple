@@ -1,6 +1,6 @@
 import { query } from "@/lib/db";
 
-// 소식(notices) 데이터 접근 레이어. 모든 쿼리는 파라미터화($1..)로만.
+// 공지사항(notices) 데이터 접근 레이어. 모든 쿼리는 파라미터화($1..)로만.
 // 정렬은 고정(고정 SQL) — 동적 컬럼/방향 없음.
 const SELECT_COLS =
   "id, category, title, body, cover_url, is_pinned, published, published_at";

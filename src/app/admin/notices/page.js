@@ -4,7 +4,6 @@ import { listNotices } from "@/lib/notices";
 import { togglePublishAction } from "./actions";
 import DeleteButton from "./DeleteButton";
 
-const CATEGORY_LABEL = { notice: "공지", news: "소식" };
 
 function fmtDate(value) {
   const d = new Date(value);
@@ -20,20 +19,20 @@ export default async function NoticesAdmin() {
   return (
     <section>
       <div className="adm-head">
-        <h1 className="adm-h1">소식 관리</h1>
+        <h1 className="adm-h1">공지사항 관리</h1>
         <Link className="btn btn-primary" href="/admin/notices/new">
-          + 새 소식
+          + 새 공지사항
         </Link>
       </div>
 
       {notices.length === 0 ? (
-        <p className="adm-empty">등록된 소식이 없습니다. 새 소식을 작성해 보세요.</p>
+        <p className="adm-empty">등록된 공지사항이 없습니다. 새 공지사항을 작성해 보세요.</p>
       ) : (
         <div className="adm-table-wrap">
           <table className="adm-table">
             <thead>
               <tr>
-                <th>분류</th>
+                <th>고정</th>
                 <th>제목</th>
                 <th>게시일</th>
                 <th>상태</th>
@@ -43,10 +42,7 @@ export default async function NoticesAdmin() {
             <tbody>
               {notices.map((n) => (
                 <tr key={n.id}>
-                  <td>
-                    {CATEGORY_LABEL[n.category] ?? n.category}
-                    {n.is_pinned ? " · 고정" : ""}
-                  </td>
+                  <td>{n.is_pinned ? "고정" : "-"}</td>
                   <td className="adm-title-cell">
                     <Link href={`/admin/notices/${n.id}/edit`}>{n.title}</Link>
                   </td>

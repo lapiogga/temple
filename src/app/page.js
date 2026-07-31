@@ -25,7 +25,7 @@ export default async function Home() {
   try {
     notices = (await listNotices({ includeUnpublished: false })).slice(0, 5);
   } catch (err) {
-    console.error("홈 소식 조회 실패:", err);
+    console.error("홈 공지사항 조회 실패:", err);
   }
   try {
     events = await listEventsInMonth(now.getFullYear(), now.getMonth() + 1);
@@ -47,13 +47,13 @@ export default async function Home() {
           {/* 윗단: 대표 이미지 좌우 슬라이드(옅게) + 문구 (관리자 편집) */}
           <HeroCarousel images={hero.images} eyebrow={hero.eyebrow} title={hero.title} />
 
-          {/* 아랫단: 소식(표)·산신도(옅은 배경)·법회행사(목록) */}
+          {/* 아랫단: 공지사항(표)·산신도(옅은 배경)·법회행사(목록) */}
           <div className="home-cards">
-            {/* 사찰 소식 — 최근 5 표 + 더보기 */}
+            {/* 공지사항 — 최근 5 표 + 더보기 */}
             <div className="hpanel">
               <div className="hpanel-head">
                 <span className="k">Notice</span>
-                <h3>사찰 소식</h3>
+                <h3>공지사항</h3>
               </div>
               <table className="mini-table">
                 <tbody>
@@ -65,7 +65,7 @@ export default async function Home() {
                       </tr>
                     ))
                   ) : (
-                    <tr><td className="empty" colSpan={2}>등록된 소식이 없습니다.</td></tr>
+                    <tr><td className="empty" colSpan={2}>등록된 공지사항이 없습니다.</td></tr>
                   )}
                 </tbody>
               </table>
