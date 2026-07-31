@@ -19,9 +19,20 @@ Next.js 14 App Router · JavaScript · PostgreSQL. Hostinger VPS 한 대에 prod
 - **이 환경의 `sudo` 는 비밀번호를 요구한다.** 에이전트 셸이나 `!` 프리픽스처럼 TTY 가 없는
   곳에서는 조용히 실패한다(`systemctl start` 를 쳐도 서비스가 그대로 죽어 있다).
   서비스 조작은 사람이 실제 터미널에서 해야 한다. 상태 확인(`systemctl status`)은 sudo 없이 된다.
+- **예외: `next.config.mjs` 를 고치면 dev 는 스스로 되살아난다.** `next dev` 가 설정 파일을
+  감시하다가 서버 자식만 exit 77 로 내리고(`server/lib/start-server.js:290-297`), CLI 부모가
+  그 코드를 받아 다시 띄운다(`cli/next-dev.js:239`). systemd·sudo 가 필요 없다.
+  위의 "재기동에 사람이 필요하다" 는 프로세스를 **밖에서 죽였을 때** 이야기다.
 - dev 는 `npx next dev` 라 `.next` 를 계속 물고 있다. **같은 디렉터리에서 `next build` 를 돌리면
   돌아가는 dev 서버와 `.next` 를 두고 충돌한다.** 화면 검증은 `curl -s -o /dev/null -w '%{http_code}'
   http://localhost:3001/<경로>` 로 한다.
+  프로덕션 빌드를 검증해야 하면 스크래치패드에 `git ls-files` 사본을 만들고 `node_modules` 를
+  심볼릭 링크한 뒤 거기서 빌드한다. **`.env` 를 복사했으면 끝나고 지울 것**(실제 DB 비밀번호가 들어 있다).
+- **dev 에서는 보이지 않는 결함이 두 종류 있다.** dev 는 nginx 를 거치지 않고 매 요청을
+  렌더하기 때문이다. 2026-07-31 에 둘 다 운영까지 나갔다(로드맵 §2-D).
+  - nginx 가 자르는 것 — `client_max_body_size` 등. dev 는 앱 한도까지 그냥 통과한다.
+  - 정적 프리렌더에서만 나는 것 — `redirect()` 만 하는 페이지가 `Location` 을 잃었다.
+  운영 관련 변경은 `:3000` 과 `:3001` 을 **대조**해야 한다. 한쪽만 보면 놓친다.
 - **컴포넌트를 `"use client"` ↔ 서버 컴포넌트로 바꾸면 dev 서버를 재시작해야 한다.**
   Next 는 클라이언트 모듈 판정을 매니페스트에 캐시하는데, 파일만 고치면 그 판정이 남아
   `You're importing a component that needs next/headers` 로 전 라우트가 500 이 된다.
