@@ -5,7 +5,11 @@ import { useEffect, useState } from "react";
 // 대표 이미지 좌우 슬라이드(자동 회전) 히어로. 이미지·문구는 관리자에서 편집.
 const FALLBACK = ["/uploads/hall-left.jpg"];
 
-export default function HeroCarousel({ images, eyebrow = "", title = "" }) {
+// 문구는 세 층이다.
+//   상단 문구(eyebrow) — 짧고 강한 한마디. 석간주로 크게.
+//   제목(title)        — 가장 큰 글자.
+//   소개 문구(lede)    — 부제. 작고 다른 색으로 받쳐 준다.
+export default function HeroCarousel({ images, eyebrow = "", title = "", lede = "" }) {
   const imgs = images && images.length ? images : FALLBACK;
   const [i, setI] = useState(0);
 
@@ -24,8 +28,9 @@ export default function HeroCarousel({ images, eyebrow = "", title = "" }) {
       </div>
       <div className="hcx-veil" />
       <div className="hcx-caption">
-        {eyebrow && <span className="eyebrow">{eyebrow}</span>}
+        {eyebrow && <p className="hcx-lead">{eyebrow}</p>}
         {title && <h1>{title}</h1>}
+        {lede && <p className="hcx-sub">{lede}</p>}
       </div>
       {imgs.length > 1 && (
         <div className="hcx-dots">

@@ -28,6 +28,11 @@ export default async function NoticesList({ searchParams }) {
   const page = Math.min(totalPages, Math.max(1, Number(searchParams?.page) || 1));
   const paged = notices.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
+  // 번호는 고정 글을 뺀 나머지에만 매긴다. 고정 글은 목록 맨 앞으로 끌어올려진
+  // 것이라 번호를 주면 순번이 어긋나 보인다(맨 앞이 가장 큰 번호가 아니게 된다).
+  const plainCount = notices.filter((n) => !n.is_pinned).length;
+  let plainSeen = notices.slice(0, (page - 1) * PER_PAGE).filter((n) => !n.is_pinned).length;
+
   return (
     <>
       <DancheongDefs />
@@ -54,10 +59,15 @@ export default async function NoticesList({ searchParams }) {
             </thead>
             <tbody>
               {paged.length > 0 ? (
-                paged.map((n, i) => (
-                  <tr key={n.id}>
-                    <td className="c-cat">{notices.length - ((page - 1) * PER_PAGE + i)}</td>
-                    <td className="c-title"><Link href={`/notices/${n.id}`}>{n.title}</Link></td>
+                paged.map((n) => (
+                  <tr key={n.id} className={n.is_pinned ? "row-pinned" : ""}>
+                    <td className="c-cat">{n.is_pinned ? "-" : plainCount - plainSeen++}</td>
+                    <td className="c-title">
+                      <Link href={`/notices/${n.id}`}>
+                        {n.is_pinned && <span className="tag-pin">공지</span>}
+                        {n.title}
+                      </Link>
+                    </td>
                     <td className="c-date">{formatDate(n.published_at)}</td>
                   </tr>
                 ))

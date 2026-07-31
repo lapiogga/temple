@@ -45,7 +45,7 @@ export default async function Home() {
       <section className="screen home2">
         <div className="wrap home2-in">
           {/* 윗단: 대표 이미지 좌우 슬라이드(옅게) + 문구 (관리자 편집) */}
-          <HeroCarousel images={hero.images} eyebrow={hero.eyebrow} title={hero.title} />
+          <HeroCarousel images={hero.images} eyebrow={hero.eyebrow} title={hero.title} lede={hero.lede} />
 
           {/* 아랫단: 공지사항(표)·산신도(옅은 배경)·법회행사(목록) */}
           <div className="home-cards">
@@ -61,7 +61,12 @@ export default async function Home() {
                     notices.map((n) => (
                       <tr key={n.id}>
                         <td className="d">{formatDate(n.published_at)}</td>
-                        <td className="t"><Link href={`/notices/${n.id}`}>{n.title}</Link></td>
+                        <td className="t">
+                          <Link href={`/notices/${n.id}`}>
+                            {n.is_pinned && <span className="tag-pin">공지</span>}
+                            {n.title}
+                          </Link>
+                        </td>
                       </tr>
                     ))
                   ) : (

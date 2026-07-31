@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useFormState, useFormStatus } from "react-dom";
+import HeroImages from "./HeroImages";
 
 function SubmitBtn() {
   const { pending } = useFormStatus();
@@ -16,24 +17,23 @@ export default function SectionForm({ section, initial = {}, action }) {
   const [state, formAction] = useFormState(action, {});
 
   return (
-    <form action={formAction} className="adm-form ev-form">
+    <form action={formAction} className="adm-form ev-form"
+      encType={section === "hero" ? "multipart/form-data" : undefined}>
       {state?.error ? <p className="adm-form-err" role="alert">{state.error}</p> : null}
       {state?.ok ? <p className="adm-form-ok">저장되었습니다. 공개 화면에 반영됩니다.</p> : null}
 
       {section === "hero" && (
         <>
-          <label className="adm-field"><span>상단 소문구</span>
-            <input name="eyebrow" defaultValue={initial.eyebrow || ""} maxLength={80} />
+          <label className="adm-field"><span>상단 문구 (최대 50자 · 화면에서 크고 진한 색으로 나옵니다)</span>
+            <input name="eyebrow" defaultValue={initial.eyebrow || ""} maxLength={50} />
           </label>
           <label className="adm-field"><span>제목</span>
             <input name="title" defaultValue={initial.title || ""} maxLength={80} />
           </label>
-          <label className="adm-field"><span>소개 문구</span>
-            <textarea name="lede" rows={2} defaultValue={initial.lede || ""} />
+          <label className="adm-field"><span>소개 문구 (최대 250자 · 부제로 작게 나옵니다)</span>
+            <textarea name="lede" rows={4} maxLength={250} defaultValue={initial.lede || ""} />
           </label>
-          <label className="adm-field"><span>배경 이미지 (한 줄에 하나 · 예: /uploads/hall-left.jpg)</span>
-            <textarea name="images" rows={5} defaultValue={(initial.images || []).join("\n")} />
-          </label>
+          <HeroImages initial={initial.images || []} />
         </>
       )}
 
@@ -53,7 +53,7 @@ export default function SectionForm({ section, initial = {}, action }) {
       )}
 
       {section === "history" && (
-        <label className="adm-field"><span>연혁 (한 줄에 하나 · 형식: 연도 | 제목 | 설명)</span>
+        <label className="adm-field"><span>연혁 (한 줄에 하나 · 형식: 연도 | 제목 | 설명 · 위에서부터 과거 → 현재 순서로 표시됩니다)</span>
           <textarea name="entries" rows={9}
             defaultValue={(Array.isArray(initial) ? initial : []).map((h) => `${h.yr} | ${h.title} | ${h.desc}`).join("\n")} />
         </label>

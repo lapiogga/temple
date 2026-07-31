@@ -272,6 +272,14 @@ header.nav{position:sticky;top:0;z-index:50;background:rgba(var(--n-bg-2-rgb),.9
 .list-table .c-author{white-space:nowrap;color:var(--n-fg-3);width:1%;text-align:center;}
 .list-table .c-date{white-space:nowrap;color:var(--n-fg-3);width:1%;text-align:center;font-variant-numeric:tabular-nums;}
 .list-table .empty-row td{text-align:center;color:var(--n-fg-3);padding:var(--sp-xxxl) 0;}
+/* 상단 고정 글 — 제목 앞 머릿말 태그. 번호 칸에는 번호 대신 '공지' 가 들어간다.
+   목록 맨 앞으로 끌어올려진 글이라 번호를 주면 순번이 어긋나 보인다. */
+.tag-pin{display:inline-block;margin-right:var(--sp-xs);padding:1px var(--sp-xs);
+  border-radius:var(--r-sm);background:var(--brand);color:var(--n-fg-on-brand);
+  font-size:var(--fs-200);font-weight:var(--fw-bold);line-height:var(--lh-200);
+  vertical-align:middle;letter-spacing:0;}
+.list-table tr.row-pinned{background:var(--brand-tint);}
+.list-table tr.row-pinned .c-cat{color:var(--n-fg-4);}
 @media(max-width:760px){
   .list-table{font-size:var(--fs-300);}
   .list-table thead th,.list-table tbody td{padding:var(--sp-mnudge) var(--sp-s);}
@@ -297,10 +305,28 @@ header.nav{position:sticky;top:0;z-index:50;background:rgba(var(--n-bg-2-rgb),.9
 .hcx-track{display:flex;height:100%;transition:transform var(--d-slide) var(--c-easy-max);}
 .hcx-slide{flex:0 0 100%;height:100%;background-size:cover;background-position:center;}
 /* 이미지를 옅게(반투명 한지 베일) */
-.hcx-veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(var(--n-bg-2-rgb),.62),rgba(var(--n-bg-2-rgb),.74));}
-.hcx-caption{position:absolute;left:clamp(22px,4vw,46px);top:50%;transform:translateY(-50%);color:var(--n-fg-1);}
-.hcx-caption .eyebrow{color:var(--brand);}
-.hcx-caption h1{font-family:var(--font-title);font-weight:var(--fw-bold);font-size:clamp(var(--fs-800),4.4vw,var(--fs-900));line-height:1.12;margin-top:var(--sp-s);}
+/* 이미지를 옅게(반투명 한지 베일).
+   왼쪽은 문구가 앉는 자리라 더 두껍게 가린다. 관리자가 어떤 사진을 올릴지
+   알 수 없으므로 "사진이 밝기를 결정하게" 두면 대비를 보장할 수 없다.
+   가장 어두운 사진(검정)을 깔아도 알파 .93 이면 배경이 #eae6df 이하로는
+   내려가지 않는다 → 보조색(--n-fg-2) 글자 대비 7.4:1. */
+.hcx-veil{position:absolute;inset:0;background:
+  linear-gradient(90deg,rgba(var(--n-bg-2-rgb),.93) 0%,rgba(var(--n-bg-2-rgb),.90) 46%,rgba(var(--n-bg-2-rgb),.55) 82%),
+  linear-gradient(180deg,rgba(var(--n-bg-2-rgb),.50),rgba(var(--n-bg-2-rgb),.62));}
+/* 히어로 문구 — 세 층의 위계.
+     상단 문구 : 중간 크기 · 석간주(가장 강한 색). 시선이 먼저 닿는 자리다.
+     제목      : 가장 큰 글자. 절 이름이라 크기로 무게를 준다.
+     소개 문구 : 작고 다른 색(보조). 부제로 받쳐 준다.
+   폭을 제한하는 이유 — 소개 문구가 250자까지 들어오므로 한 줄이 화면 끝까지
+   흘러가면 눈이 다음 줄을 못 찾는다(줄당 40자 안팎이 한계). */
+.hcx-caption{position:absolute;left:clamp(22px,4vw,46px);top:50%;transform:translateY(-50%);
+  color:var(--n-fg-1);max-width:min(58ch,calc(100% - clamp(44px,8vw,92px)));}
+.hcx-lead{color:var(--brand);font-family:var(--font-title);font-weight:var(--fw-bold);
+  font-size:clamp(var(--fs-500),2.2vw,var(--fs-700));line-height:var(--lh-600);
+  letter-spacing:var(--ls-tight);margin-bottom:var(--sp-xs);}
+.hcx-caption h1{font-family:var(--font-title);font-weight:var(--fw-bold);font-size:clamp(var(--fs-800),4.4vw,var(--fs-900));line-height:1.12;}
+.hcx-sub{margin-top:var(--sp-m);color:var(--n-fg-2);font-size:clamp(var(--fs-300),1.15vw,var(--fs-400));
+  line-height:var(--lh-ko-400);}
 .hcx-caption h1 em{font-style:normal;color:var(--brand);}
 .hcx-dots{position:absolute;right:18px;bottom:16px;display:flex;gap:var(--sp-snudge);}
 .hcx-dots button{width:9px;height:9px;padding:0;border:0;border-radius:var(--r-circular);background:var(--gold-60);cursor:pointer;transition:var(--t-state);}
@@ -342,14 +368,16 @@ header.nav{position:sticky;top:0;z-index:50;background:rgba(var(--n-bg-2-rgb),.9
   .hero-cx{height:38vh;flex:none;}
   .home-cards{grid-template-columns:1fr;height:auto;}
   .hfade{min-height:150px;}
+  /* 히어로 높이가 38vh 로 고정이라 250자짜리 소개 문구가 그대로 들어가면
+     이미지 밖으로 넘친다. 세 줄에서 자르고 나머지는 말줄임. */
+  .hcx-caption{max-width:calc(100% - 44px);}
+  .hcx-sub{margin-top:var(--sp-s);
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
 }
 
 /* Hero */
 .hero{position:relative;overflow:hidden;}
 
-.eyebrow{display:inline-flex;align-items:center;gap:var(--sp-s);font-size:var(--fs-200);font-weight:var(--fw-bold);
-  letter-spacing:var(--ls-kicker);color:var(--brand);text-transform:uppercase;margin-bottom:var(--sp-l);}
-.eyebrow::before{content:"";width:26px;height:1px;background:var(--gold-80);}
 .hero h1{font-family:var(--font-title);font-weight:var(--fw-bold);font-size:clamp(var(--fs-800),7vw,var(--fs-900));
   line-height:1.18;letter-spacing:var(--ls-tight);margin-bottom:var(--sp-l);}
 .hero h1 em{font-style:normal;color:var(--brand);}
@@ -387,15 +415,37 @@ header.nav{position:sticky;top:0;z-index:50;background:rgba(var(--n-bg-2-rgb),.9
 .plist .v{color:var(--brand);font-weight:var(--fw-semibold);white-space:nowrap;}
 
 /* 중창기 */
-.timeline{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-xl);margin-top:var(--sp-s);}
-.timeline::before{content:"";position:absolute;left:0;right:0;top:11px;height:2px;background:var(--gold-80);opacity:.7;}
-.tnode{position:relative;padding-top:var(--sp-xxxl);}
-.tnode::before{content:"";position:absolute;top:4px;left:0;width:16px;height:16px;border-radius:var(--r-circular);background:var(--n-bg-2);border:var(--st-thicker) solid var(--brand);}
-.tnode:nth-child(2)::before{border-color:var(--sec);}
-.tnode .yr{font-family:var(--font-title);font-weight:var(--fw-bold);color:var(--brand);font-size:var(--fs-400);line-height:var(--lh-400);}
-.tnode:nth-child(2) .yr{color:var(--sec);}
-.tnode h4{font-size:var(--fs-400);font-weight:var(--fw-bold);margin:var(--sp-xxs) 0 var(--sp-snudge);line-height:var(--lh-400);}
-.tnode p{font-size:var(--fs-400);color:var(--n-fg-3);}
+/* 연혁 — 위(과거)에서 아래(현재)로 흐르는 세로 타임라인.
+   예전에는 3열 가로 그리드였는데 항목이 4개라 마지막 하나가 다음 줄로 떨어져
+   시간 순서가 끊겨 보였고, 항목이 늘수록 더 나빠진다.
+   세로는 몇 개가 되든 순서가 유지되고 설명도 길게 쓸 수 있다. */
+.timeline{position:relative;margin-top:var(--sp-m);padding-left:var(--sp-xxxl);}
+/* 세로 줄기 — 첫 마디의 중심에서 시작해 마지막 마디의 중심에서 끝난다.
+   위아래로 삐져나오면 연혁이 더 있는 것처럼 보인다. */
+.timeline::before{content:"";position:absolute;left:7px;top:10px;bottom:10px;width:2px;
+  background:linear-gradient(180deg,var(--gold-80),var(--gold-100));opacity:.55;}
+.tnode{position:relative;padding:0 0 var(--sp-xxl);}
+.tnode:last-child{padding-bottom:0;}
+.tnode::before{content:"";position:absolute;top:3px;left:calc(var(--sp-xxxl) * -1);
+  width:16px;height:16px;border-radius:var(--r-circular);
+  background:var(--n-bg-2);border:var(--st-thicker) solid var(--gold-80);}
+/* 가장 최근 마디만 강조 — 지금 어디까지 왔는지가 한눈에 들어온다. */
+.tnode:last-child::before{border-color:var(--brand);background:var(--brand);
+  box-shadow:0 0 0 4px var(--brand-tint);}
+.tnode .yr{display:inline-block;font-family:var(--font-title);font-weight:var(--fw-bold);
+  color:var(--brand);font-size:var(--fs-300);line-height:var(--lh-300);
+  letter-spacing:var(--ls-kicker);padding:1px var(--sp-s);border-radius:var(--r-circular);
+  background:var(--brand-tint);}
+.tnode:last-child .yr{background:var(--brand);color:var(--n-fg-on-brand);}
+.tnode h4{font-family:var(--font-title);font-size:var(--fs-500);font-weight:var(--fw-bold);
+  margin:var(--sp-xs) 0 var(--sp-xxs);line-height:var(--lh-500);}
+.tnode p{font-size:var(--fs-400);line-height:var(--lh-ko-400);color:var(--n-fg-3);max-width:62ch;}
+@media(max-width:720px){
+  .timeline{padding-left:var(--sp-xxl);}
+  .timeline::before{left:5px;}
+  .tnode::before{left:calc(var(--sp-xxl) * -1);width:12px;height:12px;top:5px;}
+  .tnode h4{font-size:var(--fs-400);line-height:var(--lh-400);}
+}
 
 /* 오시는길 / 후원 */
 .foot-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:var(--sp-xl);}
@@ -761,6 +811,21 @@ footer.site{position:fixed;left:0;right:0;bottom:0;z-index:40;
   padding:var(--sp-s);}
 .photo-picked img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:var(--r-drop);display:block;}
 .photo-picked input{width:100%;}
+
+/* ── 히어로 배경 이미지 관리 ──
+   갤러리 사진 등록과 같은 조작감을 쓰되, 히어로는 순서가 곧 슬라이드 순서라
+   앞뒤로 옮기는 버튼이 더 붙는다. 가로로 넘어가는 화면이므로 썸네일도
+   정사각형이 아니라 16:9 로 보여 실제 잘리는 모양을 알 수 있게 한다. */
+.hero-imglist{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:var(--sp-m);margin:var(--sp-s) 0 var(--sp-m);}
+.hero-imglist li{display:flex;flex-direction:column;gap:var(--sp-xs);
+  background:var(--n-bg-1);border:var(--st-thin) solid var(--n-stroke-2);border-radius:var(--r-card);
+  padding:var(--sp-s);}
+.hero-imglist.new li{border-color:var(--brand);background:var(--brand-tint);}
+.hero-imglist img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:var(--r-drop);display:block;}
+.hero-imgbtns{display:flex;align-items:center;gap:var(--sp-xs);flex-wrap:wrap;}
+.hero-imgbtns .adm-link-btn:disabled{opacity:.35;cursor:default;}
+.hero-imgnew{margin-right:auto;font-size:var(--fs-200);font-weight:var(--fw-bold);color:var(--brand);}
 
 /* ── 사진 뷰어(라이트박스) ── */
 .photo-open{display:block;width:100%;padding:0;border:0;background:none;cursor:zoom-in;}
