@@ -38,6 +38,14 @@ Next.js 14 App Router · JavaScript · PostgreSQL. Hostinger VPS 한 대에 prod
   `You're importing a component that needs next/headers` 로 전 라우트가 500 이 된다.
   코드는 멀쩡하다 — 재시작 + `.next` 삭제로 풀린다.
 - 인증이 필요한 `/admin/*` 은 curl 로 307 이 난다. 그쪽은 esbuild 로 JSX 파싱만 확인한다.
+- **nginx 는 `nginx -t` 통과 + reload 종료코드 0 인데도 옛 설정으로 계속 돌 수 있다.**
+  reload 는 공유 메모리 zone 을 **이름으로 재사용**하는데 그때 키가 이전과 같아야 한다.
+  돌고 있는 zone 의 키를 바꾸면 `[emerg] limit_req "…" uses the "…" key while previously
+  it used the "…" key` 로 적재에 실패하고 master 는 옛 설정을 유지한다. `nginx -t` 는
+  돌고 있는 인스턴스를 모르니 못 잡는다(2026-07-31 실제 발생).
+  **reload 뒤에는 파일이 아니라 동작을 확인할 것.** 워커가 새로 떴는지가 가장 빠른 신호다:
+  `ps -o pid,lstart -C nginx` — 워커 시각이 그대로면 적용되지 않은 것이다.
+  zone 정의를 바꿀 때는 이름도 함께 바꾼다(`temple_login_post` 처럼 키를 이름에 박아 둔다).
 
 ## 코드에서 자주 걸리는 것
 
