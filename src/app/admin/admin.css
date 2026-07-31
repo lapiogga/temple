@@ -52,6 +52,28 @@
 /* 조치할 것이 없는 칸(탈퇴 회원 등). 빈 칸으로 두면 표가 깨져 보인다. */
 .adm-muted { color: var(--n-fg-3); }
 
+/* 대표 이미지 고르기 — 지금 무엇이 걸려 있는지 보여 주고 뺄 수 있게 한다. */
+.adm-cover-pick {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-m);
+  margin-bottom: var(--sp-s);
+}
+.adm-cover-thumb {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border: var(--st-thin) solid var(--n-stroke-2);
+  border-radius: var(--r-md);
+  background: var(--n-bg-3);
+}
+.adm-hint {
+  font-size: var(--fs-200);
+  line-height: var(--lh-200);
+  color: var(--n-fg-3);
+  margin-top: var(--sp-xs);
+}
+
 .adm-empty {
   color: var(--n-fg-3);
   background: var(--n-bg-1);
