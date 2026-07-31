@@ -9,12 +9,23 @@ Next.js 14 App Router · JavaScript · PostgreSQL. Hostinger VPS 한 대에 prod
 | prod | `/var/www/temple` | 3000 | `temple` | `temple.service` |
 | dev | `/home/ubuntu/temple-dev` | 3001 | `temple_dev` | `temple-dev.service` |
 
-- **둘 다 systemd 로 돌고 `Restart=on-failure` 다.** 프로세스를 직접 죽이면 5초 뒤 되살아난다.
-  재기동은 `sudo systemctl restart temple`(또는 `temple-dev`). `fuser -k 3000/tcp` 는 쓰지 말 것 —
-  systemd 의 자동 재시작과 경합한다.
+- **둘 다 systemd 로 돌지만 프로세스를 죽여도 되살아나지 않는다.** `Restart=on-failure` 가
+  걸려 있어도 systemd 가 보는 메인 PID 는 `npx` **래퍼**이고, 실제로 포트를 잡는
+  `next-server` 는 그 자식이다. 자식만 죽이면 래퍼가 `status=0/SUCCESS` 로 정상 종료해
+  `on-failure` 조건에 해당하지 않는다 — 서비스가 그냥 죽은 채로 남는다.
+  (2026-07-31 에 실제로 이렇게 dev 를 내려놓았다.)
+  재기동은 반드시 `sudo systemctl restart temple-dev`(prod 는 `temple`). `kill` · `fuser -k`
+  로는 복구되지 않는다.
+- **이 환경의 `sudo` 는 비밀번호를 요구한다.** 에이전트 셸이나 `!` 프리픽스처럼 TTY 가 없는
+  곳에서는 조용히 실패한다(`systemctl start` 를 쳐도 서비스가 그대로 죽어 있다).
+  서비스 조작은 사람이 실제 터미널에서 해야 한다. 상태 확인(`systemctl status`)은 sudo 없이 된다.
 - dev 는 `npx next dev` 라 `.next` 를 계속 물고 있다. **같은 디렉터리에서 `next build` 를 돌리면
   돌아가는 dev 서버와 `.next` 를 두고 충돌한다.** 화면 검증은 `curl -s -o /dev/null -w '%{http_code}'
   http://localhost:3001/<경로>` 로 한다.
+- **컴포넌트를 `"use client"` ↔ 서버 컴포넌트로 바꾸면 dev 서버를 재시작해야 한다.**
+  Next 는 클라이언트 모듈 판정을 매니페스트에 캐시하는데, 파일만 고치면 그 판정이 남아
+  `You're importing a component that needs next/headers` 로 전 라우트가 500 이 된다.
+  코드는 멀쩡하다 — 재시작 + `.next` 삭제로 풀린다.
 - 인증이 필요한 `/admin/*` 은 curl 로 307 이 난다. 그쪽은 esbuild 로 JSX 파싱만 확인한다.
 
 ## 코드에서 자주 걸리는 것
