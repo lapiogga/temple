@@ -183,10 +183,13 @@
   --font-body:'Pretendard',system-ui,-apple-system,sans-serif;
   --font-title:'Noto Serif KR',serif;
   --maxw:1080px;
-  --nav-h:91px; --foot-h:44px;
+  --nav-h:103px; --foot-h:44px;
   /* 헤더 실높이 = topbar 46 + mainbar 경계 1 + mainbar-in 42(.gnb-top 행간 26 + 패딩 16)
-     + header 경계 1 = 90px. 1px 여유를 둔다. 타입 이전 전에는 .gnb-top 이 body 의
-     행간 1.8 을 물려받아 28.8 이었고 합계가 92.8 이라 94 로 두었다. */
+     + 단청 띠 12(.mainbar 아래 패딩) + header 경계 1 = 102px. 1px 여유를 둔다.
+     단청 띠를 넣기 전에는 90px 이라 91 이었다. 타입 이전 전에는 .gnb-top 이 body 의
+     행간 1.8 을 물려받아 28.8 이었고 합계가 92.8 이라 94 로 두었다.
+     이 값이 어긋나면 calc(100vh - --nav-h - --foot-h) 로 높이를 잡는 무스크롤
+     화면(홈 2단·산신도·회원가입·법회 2단)이 그만큼 넘치거나 남는다. */
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
@@ -220,7 +223,18 @@ header.nav{position:sticky;top:0;z-index:50;background:rgba(var(--n-bg-2-rgb),.9
 .top-admin:hover{border-color:var(--sec);color:var(--sec);}
 
 /* 대메뉴 바 */
-.mainbar{background:linear-gradient(90deg,var(--n-bg-2),var(--n-bg-4));border-top:var(--st-thin) solid var(--n-stroke-2);}
+/* 대메뉴 바에 단청 뇌문 띠를 아주 옅게 깐다.
+   단청은 원래 처마 밑을 두르는 띠 장식이라 상단바 바로 아래가 제자리다.
+   타일은 public/patterns/dan-band-soft.png — 원본에서 반복 주기(270px)를
+   계산해 한 단위만 잘라낸 것이라 이음매가 없다(출처·제작 방법은 그 폴더의 README).
+   반드시 repeat-x 다. 세로로도 반복하면 가로 줄무늬가 되어 읽기를 방해한다.
+   높이는 대메뉴 바에 맞춰 늘린다(alpha 18% 라 약간의 흐림은 보이지 않는다). */
+.mainbar{background:
+    url("/patterns/dan-band.png") repeat-x left bottom / auto 12px,
+    linear-gradient(90deg,var(--n-bg-2),var(--n-bg-4));
+  border-top:var(--st-thin) solid var(--n-stroke-2);
+  /* 띠가 아래 가장자리에 앉으므로 메뉴 글자와 겹치지 않게 그만큼 띄운다 */
+  padding-bottom:12px;}
 .mainbar-in{display:flex;align-items:center;min-height:38px;}
 .gnb{display:flex;gap:var(--sp-xs);}
 .gnb-group{position:relative;}
