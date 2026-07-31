@@ -10,6 +10,19 @@ import TimeField from "./TimeField";
 const p2 = (n) => String(n).padStart(2, "0");
 const ymd = (d) => `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`;
 
+// 저장된 starts_at · recurrence_until 을 되읽을 때 쓰는 UTC 판.
+//
+// 이 두 값은 '어느 순간' 이 아니라 관리자가 친 벽시계다. 저장 경로가
+// `${solarDate}T${time}` 이라는 시간대 없는 문자열을 서버(TZ=UTC)에서 new Date() 로
+// 파싱하므로 "18:00" 입력이 18:00+00 으로 들어간다(실측: id=3 → 2026-08-04T18:00Z,
+// when_text 는 "2026-08-04 18:00"). 그러니 되읽을 때도 UTC 로 꺼내야 친 그대로 나온다.
+//
+// 로컬 게터를 쓰면 안 되는 이유가 하나 더 있다 — 이 파일은 "use client" 라서
+// 초기 state 가 브라우저에서 다시 계산된다. 관리자의 브라우저가 KST 면 18:00Z 가
+// 다음날 03:00 으로 읽혀 날짜까지 하루 밀린다(SSR 은 UTC 라 하이드레이션도 어긋난다).
+const ymdU = (d) => `${d.getUTCFullYear()}-${p2(d.getUTCMonth() + 1)}-${p2(d.getUTCDate())}`;
+const hmU = (d) => `${p2(d.getUTCHours())}:${p2(d.getUTCMinutes())}`;
+
 // 종료일 상한. 신규 등록은 시작일 + 1년까지, 이미 등록된 것은 '1년 연장' 으로
 // 한 번 더 밀 수 있어 최대 2년이다(서버도 같은 값으로 검사한다).
 function plusYears(dateStr, n) {
@@ -43,21 +56,28 @@ export default function EventForm({ action, initial = {}, submitLabel = "저장"
     isEdit ? !!(initial.recurrence || "").trim() : (initial.kind ?? "event") === "regular"
   );
 
+  // 날짜(일회성) / 반복 시작일 — 아래 time 초기화가 이 값을 쓰므로 먼저 계산한다.
+  const initStarts = initial.starts_at ? new Date(initial.starts_at) : null;
+
   const [freq, setFreq] = useState(ir.type === "daily" || ir.type === "monthly" ? ir.type : "weekly");
   const [weekday, setWeekday] = useState(ir.weekday ?? 0);
   const [monthDay, setMonthDay] = useState(ir.day ?? ir.lday ?? 1);
-  const [time, setTime] = useState(ir.time ?? "10:00");
 
-  // 날짜(일회성) / 반복 시작일
-  const initStarts = initial.starts_at ? new Date(initial.starts_at) : null;
+  // 시각은 반복 규칙 문자열 안에 들어 있다(weekly:0:10:00). 일회성은 규칙이 없어
+  // parseRec 이 null 을 돌려주므로 starts_at 에서 꺼내야 한다.
+  // 이 폴백이 빠져 있어서 일회성 수정 화면이 저장값과 무관하게 늘 10:00 으로 열렸고,
+  // 시각을 건드리지 않고 제목만 고쳐 저장해도 hidden startsAt·whenText 가 10:00 으로
+  // 다시 조립돼 저장돼 있던 시각이 조용히 사라졌다. Ver1.1 에는 있던 처리다.
+  const [time, setTime] = useState(ir.time ?? (initStarts ? hmU(initStarts) : "10:00"));
+
   const [calType, setCalType] = useState("solar");
-  const [solarDate, setSolarDate] = useState(initStarts ? ymd(initStarts) : "");
-  const [lunarYear, setLunarYear] = useState(initStarts ? initStarts.getFullYear() : 2026);
+  const [solarDate, setSolarDate] = useState(initStarts ? ymdU(initStarts) : "");
+  const [lunarYear, setLunarYear] = useState(initStarts ? initStarts.getUTCFullYear() : 2026);
   const [lunarMonth, setLunarMonth] = useState(1);
   const [lunarDay, setLunarDay] = useState(1);
 
   const [until, setUntil] = useState(
-    initial.recurrence_until ? ymd(new Date(initial.recurrence_until)) : ""
+    initial.recurrence_until ? ymdU(new Date(initial.recurrence_until)) : ""
   );
 
   // 일회성 시각도 같은 time 상태를 쓴다(시간 입력이 하나뿐이라 헷갈리지 않는다).

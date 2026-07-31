@@ -1,16 +1,9 @@
 import Link from "next/link";
 import { requireSession } from "@/lib/session";
 import { listNotices } from "@/lib/notices";
+import { formatDate } from "@/lib/format";
 import { togglePublishAction } from "./actions";
 import DeleteButton from "./DeleteButton";
-
-
-function fmtDate(value) {
-  const d = new Date(value);
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `${d.getFullYear()}. ${mm}. ${dd}.`;
-}
 
 export default async function NoticesAdmin() {
   await requireSession();
@@ -46,7 +39,7 @@ export default async function NoticesAdmin() {
                   <td className="adm-title-cell">
                     <Link href={`/admin/notices/${n.id}/edit`}>{n.title}</Link>
                   </td>
-                  <td>{fmtDate(n.published_at)}</td>
+                  <td>{formatDate(n.published_at)}</td>
                   <td>
                     <span className={n.published ? "adm-badge on" : "adm-badge off"}>
                       {n.published ? "공개" : "비공개"}

@@ -40,18 +40,20 @@ export function recMatches(p, weekday, lunarDay, solarDay) {
 // 그 날이 반복 기간 안인가.
 // 시작일이 없으면 "예전부터" 로 본다(종료일만 지정한 기존 데이터 호환).
 // 종료일이 없으면 "끝없이" 로 본다(종료일을 도입하기 전에 등록한 정기법회).
+//
+// 세 값 모두 UTC 로 꺼내 비교한다. starts_at 은 관리자가 친 벽시계가 UTC 라벨을
+// 달고 저장된 값이고 recurrence_until 은 DATE 라 UTC 자정으로 들어온다
+// (lib/format.js 머리말). 로컬 게터를 쓰면 이 함수가 도는 곳의 TZ 에 따라
+// 시작·종료 당일이 하루씩 어긋난다. 지금 서버가 UTC 라 결과는 같다.
 export function inRecurrenceWindow(ev, y, m, d) {
-  const day = new Date(y, m - 1, d);
+  const day = Date.UTC(y, m - 1, d);
   if (ev.starts_at) {
     const s = new Date(ev.starts_at);
-    const sDay = new Date(s.getFullYear(), s.getMonth(), s.getDate());
-    if (day < sDay) return false;
+    if (day < Date.UTC(s.getUTCFullYear(), s.getUTCMonth(), s.getUTCDate())) return false;
   }
   if (ev.recurrence_until) {
-    // DATE 컬럼이라 타임존 해석에 흔들리지 않도록 연·월·일만 꺼내 비교한다.
     const u = new Date(ev.recurrence_until);
-    const uDay = new Date(u.getFullYear(), u.getMonth(), u.getDate());
-    if (day > uDay) return false;
+    if (day > Date.UTC(u.getUTCFullYear(), u.getUTCMonth(), u.getUTCDate())) return false;
   }
   return true;
 }

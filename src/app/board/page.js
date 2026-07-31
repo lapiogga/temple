@@ -7,6 +7,7 @@ import { DancheongDefs } from "@/components/Icons";
 import { listPosts } from "@/lib/posts";
 import { listBoardTabCategories, getLabelMap, canWrite } from "@/lib/board-categories";
 import { getViewer } from "@/lib/viewer";
+import { formatDate } from "@/lib/format";
 import { SITE } from "@/content/site";
 import Pager from "@/components/Pager";
 
@@ -14,12 +15,6 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: `게시판 | ${SITE.name}` };
 
 const PER_PAGE = 12;
-
-function fmt(v) {
-  const d = new Date(v);
-  const p = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}. ${p(d.getMonth() + 1)}. ${p(d.getDate())}.`;
-}
 
 export default async function BoardPage({ searchParams }) {
   // 카테고리는 board_categories 가 갖는다. 목록 탭에는 숨김을 뺀 것만 쓰되,
@@ -110,7 +105,7 @@ export default async function BoardPage({ searchParams }) {
                     <td className="c-cat"><span className="post-badge">{labelMap[p.board] ?? ""}</span></td>
                     <td className="c-title"><Link href={`/board/${p.id}`}>{p.title}</Link></td>
                     <td className="c-author">{p.author_name}</td>
-                    <td className="c-date">{fmt(p.created_at)}</td>
+                    <td className="c-date">{formatDate(p.created_at)}</td>
                   </tr>
                 ))
               ) : (

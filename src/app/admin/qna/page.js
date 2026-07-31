@@ -1,13 +1,8 @@
 import { requireSession } from "@/lib/session";
 import { formatPhone } from "@/lib/phone";
 import { listAllQuestions } from "@/lib/qna";
+import { formatDateCompact as fmt } from "@/lib/format";
 import { answerQuestionAction, deleteQuestionAction } from "./actions";
-
-function fmt(v) {
-  const d = new Date(v);
-  const p = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())}`;
-}
 
 export default async function QnaAdmin() {
   await requireSession();

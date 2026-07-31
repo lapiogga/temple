@@ -1,10 +1,8 @@
 // 질문 창 + 답변 창 (표 형식). 서버(page)·클라이언트(SecretGate) 양쪽에서 공용.
-function fmtDate(v) {
-  if (!v) return "-";
-  const d = new Date(v);
-  const p = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}. ${p(d.getMonth() + 1)}. ${p(d.getDate())}.`;
-}
+import { formatDate } from "@/lib/format";
+
+// 값이 없을 때만 "-" 로 채운다(답변 전 answeredAt 이 null 이다).
+const fmtDate = (v) => (v ? formatDate(v) : "-");
 
 export default function QnaView({ title, authorName, createdAt, body, answer, answeredAt }) {
   return (

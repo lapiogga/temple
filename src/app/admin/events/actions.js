@@ -33,12 +33,21 @@ function readForm(formData) {
   };
 }
 
+// 폼이 보내는 startsAt 은 "2026-08-04T18:00" — 시간대가 없는 벽시계 문자열이다.
+// new Date() 에 그대로 주면 이 코드가 도는 곳의 TZ 로 해석된다. 지금은 서버가 UTC 라
+// 18:00+00 이 되고 읽기도 UTC 라 맞아떨어지지만, TZ 를 넣는 순간 전부 밀린다.
+// "Z" 를 붙여 UTC 로 못 박으면 서버가 어디에 있든 친 그대로 저장된다.
+// (지금 서버가 UTC 라 저장값은 달라지지 않는다 — 기존 행 이전이 필요 없다.)
+function wallToDate(s) {
+  return new Date(`${s}Z`);
+}
+
 function toRecord(d) {
   return {
     kind: d.kind,
     title: d.title,
     whenText: d.whenText === "" ? null : d.whenText,
-    startsAt: d.startsAt === "" ? null : new Date(d.startsAt),
+    startsAt: d.startsAt === "" ? null : wallToDate(d.startsAt),
     recurrence: d.recurrence === "" ? null : d.recurrence,
     recurrenceUntil: d.recurrenceUntil === "" ? null : d.recurrenceUntil,
     description: d.description === "" ? null : d.description,
@@ -57,18 +66,19 @@ function validUntil(d) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return { ok: false, msg: "종료일 형식이 올바르지 않습니다." };
   if (d.recurrence === "") return { ok: false, msg: "반복 일정이 아니면 종료일을 둘 수 없습니다." };
 
+  // 날짜 비교도 전부 UTC 로 — startsAt 저장이 UTC 기준이므로 기준을 맞춘다.
   const [Y, M, D] = raw.split("-").map(Number);
-  const until = new Date(Y, M - 1, D);
-  if (until.getFullYear() !== Y || until.getMonth() !== M - 1 || until.getDate() !== D) {
+  const until = new Date(Date.UTC(Y, M - 1, D));
+  if (until.getUTCFullYear() !== Y || until.getUTCMonth() !== M - 1 || until.getUTCDate() !== D) {
     return { ok: false, msg: "종료일이 실제로 없는 날짜입니다." };
   }
 
-  const base = d.startsAt ? new Date(d.startsAt) : new Date();
+  const base = d.startsAt ? wallToDate(d.startsAt) : new Date();
   if (Number.isNaN(base.getTime())) return { ok: false, msg: "시작일이 올바르지 않습니다." };
-  const baseDay = new Date(base.getFullYear(), base.getMonth(), base.getDate());
+  const baseDay = new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate()));
   if (until < baseDay) return { ok: false, msg: "종료일이 시작일보다 앞설 수 없습니다." };
 
-  const cap = new Date(baseDay.getFullYear() + RECUR_MAX_YEARS, baseDay.getMonth(), baseDay.getDate());
+  const cap = new Date(Date.UTC(baseDay.getUTCFullYear() + RECUR_MAX_YEARS, baseDay.getUTCMonth(), baseDay.getUTCDate()));
   if (until > cap) {
     return { ok: false, msg: `종료일은 시작일로부터 ${RECUR_MAX_YEARS}년 이내여야 합니다.` };
   }
@@ -81,9 +91,9 @@ function validDate(rec, raw) {
   if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(raw)) return false;
   const d = rec.startsAt;
   if (!d || Number.isNaN(d.getTime())) return false;
-  // 라운드트립: 2/30 → 3/2 같은 오버플로 정규화 차단
+  // 라운드트립: 2/30 → 3/2 같은 오버플로 정규화 차단. 저장이 UTC 기준이라 여기도 UTC.
   const p = (n) => String(n).padStart(2, "0");
-  const rt = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+  const rt = `${d.getUTCFullYear()}-${p(d.getUTCMonth() + 1)}-${p(d.getUTCDate())}T${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
   return rt === raw;
 }
 

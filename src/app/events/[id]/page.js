@@ -5,6 +5,7 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
 import { getEvent, listAttachments } from "@/lib/events";
+import { formatDate, formatWallDateTime } from "@/lib/format";
 import { SITE } from "@/content/site";
 
 export const dynamic = "force-dynamic";
@@ -15,22 +16,8 @@ function parseId(raw) {
   const id = Number(raw);
   return Number.isInteger(id) && id > 0 ? id : null;
 }
-function fmtDateTime(startsAt) {
-  const d = new Date(startsAt);
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  const hh = String(d.getHours()).padStart(2, "0");
-  const mi = String(d.getMinutes()).padStart(2, "0");
-  const time = hh === "00" && mi === "00" ? "" : ` ${hh}:${mi}`;
-  return `${d.getFullYear()}. ${mm}. ${dd}.${time}`;
-}
-function fmtDate(v) {
-  if (!v) return "-";
-  const d = new Date(v);
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `${d.getFullYear()}. ${mm}. ${dd}.`;
-}
+// 등록일(created_at)은 실제 시각이라 KST, 행사 일시는 벽시계라 UTC 고정.
+const fmtCreated = (v) => (v ? formatDate(v) : "-");
 
 export async function generateMetadata({ params }) {
   const id = parseId(params.id);
@@ -63,7 +50,9 @@ export default async function EventDetail({ params }) {
     console.error("첨부 조회 실패:", err);
   }
 
-  const when = e.starts_at ? fmtDateTime(e.starts_at) : e.when_text;
+  // 반복 일정은 starts_at 이 '첫 회' 날짜다. 그대로 찍으면 매주 하는 법회의 상세가
+  // 그 하루짜리 행사처럼 보이므로, 반복이면 규칙을 담은 when_text 를 먼저 쓴다.
+  const when = e.recurrence ? e.when_text ?? "" : e.starts_at ? formatWallDateTime(e.starts_at) : e.when_text;
 
   return (
     <>
@@ -97,7 +86,7 @@ export default async function EventDetail({ params }) {
               </tr>
               <tr>
                 <th scope="row">작성일</th>
-                <td>{fmtDate(e.created_at)}</td>
+                <td>{fmtCreated(e.created_at)}</td>
               </tr>
               <tr>
                 <th scope="row">첨부자료</th>

@@ -4,12 +4,17 @@ import { query } from "@/lib/db";
 const COLS =
   "id, kind, title, when_text, starts_at, recurrence, recurrence_until, description, sort_order, created_at";
 
-// 특정 월(로컬 기준)에 날짜가 박힌 일회성 일정.
+// 특정 월에 날짜가 박힌 일회성 일정.
 // 반복 일정(recurrence 있음)은 여기서 빼고 listRecurring() 이 따로 준다 —
 // 반복은 starts_at 이 '첫 회' 날짜라 그 달에만 걸리기 때문이다.
+//
+// 월 경계를 Date.UTC 로 잡는 이유: starts_at 은 관리자가 친 벽시계가 UTC 라벨을
+// 달고 저장된 값이다(lib/format.js 머리말). new Date(y, m-1, 1) 은 이 코드가 도는
+// 곳의 TZ 를 타므로 서버 TZ 가 UTC 가 아니게 되는 순간 월말·월초 일정이 옆 달로
+// 새어 나간다. 지금 서버가 UTC 라 이 변경은 결과를 바꾸지 않는다.
 export async function listEventsInMonth(year, month) {
-  const from = new Date(year, month - 1, 1);
-  const to = new Date(year, month, 1);
+  const from = new Date(Date.UTC(year, month - 1, 1));
+  const to = new Date(Date.UTC(year, month, 1));
   const { rows } = await query(
     `SELECT ${COLS} FROM events
       WHERE recurrence IS NULL AND starts_at >= $1 AND starts_at < $2
@@ -30,11 +35,20 @@ export async function listRecurring() {
   return rows;
 }
 
-// 정기 법회(반복, 날짜 없이 표시용 when_text).
+// 오른쪽 '정기 법회' 패널 — 되풀이되는 법회를 when_text 로 안내한다.
+//
+// 조건이 kind = 'regular' 뿐이면 두 가지가 잘못 실린다.
+//  · 반복을 끈 하루짜리 법회(특별법회) — 달력에 이미 그 날짜로 그려지는데
+//    패널에도 올라와 한 화면에 같은 항목이 두 번 나온다.
+//  · 종료일이 지난 반복 — 끝난 법회가 '정기 법회' 로 계속 걸려 있다.
+// 그래서 반복이 있고(recurrence IS NOT NULL) 아직 안 끝난 것만 고른다.
+// recurrence_until 이 NULL 인 것은 종료일 도입 전에 등록된 무기한 법회다(하위호환).
 export async function listRegular() {
   const { rows } = await query(
     `SELECT ${COLS} FROM events
       WHERE kind = 'regular'
+        AND recurrence IS NOT NULL
+        AND (recurrence_until IS NULL OR recurrence_until >= CURRENT_DATE)
       ORDER BY sort_order ASC, id ASC`
   );
   return rows;

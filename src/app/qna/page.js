@@ -5,6 +5,7 @@ import SiteFooter from "@/components/SiteFooter";
 import Reveal from "@/components/Reveal";
 import { DancheongDefs } from "@/components/Icons";
 import { listQuestions } from "@/lib/qna";
+import { formatDate } from "@/lib/format";
 import { SITE } from "@/content/site";
 import Pager from "@/components/Pager";
 
@@ -12,12 +13,6 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: `묻고답하기 | ${SITE.name}` };
 
 const PER_PAGE = 12;
-
-function fmt(v) {
-  const d = new Date(v);
-  const p = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}. ${p(d.getMonth() + 1)}. ${p(d.getDate())}.`;
-}
 
 export default async function QnaPage({ searchParams }) {
   let qs = [];
@@ -67,7 +62,7 @@ export default async function QnaPage({ searchParams }) {
                       </Link>
                     </td>
                     <td className="c-author">{q.author_name}</td>
-                    <td className="c-date">{fmt(q.created_at)}</td>
+                    <td className="c-date">{formatDate(q.created_at)}</td>
                   </tr>
                 ))
               ) : (

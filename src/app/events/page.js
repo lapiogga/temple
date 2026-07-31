@@ -6,6 +6,7 @@ import { DancheongDefs, LanternIcon } from "@/components/Icons";
 import { listEventsInMonth, listRegular, listRecurring, listAllEvents } from "@/lib/events";
 import { WEEK, parseRec, recMatches, inRecurrenceWindow, toMin } from "@/lib/recurrence";
 import { monthMatrix, ymNav, parseYm, ymString } from "@/lib/calendar";
+import { formatWallDateTime, wallDayOfMonth, wallTime, kstToday } from "@/lib/format";
 import { solarToLunar, lunarLabel } from "@/lib/lunar";
 import { SITE } from "@/content/site";
 
@@ -14,21 +15,15 @@ export const metadata = { title: `법회·행사 | ${SITE.name}` };
 
 const KIND_LABEL = { regular: "정기법회", event: "행사" };
 
-function eventDay(startsAt) {
-  return new Date(startsAt).getDate();
-}
-function fmtDateTime(startsAt) {
-  const d = new Date(startsAt);
-  const p = (n) => String(n).padStart(2, "0");
-  const time = d.getHours() === 0 && d.getMinutes() === 0 ? "" : ` ${p(d.getHours())}:${p(d.getMinutes())}`;
-  return `${d.getFullYear()}. ${p(d.getMonth() + 1)}. ${p(d.getDate())}.${time}`;
-}
-
-const pad = (n) => String(n).padStart(2, "0");
+// starts_at 은 관리자가 친 벽시계가 UTC 라벨을 달고 저장된 값이다.
+// 로컬 게터로 꺼내면 서버 TZ 가 UTC 가 아닌 순간 전부 밀리므로 lib/format 의
+// UTC 고정 판을 쓴다(자세한 사정은 그 파일 머리말).
 
 export default async function EventsPage({ searchParams }) {
-  const now = new Date();
-  const parsed = parseYm(searchParams?.ym) ?? { y: now.getFullYear(), m: now.getMonth() + 1 };
+  // '오늘' 은 KST 기준이어야 한다 — 서버 TZ(UTC)를 쓰면 KST 00:00~09:00 사이에
+  // 달력이 어제를 오늘로 표시하고, 매월 1일 그 시간대에는 지난달로 열린다.
+  const today0 = kstToday();
+  const parsed = parseYm(searchParams?.ym) ?? { y: today0.y, m: today0.m };
   const { y, m } = parsed;
   const view = searchParams?.view === "list" ? "list" : "calendar";
 
@@ -48,8 +43,8 @@ export default async function EventsPage({ searchParams }) {
 
   const byDay = {};
   monthEvents.forEach((e) => {
-    const d = eventDay(e.starts_at);
-    (byDay[d] ||= []).push(e);
+    const d = wallDayOfMonth(e.starts_at);
+    if (d != null) (byDay[d] ||= []).push(e);
   });
 
   // 특정 날짜의 일정(일회성 + 반복)을 시간순으로 모아 반환.
@@ -58,9 +53,18 @@ export default async function EventsPage({ searchParams }) {
     const weekday = new Date(y, m - 1, day).getDay();
     const lun = solarToLunar(y, m, day);
     const dated = (byDay[day] ?? []).map((e) => {
-      const d = new Date(e.starts_at);
-      const time = d.getHours() === 0 && d.getMinutes() === 0 ? null : `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-      return { key: `e${e.id}`, href: `/events/${e.id}`, title: e.title, time, reg: false, sort: d.getHours() * 60 + d.getMinutes() };
+      const time = wallTime(e.starts_at);
+      return {
+        key: `e${e.id}`, href: `/events/${e.id}`, title: e.title, time,
+        // 반복 여부가 아니라 구분(kind)이 정기법회인지를 본다.
+        // 여기가 false 로 박혀 있어, 반복을 끈 하루짜리 법회(특별법회)가 달력에서는
+        // '행사' 색으로, 모바일 목록에서는 '행사' 라벨로 나왔다 — 아래 반복 분기(:reg)
+        // 와 기준이 서로 달랐던 것이다. 상세 화면은 처음부터 kind 를 쓰고 있었다.
+        reg: e.kind === "regular",
+        // toMin(null)=맨 뒤. 00:00 은 화면에서도 '시각 없음' 으로 다루므로
+        // 시각을 적은 일정 뒤에 오는 것이 맞다(반복 분기와 같은 기준).
+        sort: toMin(time),
+      };
     });
     const recs = recurring
       .map((e) => ({ e, p: parseRec(e.recurrence) }))
@@ -82,8 +86,8 @@ export default async function EventsPage({ searchParams }) {
     .filter((d) => d != null)
     .flatMap((day) => dayItems(day).map((it) => ({ ...it, day })));
   const { prev, next } = ymNav(y, m);
-  const isThisMonth = y === now.getFullYear() && m === now.getMonth() + 1;
-  const today = now.getDate();
+  const isThisMonth = y === today0.y && m === today0.m;
+  const today = today0.d;
   const linkYm = (ny, nm, v = view) => `/events?ym=${ymString(ny, nm)}&view=${v}`;
 
   return (
@@ -148,7 +152,8 @@ export default async function EventsPage({ searchParams }) {
               </table>
               <p className="cal-legend">
                 <span className="lg-dot ev" /> 행사
-                <span className="lg-dot reg" /> 정기법회(반복)
+                {/* 기준이 kind 라 '(반복)' 은 뗀다 — 반복을 끈 특별법회도 여기 들어온다. */}
+                <span className="lg-dot reg" /> 정기법회
                 <span style={{ color: "var(--n-fg-3)" }}>· 날짜 아래 작은 숫자는 음력</span>
               </p>
             </div>
@@ -186,7 +191,13 @@ export default async function EventsPage({ searchParams }) {
                         <span className="ev-kind">{KIND_LABEL[e.kind] ?? ""}</span>
                         {e.title}
                       </span>
-                      <span className="ev-w">{e.starts_at ? fmtDateTime(e.starts_at) : e.when_text}</span>
+                      {/* 반복 일정은 starts_at 이 '첫 회' 날짜다. 그대로 찍으면 매주 하는
+                          법회가 그 하루짜리 행사처럼 보이므로, 반복이면 규칙을 담은
+                          when_text("매주 일요일 오전 10:00")를 먼저 쓴다.
+                          관리자 목록(admin/events/page.js:54)은 처음부터 이 순서였다. */}
+                      <span className="ev-w">
+                        {e.recurrence ? e.when_text ?? "" : e.starts_at ? formatWallDateTime(e.starts_at) : e.when_text}
+                      </span>
                     </Link>
                   </li>
                 ))

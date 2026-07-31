@@ -3,16 +3,11 @@ import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { getCategoryBySlug } from "@/lib/board-categories";
 import { listPosts, listPostImages } from "@/lib/posts";
+import { formatDateCompact as fmt } from "@/lib/format";
 import SettingsForm from "./SettingsForm";
 import { updateIntroSettingsAction, deleteIntroPostAction } from "../actions";
 
 export const dynamic = "force-dynamic";
-
-function fmt(v) {
-  const d = new Date(v);
-  const p = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())}`;
-}
 
 export default async function IntroBoardAdmin({ params }) {
   await requireSession();

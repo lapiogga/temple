@@ -6,20 +6,21 @@ import HeroCarousel from "@/components/HeroCarousel";
 import { listNotices } from "@/lib/notices";
 import { listEventsInMonth, listAllEvents } from "@/lib/events";
 import { getSection } from "@/lib/site-content";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatWallMonthDay, kstToday } from "@/lib/format";
 
 // 관리자 등록이 즉시 반영되도록 항상 최신 DB 조회.
 export const dynamic = "force-dynamic";
 
-function evDate(startsAt, whenText) {
+// 반복 일정은 starts_at 이 '첫 회' 날짜라 그 하루로 보이면 안 된다 —
+// 규칙을 담은 when_text 를 먼저 쓴다(/events 목록·상세와 같은 규칙).
+function evDate(startsAt, whenText, recurrence) {
+  if (recurrence) return whenText || "";
   if (!startsAt) return whenText || "";
-  const d = new Date(startsAt);
-  const p = (n) => String(n).padStart(2, "0");
-  return `${p(d.getMonth() + 1)}.${p(d.getDate())}`;
+  return formatWallMonthDay(startsAt);
 }
 
 export default async function Home() {
-  const now = new Date();
+  const today = kstToday();
   let notices = [];
   let events = [];
   try {
@@ -28,7 +29,7 @@ export default async function Home() {
     console.error("홈 공지사항 조회 실패:", err);
   }
   try {
-    events = await listEventsInMonth(now.getFullYear(), now.getMonth() + 1);
+    events = await listEventsInMonth(today.y, today.m);
     if (events.length === 0) events = await listAllEvents();
   } catch (err) {
     console.error("홈 행사 조회 실패:", err);
@@ -98,7 +99,7 @@ export default async function Home() {
                   events.map((e) => (
                     <li key={e.id}>
                       <Link href={`/events/${e.id}`}>
-                        <span className="d">{evDate(e.starts_at, e.when_text)}</span>
+                        <span className="d">{evDate(e.starts_at, e.when_text, e.recurrence)}</span>
                         <span className="t">{e.title}</span>
                       </Link>
                     </li>

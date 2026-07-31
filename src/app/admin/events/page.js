@@ -1,23 +1,15 @@
 import Link from "next/link";
 import { requireSession } from "@/lib/session";
 import { listAllEvents } from "@/lib/events";
+import { formatWallDateTimeFull, formatWallDate } from "@/lib/format";
 import DeleteButton from "./DeleteButton";
 
 const KIND = { regular: "정기법회", event: "행사" };
 
-function fmt(v) {
-  if (!v) return "";
-  const d = new Date(v);
-  const p = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}. ${p(d.getMonth() + 1)}. ${p(d.getDate())}. ${p(d.getHours())}:${p(d.getMinutes())}`;
-}
-
-function fmtDay(v) {
-  if (!v) return "";
-  const d = new Date(v);
-  const p = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}. ${p(d.getMonth() + 1)}. ${p(d.getDate())}.`;
-}
+// starts_at·recurrence_until 은 관리자가 친 벽시계라 UTC 로 고정해 꺼낸다
+// (lib/format.js 머리말).
+const fmt = (v) => (v ? formatWallDateTimeFull(v) : "");
+const fmtDay = (v) => (v ? formatWallDate(v) : "");
 
 export default async function EventsAdmin() {
   await requireSession();

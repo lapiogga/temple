@@ -1,6 +1,7 @@
 import { requireSession } from "@/lib/session";
 import { formatPhone } from "@/lib/phone";
 import { listMembers } from "@/lib/members";
+import { formatDateCompact, formatWallDateCompact } from "@/lib/format";
 import {
   approveMemberAction,
   rejectMemberAction,
@@ -11,12 +12,9 @@ import {
 const GENDER = { male: "남", female: "여", other: "기타" };
 const STATUS = { approved: "승인", pending: "대기", rejected: "거절", suspended: "정지" };
 
-function fmt(v) {
-  if (!v) return "";
-  const d = new Date(v);
-  const p = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())}`;
-}
+// 가입일은 '언제 일어났는가' 라 KST, 생년월일은 시각 없는 DATE 라 변환을 태우지 않는다.
+const fmt = (v) => (v ? formatDateCompact(v) : "");
+const fmtBirth = (v) => (v ? formatWallDateCompact(v) : "");
 
 export default async function MembersAdmin() {
   await requireSession();
@@ -56,7 +54,7 @@ export default async function MembersAdmin() {
                   <td>{m.login_id}</td>
                   <td>{m.phone ? formatPhone(m.phone) : "-"}</td>
                   <td>{GENDER[m.gender] ?? "-"}</td>
-                  <td>{fmt(m.birth_date)}</td>
+                  <td>{fmtBirth(m.birth_date)}</td>
                   <td>{fmt(m.created_at)}</td>
                   <td>
                     <span className={`adm-badge ${m.status === "approved" ? "on" : "off"}`}>

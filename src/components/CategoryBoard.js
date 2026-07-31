@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { listPosts, listPostsWithThumb } from "@/lib/posts";
 import { getCategoryBySlug, canWrite } from "@/lib/board-categories";
 import { getViewer } from "@/lib/viewer";
+import { formatDate } from "@/lib/format";
 import Pager from "@/components/Pager";
 
 // 소개 메뉴에 딸린 게시판(법문·휴심선원)을 자기 주소에서 보여 준다.
@@ -11,12 +12,6 @@ import Pager from "@/components/Pager";
 // 목록 생김새(layout)와 누가 쓸 수 있는지(write_role)뿐이다.
 
 const PER_PAGE = 12;
-
-function fmt(v) {
-  const d = new Date(v);
-  const p = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}. ${p(d.getMonth() + 1)}. ${p(d.getDate())}.`;
-}
 
 export default async function CategoryBoard({ slug, kicker, basePath, page = 1 }) {
   const category = await getCategoryBySlug(slug);
@@ -64,7 +59,7 @@ export default async function CategoryBoard({ slug, kicker, basePath, page = 1 }
                 </div>
                 <div className="meta">
                   <h3>{p.title}</h3>
-                  <div className="cnt">{p.author_name} · {fmt(p.created_at)}</div>
+                  <div className="cnt">{p.author_name} · {formatDate(p.created_at)}</div>
                 </div>
               </Link>
             ))}
@@ -83,7 +78,7 @@ export default async function CategoryBoard({ slug, kicker, basePath, page = 1 }
                 <tr key={p.id}>
                   <td className="c-title"><Link href={`/board/${p.id}`}>{p.title}</Link></td>
                   <td className="c-author">{p.author_name}</td>
-                  <td className="c-date">{fmt(p.created_at)}</td>
+                  <td className="c-date">{formatDate(p.created_at)}</td>
                 </tr>
               ))}
             </tbody>

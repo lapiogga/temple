@@ -6,6 +6,7 @@ import { getMemberById } from "@/lib/members";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
+import { formatDate, formatWallDate } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "내 정보 | 응선사" };
@@ -13,12 +14,10 @@ export const metadata = { title: "내 정보 | 응선사" };
 const GENDER = { male: "남", female: "여", other: "기타" };
 const STATUS = { approved: "승인", pending: "승인 대기", rejected: "거절", suspended: "정지" };
 
-function fmt(v) {
-  if (!v) return "-";
-  const d = new Date(v);
-  const p = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}. ${p(d.getMonth() + 1)}. ${p(d.getDate())}.`;
-}
+// 가입일은 '언제 일어났는가' 라 KST 로 본다.
+// 생년월일은 DATE 컬럼(시각 없는 달력상의 날짜)이라 시간대 변환을 태우면 안 된다.
+const fmt = (v) => (v ? formatDate(v) : "-");
+const fmtBirth = (v) => (v ? formatWallDate(v) : "-");
 
 export default async function MyPage() {
   const session = await requireMember();
@@ -41,7 +40,7 @@ export default async function MyPage() {
                 <dt>아이디</dt><dd>{m.login_id}</dd>
                 <dt>성명</dt><dd>{m.name}</dd>
                 <dt>닉네임</dt><dd>{m.nickname ?? "-"}</dd>
-                <dt>생년월일</dt><dd>{fmt(m.birth_date)}</dd>
+                <dt>생년월일</dt><dd>{fmtBirth(m.birth_date)}</dd>
                 <dt>성별</dt><dd>{GENDER[m.gender] ?? "-"}</dd>
                 <dt>휴대폰</dt><dd>{m.phone ? formatPhone(m.phone) : "-"}</dd>
                 <dt>상태</dt><dd><span className={`status-badge ${m.status}`}>{STATUS[m.status] ?? m.status}</span></dd>

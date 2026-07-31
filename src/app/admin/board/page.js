@@ -2,13 +2,8 @@ import Link from "next/link";
 import { requireSession } from "@/lib/session";
 import { listAllPosts } from "@/lib/posts";
 import { getLabelMap, listCategories } from "@/lib/board-categories";
+import { formatDateCompact as fmt } from "@/lib/format";
 import { deletePostAction } from "./actions";
-
-function fmt(v) {
-  const d = new Date(v);
-  const p = (n) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())}`;
-}
 
 export default async function BoardAdmin() {
   await requireSession();
