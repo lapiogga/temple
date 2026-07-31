@@ -1,4 +1,5 @@
 import SiteHeader from "@/components/SiteHeader";
+import BackLink from "@/components/BackLink";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
 import { SITE } from "@/content/site";
@@ -15,6 +16,7 @@ export default function QnaWrite() {
       <SiteHeader />
       <section className="screen top">
         <div className="wrap" style={{ maxWidth: "620px" }}>
+          <BackLink href="/qna" label="묻고답하기" />
           <div className="sec-head">
             <div><div className="ki">Q&amp;A</div><h2>묻고답하기</h2></div>
           </div>

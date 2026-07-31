@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BackLink from "@/components/BackLink";
 import { notFound } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
@@ -46,7 +47,7 @@ export default async function PostDetail({ params }) {
       <SiteHeader />
       <article className="screen top">
         <div className="wrap wide">
-          <Link className="more" href={backHref}>← {backLabel}</Link>
+          <BackLink href={backHref} label={backLabel} />
 
           {/* 정해진 틀(표): 타이틀·게시자·게시일시·게시내용·첨부자료 */}
           <table className="detail-table">

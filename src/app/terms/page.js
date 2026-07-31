@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BackLink from "@/components/BackLink";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
@@ -15,9 +16,9 @@ export default function TermsPage() {
 
       <section className="screen top">
         <div className="wrap" style={{ maxWidth: "820px" }}>
+          <BackLink href="/" label="홈으로" />
           <div className="sec-head">
             <div><div className="ki">Terms</div><h2>서비스 이용약관</h2></div>
-            <Link className="more" href="/">← 홈으로</Link>
           </div>
           <div className="legal-doc" style={{ whiteSpace: "pre-line" }}>{TERMS}</div>
         </div>

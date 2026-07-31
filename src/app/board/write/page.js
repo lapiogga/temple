@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import BackLink from "@/components/BackLink";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
@@ -45,6 +46,7 @@ export default async function BoardWrite({ searchParams }) {
         {/* 본문 에디터가 들어가므로 화면이 허용하는 최대 폭을 쓴다. 예전에는 wrap 을
             760px 로 조인 위에 폼에 .auth-wide(560px)까지 걸려 에디터가 손바닥만 했다. */}
         <div className="wrap wide">
+          <BackLink href="/board" label="게시판" />
           <div className="sec-head">
             <div><div className="ki">Write</div><h2>글쓰기</h2></div>
           </div>

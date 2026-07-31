@@ -1,4 +1,5 @@
 import SiteHeader from "@/components/SiteHeader";
+import BackLink from "@/components/BackLink";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
 import { SITE } from "@/content/site";
@@ -17,6 +18,7 @@ export default function MemberPasswordReset({ searchParams }) {
       <SiteHeader />
       <section className="screen top">
         <div className="wrap" style={{ maxWidth: "560px" }}>
+          <BackLink href="/member-login" label="회원 로그인" />
           <div className="sec-head">
             <div><div className="ki">Reset</div><h2>비밀번호 재설정</h2></div>
           </div>

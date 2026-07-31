@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BackLink from "@/components/BackLink";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
@@ -12,8 +13,9 @@ export default function GuidePage() {
     <>
       <DancheongDefs />
       <SiteHeader />
-      <section className="screen">
+      <section className="screen top">
         <div className="wrap">
+          <BackLink href="/" label="홈으로" />
           <div className="sec-head">
             <div><div className="ki">Guide</div><h2>사찰 안내도</h2></div>
             <Link className="more" href="/visit">오시는 길 →</Link>

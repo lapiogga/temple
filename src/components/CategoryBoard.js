@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BackLink from "@/components/BackLink";
 import { notFound } from "next/navigation";
 import { listPosts, listPostsWithThumb } from "@/lib/posts";
 import { getCategoryBySlug, canWrite } from "@/lib/board-categories";
@@ -39,6 +40,7 @@ export default async function CategoryBoard({ slug, kicker, basePath, page = 1 }
   return (
     <section className="screen top">
       <div className="wrap wide">
+        <BackLink href="/" label="홈으로" />
         <div className="sec-head">
           <div>
             <div className="ki">{kicker}</div>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BackLink from "@/components/BackLink";
 import { notFound } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
@@ -31,7 +32,7 @@ export default async function QnaDetail({ params }) {
       <SiteHeader />
       <article className="screen top">
         <div className="wrap wide">
-          <Link className="more" href="/qna">← 묻고답하기</Link>
+          <BackLink href="/qna" label="묻고답하기" />
           {q.is_secret ? (
             <div style={{ marginTop: "20px" }}>
               <SecretGate action={revealSecretAction.bind(null, id)} />

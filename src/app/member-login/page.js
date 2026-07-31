@@ -1,4 +1,5 @@
 import SiteHeader from "@/components/SiteHeader";
+import BackLink from "@/components/BackLink";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
 import { SITE } from "@/content/site";
@@ -15,6 +16,7 @@ export default function MemberLogin({ searchParams }) {
       <SiteHeader />
       <section className="screen top">
         <div className="wrap" style={{ maxWidth: "460px" }}>
+          <BackLink href="/" label="홈으로" />
           <div className="sec-head">
             <div><div className="ki">Login</div><h2>회원 로그인</h2></div>
           </div>

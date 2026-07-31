@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BackLink from "@/components/BackLink";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import Reveal from "@/components/Reveal";
@@ -70,6 +71,7 @@ export default async function BoardPage({ searchParams }) {
       <SiteHeader />
       <section className="screen top">
         <div className="wrap wide">
+          <BackLink href="/" label="홈으로" />
           <div className="sec-head reveal">
             <div><div className="ki">Community</div><h2>게시판</h2></div>
             {canWriteHere ? (

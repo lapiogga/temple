@@ -1,4 +1,5 @@
 import SiteHeader from "@/components/SiteHeader";
+import BackLink from "@/components/BackLink";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
 import { SITE } from "@/content/site";
@@ -14,6 +15,7 @@ export default function FindAccountPage({ searchParams }) {
       <SiteHeader />
       <section className="screen top">
         <div className="wrap" style={{ maxWidth: "460px" }}>
+          <BackLink href="/member-login" label="회원 로그인" />
           <div className="sec-head">
             <div><div className="ki">Find</div><h2>아이디·비밀번호 찾기</h2></div>
           </div>

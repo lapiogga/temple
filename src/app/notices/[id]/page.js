@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BackLink from "@/components/BackLink";
 import { notFound } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
@@ -46,7 +47,7 @@ export default async function NoticeDetail({ params }) {
 
       <article className="screen top">
         <div className="wrap wide">
-          <Link className="more" href="/notices">← 공지사항 목록</Link>
+          <BackLink href="/notices" label="공지사항" />
 
           {/* 게시판과 동일한 표 틀: 타이틀·게시자·게시일시·게시내용·첨부자료 */}
           <table className="detail-table">

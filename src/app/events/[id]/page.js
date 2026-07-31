@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BackLink from "@/components/BackLink";
 import { notFound } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
@@ -70,8 +71,8 @@ export default async function EventDetail({ params }) {
       <SiteHeader />
 
       <article className="screen top">
-        <div className="wrap" style={{ maxWidth: "820px" }}>
-          <Link className="more" href="/events">← 법회·행사</Link>
+        <div className="wrap wide">
+          <BackLink href="/events" label="법회·행사" />
 
           {/* 정해진 틀(표): 타이틀·일시·내용·작성자·작성일·첨부자료 */}
           <table className="detail-table">

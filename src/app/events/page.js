@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BackLink from "@/components/BackLink";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs, LanternIcon } from "@/components/Icons";
@@ -115,12 +116,12 @@ export default async function EventsPage({ searchParams }) {
 
       <section className="screen top tight">
         <div className="wrap wide">
+          <BackLink href="/" label="홈으로" />
           <div className="sec-head" style={{ marginBottom: "8px" }}>
             <div>
               <div className="ki">Dharma</div>
               <h2>법회 · 행사 안내</h2>
             </div>
-            <Link className="more" href="/">← 홈으로</Link>
           </div>
 
           <div className="cal-head">

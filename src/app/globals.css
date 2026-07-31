@@ -706,6 +706,18 @@ footer.site{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--n
 
 
 
+
+/* ── 돌아가기 (모든 공개 화면 공통) ──
+   제목 위 왼쪽 한 자리로 모았다. 예전에는 목록 화면은 제목 줄 안에 있어
+   오른쪽에, 상세 화면은 제목 위라 왼쪽에 있었고 아예 없는 화면도 많았다.
+   손가락 목표 크기(44px)를 세로 여백으로 확보한다. */
+.back-link{display:inline-flex;align-items:center;gap:var(--sp-xs);
+  min-height:44px;margin-bottom:var(--sp-xxs);
+  font-size:var(--fs-300);font-weight:var(--fw-semibold);color:var(--n-fg-3);
+  transition:color var(--t-state);}
+.back-link:hover{color:var(--brand);}
+.back-link:active{color:var(--brand-pressed);}
+
 /* ── 사진 여러 장 올리기 (관리자 갤러리) ── */
 .photo-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--sp-xxs);
   min-height:120px;padding:var(--sp-xxl);cursor:pointer;text-align:center;

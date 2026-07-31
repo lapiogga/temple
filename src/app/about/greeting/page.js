@@ -1,4 +1,5 @@
 import SiteHeader from "@/components/SiteHeader";
+import BackLink from "@/components/BackLink";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
 import { SITE } from "@/content/site";
@@ -13,8 +14,9 @@ export default async function GreetingPage() {
     <>
       <DancheongDefs />
       <SiteHeader />
-      <section className="screen">
+      <section className="screen top">
         <div className="wrap">
+          <BackLink href="/" label="홈으로" />
           <div className="sec-head">
             <div><div className="ki">Greeting</div><h2>주지 스님 인사말</h2></div>
           </div>

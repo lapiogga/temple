@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BackLink from "@/components/BackLink";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
@@ -14,9 +15,9 @@ export default function EmailPolicy() {
 
       <section className="screen top">
         <div className="wrap" style={{ maxWidth: "760px" }}>
+          <BackLink href="/" label="홈으로" />
           <div className="sec-head">
             <div><div className="ki">Notice</div><h2>이메일 무단수집 거부</h2></div>
-            <Link className="more" href="/">← 홈으로</Link>
           </div>
           <div className="legal-doc">
             <p>

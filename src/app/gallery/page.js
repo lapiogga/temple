@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BackLink from "@/components/BackLink";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import Reveal from "@/components/Reveal";
@@ -32,12 +33,12 @@ export default async function GalleryPage({ searchParams }) {
 
       <section className="screen top">
         <div className="wrap">
+          <BackLink href="/" label="홈으로" />
           <div className="sec-head reveal">
             <div>
               <div className="ki">Gallery</div>
               <h2>갤러리</h2>
             </div>
-            <Link className="more" href="/">← 홈으로</Link>
           </div>
 
           {albums.length === 0 ? (

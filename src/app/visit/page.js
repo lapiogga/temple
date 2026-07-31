@@ -1,4 +1,5 @@
 import SiteHeader from "@/components/SiteHeader";
+import BackLink from "@/components/BackLink";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
 import MapView from "@/components/MapView";
@@ -16,6 +17,7 @@ export default async function VisitPage() {
       <SiteHeader />
       <section className="screen top">
         <div className="wrap">
+          <BackLink href="/" label="홈으로" />
           <div className="foot-grid">
             <div>
               <div className="sec-head"><div><div className="ki">Visit</div><h2>오시는 길</h2></div></div>

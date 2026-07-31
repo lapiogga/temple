@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BackLink from "@/components/BackLink";
 import { notFound } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
@@ -49,12 +50,12 @@ export default async function AlbumPage({ params }) {
 
       <section className="screen top">
         <div className="wrap">
+          <BackLink href="/gallery" label="갤러리" />
           <div className="sec-head reveal">
             <div>
               <div className="ki">Gallery</div>
               <h2>{album.title}</h2>
             </div>
-            <Link className="more" href="/gallery">← 갤러리</Link>
           </div>
 
           {photos.length === 0 ? (
