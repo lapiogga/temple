@@ -479,6 +479,8 @@ footer.site{margin-top:var(--sp-xl);}
 .gal-card:hover{transform:translateY(-4px);box-shadow:var(--sh-card-hover);}
 .gal-card .cover{aspect-ratio:4/3;background:var(--n-bg-2);display:grid;place-items:center;overflow:hidden;}
 .gal-card .cover img{width:100%;height:100%;object-fit:cover;}
+/* 카드 목록에서 본문에 이미지가 하나도 없는 글 */
+.gal-card .cover-empty{font-size:var(--fs-200);color:var(--n-fg-4);}
 .gal-card .meta{padding:var(--sp-m) var(--sp-l);}
 .gal-card .meta h3{font-size:var(--fs-400);font-weight:var(--fw-bold);line-height:var(--lh-400);}
 .gal-card .meta .cnt{font-size:var(--fs-200);color:var(--n-fg-3);margin-top:var(--sp-xxs);}

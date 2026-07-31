@@ -6,9 +6,10 @@ import { SITE } from "@/content/site";
 import { getMemberSession } from "@/lib/member-session";
 import { getSession } from "@/lib/session";
 import { getMemberById } from "@/lib/members";
-import { listVisibleCategories } from "@/lib/board-categories";
+import { listVisibleCategories, canWrite } from "@/lib/board-categories";
 import BoardWriteForm from "../BoardWriteForm";
 import { createPostAction } from "../actions";
+import { uploadPostImageAction } from "../image-actions";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: `글쓰기 | ${SITE.name}` };
@@ -19,11 +20,15 @@ export default async function BoardWrite({ searchParams }) {
   const [memberSession, adminSession] = await Promise.all([getMemberSession(), getSession()]);
   if (!memberSession.isLoggedIn && !adminSession.isLoggedIn) redirect("/member-login");
 
+  const isAdmin = !!adminSession.isLoggedIn;
+
   // 두 쿠키가 동시에 살아 있을 수 있으므로 어떤 이름으로 올라가는지 미리 보여준다.
   // 우선순위는 createPostAction 과 같아야 한다 — 운영자 우선.
   let authorName = "종무소";
-  if (!adminSession.isLoggedIn) {
+  let isApprovedMember = false;
+  if (!isAdmin) {
     const m = await getMemberById(memberSession.memberId);
+    isApprovedMember = !!m && m.status === "approved";
     authorName = m?.nickname || m?.name || "회원";
   }
 
@@ -33,9 +38,11 @@ export default async function BoardWrite({ searchParams }) {
   } catch (err) {
     console.error("카테고리 조회 실패:", err);
   }
+  // 쓸 수 있는 게시판만 선택지에 남긴다. 서버 액션에서 한 번 더 검사한다.
+  const writable = categories.filter((c) => canWrite(c, { isAdmin, isApprovedMember }));
 
   const wanted = searchParams?.board;
-  const defaultBoard = categories.some((c) => c.slug === wanted) ? wanted : categories[0]?.slug;
+  const defaultBoard = writable.some((c) => c.slug === wanted) ? wanted : writable[0]?.slug;
 
   return (
     <>
@@ -48,15 +55,18 @@ export default async function BoardWrite({ searchParams }) {
           <div className="sec-head">
             <div><div className="ki">Write</div><h2>글쓰기</h2></div>
           </div>
-          {categories.length === 0 ? (
+          {writable.length === 0 ? (
             <p className="adm-empty">
-              글을 올릴 수 있는 게시판이 없습니다. 종무소에 문의해 주세요.
+              {categories.some((c) => c.slug === wanted)
+                ? "이 게시판은 운영자만 글을 쓸 수 있습니다."
+                : "글을 올릴 수 있는 게시판이 없습니다. 종무소에 문의해 주세요."}
             </p>
           ) : (
             <BoardWriteForm
               action={createPostAction}
+              uploadAction={uploadPostImageAction}
               defaultBoard={defaultBoard}
-              categories={categories}
+              categories={writable}
               authorName={authorName}
             />
           )}

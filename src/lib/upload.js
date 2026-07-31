@@ -1,4 +1,4 @@
-import { writeFile, mkdir } from "fs/promises";
+import { writeFile, mkdir, unlink } from "fs/promises";
 import path from "path";
 import crypto from "crypto";
 
@@ -64,4 +64,24 @@ export async function saveAttachment(file) {
     mime: file.type || null,
     size: file.size,
   };
+}
+
+// 업로드 파일 삭제. url 은 saveImage/saveAttachment 가 돌려준 "/uploads/<name>" 형식이다.
+//
+// 경로를 그대로 믿지 않는다. DB 에 들어 있는 값이라 해도 ../ 가 섞이면 uploads
+// 밖의 파일을 지울 수 있으므로, 파일명만 뽑아 UPLOAD_DIR 안으로 다시 붙인다.
+export async function deleteUpload(url) {
+  if (typeof url !== "string" || !url.startsWith("/uploads/")) return false;
+  const base = path.basename(url);
+  if (!base || base === "." || base === "..") return false;
+  const target = path.join(UPLOAD_DIR, base);
+  // 정규화 후에도 UPLOAD_DIR 안인지 확인한다.
+  if (path.dirname(path.resolve(target)) !== path.resolve(UPLOAD_DIR)) return false;
+  try {
+    await unlink(target);
+    return true;
+  } catch (err) {
+    if (err?.code !== "ENOENT") console.error("업로드 파일 삭제 실패:", url, err.message);
+    return false;
+  }
 }

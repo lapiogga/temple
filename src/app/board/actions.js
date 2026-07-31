@@ -6,7 +6,7 @@ import { getMemberSession } from "@/lib/member-session";
 import { getSession } from "@/lib/session";
 import { getMemberById } from "@/lib/members";
 import { createPost } from "@/lib/posts";
-import { getCategoryBySlug } from "@/lib/board-categories";
+import { getCategoryBySlug, canWrite } from "@/lib/board-categories";
 import { sanitizeHtml, stripTags } from "@/lib/sanitize";
 
 // board 는 board_categories 에서 오므로 z.enum 으로 고정할 수 없다. 아래에서 조회로 검증한다.
@@ -22,6 +22,7 @@ export async function createPostAction(prevState, formData) {
 
   let authorMemberId = null;
   let authorName = null;
+  let isApprovedMember = false;
 
   // 운영자 세션이 우선이다. 두 쿠키(temple_admin · temple_member)는 서로 독립이라
   // 같은 브라우저에 동시에 살아 있을 수 있는데, 회원을 먼저 보면 관리자 화면에서
@@ -35,6 +36,7 @@ export async function createPostAction(prevState, formData) {
     if (!m || m.status !== "approved") {
       return { error: "승인된 회원만 글을 쓸 수 있습니다." };
     }
+    isApprovedMember = true;
     authorMemberId = m.id;
     // 실명은 비공개다. 게시판에는 닉네임만 노출한다.
     authorName = m.nickname || m.name;
@@ -46,6 +48,11 @@ export async function createPostAction(prevState, formData) {
   const category = await getCategoryBySlug(slug);
   if (!category || category.is_hidden) {
     return { error: "존재하지 않는 게시판입니다." };
+  }
+  // 게시판마다 쓸 수 있는 사람이 다르다(write_role). 화면에서 선택지를 감추는
+  // 것만으로는 막히지 않는다 — 액션은 페이지 트리 밖의 독립 엔드포인트다.
+  if (!canWrite(category, { isAdmin: !!adminSession.isLoggedIn, isApprovedMember })) {
+    return { error: `'${category.label}' 은 운영자만 글을 쓸 수 있습니다.` };
   }
 
   const parsed = schema.safeParse({

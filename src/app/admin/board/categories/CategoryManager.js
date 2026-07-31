@@ -53,6 +53,27 @@ function CategoryRow({ c, count, onUpdate, onToggle, onDelete }) {
             style={{ width: "5em" }}
           />
         </td>
+        <td>
+          <select form={`cat-edit-${c.id}`} name="writeRole" defaultValue={c.write_role} aria-label="글쓰기 권한">
+            <option value="member">회원+운영자</option>
+            <option value="admin">운영자만</option>
+          </select>
+        </td>
+        <td>
+          <select form={`cat-edit-${c.id}`} name="layout" defaultValue={c.layout} aria-label="목록 형식">
+            <option value="list">목록</option>
+            <option value="card">카드</option>
+          </select>
+        </td>
+        <td style={{ textAlign: "center" }}>
+          <input
+            form={`cat-edit-${c.id}`}
+            type="checkbox"
+            name="showInBoard"
+            defaultChecked={c.show_in_board}
+            aria-label="게시판 탭에 노출"
+          />
+        </td>
         <td>{count}건</td>
         <td>
           <span className={`adm-badge ${c.is_hidden ? "off" : "on"}`}>
@@ -74,7 +95,7 @@ function CategoryRow({ c, count, onUpdate, onToggle, onDelete }) {
       </tr>
       {(upState?.error || upState?.ok || delState?.error || delState?.ok) && (
         <tr>
-          <td colSpan={6}>
+          <td colSpan={9}>
             <Msg state={upState} />
             <Msg state={delState} />
           </td>
@@ -104,6 +125,24 @@ export default function CategoryManager({ categories, counts, onCreate, onUpdate
             <span>정렬 순서</span>
             <input name="sortOrder" type="number" defaultValue={0} min={0} max={999} />
           </label>
+          <label className="adm-field">
+            <span>글쓰기 권한</span>
+            <select name="writeRole" defaultValue="member">
+              <option value="member">회원+운영자</option>
+              <option value="admin">운영자만</option>
+            </select>
+          </label>
+          <label className="adm-field">
+            <span>목록 형식</span>
+            <select name="layout" defaultValue="list">
+              <option value="list">목록 (표)</option>
+              <option value="card">카드 (갤러리식, 첫 이미지가 썸네일)</option>
+            </select>
+          </label>
+          <label className="adm-check-row">
+            <input type="checkbox" name="showInBoard" defaultChecked />
+            <span>게시판(/board) 탭에 노출</span>
+          </label>
         </div>
         <div className="adm-form-actions">
           <Submit className="btn btn-primary" pendingLabel="추가 중…">게시판 추가</Submit>
@@ -120,6 +159,9 @@ export default function CategoryManager({ categories, counts, onCreate, onUpdate
                 <th>이름</th>
                 <th>주소값</th>
                 <th>순서</th>
+                <th>글쓰기</th>
+                <th>형식</th>
+                <th>탭</th>
                 <th>글</th>
                 <th>상태</th>
                 <th className="adm-th-actions">관리</th>

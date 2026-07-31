@@ -2,26 +2,25 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
 import { SITE } from "@/content/site";
+import CategoryBoard from "@/components/CategoryBoard";
 
-// 화면 구성은 별도로 진행 예정. 지금은 대메뉴에서 눌렀을 때 404 가 나지 않도록
-// 사이트 프레임과 제목만 세워 둔다.
+// 글·글쓰기·상세는 게시판(posts)과 같은 것을 쓴다. 이 화면은 board_categories 의
+// 'teaching' 만 걸러 보여 준다. 목록 생김새와 글쓰기 권한은 그 카테고리 설정을 따르며,
+// 관리자 화면(/admin/board/categories)에서 바꿀 수 있다.
+export const dynamic = "force-dynamic";
 export const metadata = { title: `법문-살며 생각하며 | ${SITE.name}` };
 
-export default function TeachingPage() {
+export default function TeachingPage({ searchParams }) {
   return (
     <>
       <DancheongDefs />
       <SiteHeader />
-      <section className="screen">
-        <div className="wrap">
-          <div className="sec-head">
-            <div><div className="ki">Teaching</div><h2>법문-살며 생각하며</h2></div>
-          </div>
-          <div className="about-greeting">
-            <p className="draft-badge">※ 준비 중입니다 — 화면 구성은 별도로 진행합니다.</p>
-          </div>
-        </div>
-      </section>
+      <CategoryBoard
+        slug="teaching"
+        kicker="Teaching"
+        basePath="/about/teaching"
+        page={searchParams?.page}
+      />
       <SiteFooter />
     </>
   );

@@ -4,7 +4,7 @@ import SiteFooter from "@/components/SiteFooter";
 import Reveal from "@/components/Reveal";
 import { DancheongDefs } from "@/components/Icons";
 import { listPosts } from "@/lib/posts";
-import { listVisibleCategories, getLabelMap } from "@/lib/board-categories";
+import { listBoardTabCategories, getLabelMap } from "@/lib/board-categories";
 import { getMemberSession } from "@/lib/member-session";
 import { getSession } from "@/lib/session";
 import { SITE } from "@/content/site";
@@ -27,7 +27,7 @@ export default async function BoardPage({ searchParams }) {
   let categories = [];
   let labelMap = {};
   try {
-    [categories, labelMap] = await Promise.all([listVisibleCategories(), getLabelMap()]);
+    [categories, labelMap] = await Promise.all([listBoardTabCategories(), getLabelMap()]);
   } catch (err) {
     console.error("게시판 카테고리 조회 실패:", err);
   }
@@ -39,6 +39,12 @@ export default async function BoardPage({ searchParams }) {
   let posts = [];
   try {
     posts = await listPosts(board ? { board } : {});
+    // '전체' 탭은 이 화면의 탭에 있는 게시판만 모은다. 소개 메뉴에 자기 주소가
+    // 따로 있는 게시판(법문·휴심선원)의 글이 여기 섞이면 안 된다.
+    if (!board) {
+      const shown = new Set(categories.map((c) => c.slug));
+      posts = posts.filter((p) => shown.has(p.board));
+    }
   } catch (err) {
     console.error("게시판 조회 실패:", err);
   }

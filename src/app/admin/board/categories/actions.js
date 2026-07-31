@@ -24,21 +24,39 @@ const createSchema = z.object({
   slug: slugRule,
   label: z.string().trim().min(1, "이름을 입력하세요.").max(30),
   sortOrder: z.coerce.number().int().min(0).max(999),
+  // member = 승인 회원과 운영자 / admin = 운영자만
+  writeRole: z.enum(["member", "admin"]),
+  // list = 표 목록 / card = 갤러리식 카드(첫 이미지가 썸네일)
+  layout: z.enum(["list", "card"]),
+  // /board 탭에 낄지. 소개 메뉴에 자기 주소가 따로 있는 게시판은 끈다.
+  showInBoard: z.coerce.boolean(),
 });
+
+// 체크박스는 꺼져 있으면 formData 에 아예 없다. 그래서 "on" 유무로 읽는다.
+function readForm(formData) {
+  return {
+    slug: formData.get("slug") ?? "",
+    label: formData.get("label") ?? "",
+    sortOrder: formData.get("sortOrder") || 0,
+    writeRole: formData.get("writeRole") === "admin" ? "admin" : "member",
+    layout: formData.get("layout") === "card" ? "card" : "list",
+    showInBoard: formData.get("showInBoard") === "on",
+  };
+}
 
 function revalidate() {
   revalidatePath("/admin/board/categories");
   revalidatePath("/board");
   revalidatePath("/board/write");
+  // 소개 메뉴에 딸린 게시판들도 카테고리 설정을 그대로 읽는다.
+  revalidatePath("/about/teaching");
+  revalidatePath("/about/hyusim-tapjeon");
+  revalidatePath("/about/hyusim-jirisan");
 }
 
 export async function createCategoryAction(prevState, formData) {
   await requireSession();
-  const parsed = createSchema.safeParse({
-    slug: formData.get("slug") ?? "",
-    label: formData.get("label") ?? "",
-    sortOrder: formData.get("sortOrder") || 0,
-  });
+  const parsed = createSchema.safeParse(readForm(formData));
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "입력값을 확인하세요." };
 
   if (await getCategoryBySlug(parsed.data.slug)) {
@@ -59,11 +77,7 @@ export async function updateCategoryAction(prevState, formData) {
   const id = Number(formData.get("id"));
   if (!Number.isInteger(id) || id <= 0) return { error: "잘못된 요청입니다." };
 
-  const parsed = createSchema.safeParse({
-    slug: formData.get("slug") ?? "",
-    label: formData.get("label") ?? "",
-    sortOrder: formData.get("sortOrder") || 0,
-  });
+  const parsed = createSchema.safeParse(readForm(formData));
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "입력값을 확인하세요." };
 
   const dup = await getCategoryBySlug(parsed.data.slug);

@@ -137,10 +137,25 @@ CREATE TABLE IF NOT EXISTS board_categories (
   is_hidden  BOOLEAN NOT NULL DEFAULT false,    -- 숨김: 탭·글쓰기 선택지에서 제외
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+-- 게시판마다 누가 쓰는지 · 어떻게 보이는지 · /board 탭에 낄지가 다르다.
+--   write_role    member = 승인 회원과 운영자 / admin = 운영자만
+--   layout        list = 표 목록 / card = 갤러리식 카드(첫 이미지가 썸네일)
+--   show_in_board /board 탭에 낄지. 소개 메뉴에 자기 주소가 따로 있는 것은 false.
+ALTER TABLE board_categories ADD COLUMN IF NOT EXISTS write_role    TEXT    NOT NULL DEFAULT 'member';
+ALTER TABLE board_categories ADD COLUMN IF NOT EXISTS layout        TEXT    NOT NULL DEFAULT 'list';
+ALTER TABLE board_categories ADD COLUMN IF NOT EXISTS show_in_board BOOLEAN NOT NULL DEFAULT true;
+
 -- 이전에 코드에 하드코딩돼 있던 두 개를 옮겨 심는다.
 INSERT INTO board_categories (slug, label, sort_order) VALUES
   ('free', '자유게시판', 1),
   ('story', '신행수기', 2)
+ON CONFLICT (slug) DO NOTHING;
+
+-- 소개 메뉴에 딸린 세 게시판. 자기 주소(/about/*)가 따로 있어 /board 탭에는 넣지 않는다.
+INSERT INTO board_categories (slug, label, sort_order, write_role, layout, show_in_board) VALUES
+  ('teaching',        '법문-살며 생각하며',   10, 'admin', 'list', false),
+  ('hyusim-tapjeon',  '휴심선원(탑전)',       11, 'admin', 'card', false),
+  ('hyusim-jirisan',  '휴심선원(지리산 휴심)', 12, 'admin', 'card', false)
 ON CONFLICT (slug) DO NOTHING;
 
 -- 게시판 글
@@ -156,6 +171,19 @@ CREATE TABLE IF NOT EXISTS posts (
   updated_at       TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_posts_board ON posts (board, created_at DESC);
+
+-- 글에 딸린 이미지. 본문 HTML 에도 <img src="/uploads/…"> 로 들어가지만,
+-- 관계를 DB 가 알아야 글을 지울 때 어떤 파일을 지울지 알 수 있고(고아 파일 방지)
+-- 카드 목록의 썸네일도 본문 파싱 없이 뽑을 수 있다.
+CREATE TABLE IF NOT EXISTS post_images (
+  id         BIGSERIAL PRIMARY KEY,
+  post_id    BIGINT NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+  url        TEXT NOT NULL,
+  sort_order INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_post_images_post ON post_images (post_id, sort_order);
+
 
 -- 묻고답하기(Q&A) — 비회원도 휴대폰 인증 후 작성, 비밀글, 관리자 답변
 CREATE TABLE IF NOT EXISTS questions (

@@ -13,7 +13,7 @@ function SubmitButton() {
   );
 }
 
-export default function BoardWriteForm({ action, defaultBoard, categories = [], authorName }) {
+export default function BoardWriteForm({ action, uploadAction, defaultBoard, categories = [], authorName }) {
   const [state, formAction] = useFormState(action, {});
   return (
     // auth-full: 이 폼만 화면 폭을 다 쓴다(.auth-card 기본 460px, .auth-wide 560px).
@@ -43,7 +43,7 @@ export default function BoardWriteForm({ action, defaultBoard, categories = [], 
 
       <div className="auth-field">
         <span>본문</span>
-        <RichEditor name="body" />
+        <RichEditor name="body" uploadAction={uploadAction} />
       </div>
 
       <div className="auth-actions">
