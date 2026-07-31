@@ -37,12 +37,16 @@ export async function memberLoginAction(prevState, formData) {
   // 계정 유무와 무관하게 항상 compare 를 태워 타이밍으로 존재가 새지 않게 한다.
   const ok = await bcrypt.compare(parsed.data.password, m?.password_hash ?? DUMMY_HASH);
 
-  // 관리자가 초기화한 계정은 기존 해시가 난수로 덮여 있어 어떤 비밀번호도 맞지 않는다.
-  // 여기서 걸러주지 않으면 "비밀번호가 틀렸다"만 반복되어 회원이 길을 못 찾는다.
-  if (m?.must_reset_password) {
-    return { needsReset: true, loginId: m.login_id };
-  }
-
+  // 관리자가 초기화한 계정(must_reset_password)도 여기서 GENERIC 으로 떨어진다.
+  // 초기화 시 해시를 난수로 덮으므로(admin/members/actions.js) ok 가 항상 false 다.
+  //
+  // 예전에는 이 위에서 { needsReset, loginId } 를 돌려줘 재설정 화면으로 안내했다.
+  // 그런데 그 분기가 비밀번호 검사보다 앞이라, 아이디만 찍어 넣으면 비밀번호 없이도
+  // "그 계정은 있고, 초기화 대기 중" 이라는 사실이 그대로 나왔다. 타이밍까지 균일화해
+  // 계정 존재를 감춰 놓고 응답으로 흘리고 있었던 셈이다.
+  //
+  // 안내는 없애지 않고 화면 쪽으로 옮겼다 — LoginForm 이 '실패 전체' 에 대해
+  // 재설정 경로를 함께 보여 준다. 계정 상태와 무관하게 늘 같은 문구라 새지 않는다.
   if (!m || !ok) return { error: GENERIC };
 
   if (m.status !== "approved") {

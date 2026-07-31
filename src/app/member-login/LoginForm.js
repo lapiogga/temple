@@ -16,18 +16,19 @@ export default function LoginForm({ action }) {
   const [state, formAction] = useFormState(action, {});
   return (
     <form action={formAction} className="auth-card">
-      {state?.error ? <p className="adm-form-err" role="alert">{state.error}</p> : null}
-      {state?.needsReset ? (
+      {/* 안내를 '실패 전체' 에 붙인다. 예전에는 초기화 대기 계정일 때만 따로 띄웠는데,
+          그러면 비밀번호를 몰라도 그 계정의 존재와 상태를 알아낼 수 있었다.
+          문구가 늘 같으면 아무것도 새지 않으면서, 종무소가 초기화해 준 회원도
+          여기서 갈 곳을 찾는다. */}
+      {state?.error ? (
         <div className="adm-form-err" role="alert">
+          <p style={{ marginBottom: "var(--sp-m)" }}>{state.error}</p>
           <p style={{ marginBottom: "var(--sp-m)" }}>
-            종무소에서 이 계정의 비밀번호를 초기화했습니다. 가입할 때 적으신 휴대폰 번호와
-            생년월일을 확인한 뒤 새 비밀번호를 정해 주세요.
+            종무소에서 비밀번호를 초기화해 드린 경우에도 같은 문구가 나옵니다. 그때는
+            가입할 때 적으신 휴대폰 번호와 생년월일로 새 비밀번호를 정하실 수 있습니다.
           </p>
-          {/* 문장 속 링크는 눈에 띄지 않아 버튼으로 둔다 — 여기서 갈 곳은 이 하나뿐이다. */}
-          <Link
-            className="btn btn-primary"
-            href={`/member-login/reset?loginId=${encodeURIComponent(state.loginId)}`}
-          >
+          {/* 문장 속 링크는 눈에 띄지 않아 버튼으로 둔다. */}
+          <Link className="btn btn-primary" href="/member-login/reset">
             새 비밀번호 설정하기 →
           </Link>
         </div>
