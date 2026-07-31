@@ -62,7 +62,14 @@ export async function createMember(d) {
     `INSERT INTO members
        (login_id, password_hash, name, nickname, birth_date, gender, phone,
         phone_verified, status, agreed_terms, agreed_privacy, agreed_at)
-     VALUES ($1,$2,$3,$4,$5,$6,$7, true, 'pending', true, true, now())
+     -- phone_verified 는 false 로 넣는다.
+     -- 가입 폼의 '휴대폰 본인인증' 은 아직 실물이 아니다 — JoinForm 이 브라우저에서
+     -- 6자리 난수를 만들어 화면에 띄우고 브라우저에서 대조한 뒤 phoneVerified=true 를
+     -- 숨은 필드로 보내고, 서버는 그 값을 그대로 믿는다(join/actions.js). 즉 누구나
+     -- 통과한다. 그런데도 true 를 넣고 있어서 DB 가 "이 회원은 본인인증을 마쳤다" 고
+     -- 거짓을 기록하고 있었다. 인증 방식이 정해지기 전까지는 사실대로 false 다.
+     -- (이 컬럼을 읽는 코드는 아직 없다 — grep 으로 확인. 그래서 지금 바꿔도 안전하다.)
+     VALUES ($1,$2,$3,$4,$5,$6,$7, false, 'pending', true, true, now())
      RETURNING id`,
     [loginId, passwordHash, name, nickname, birthDate, gender, phone]
   );

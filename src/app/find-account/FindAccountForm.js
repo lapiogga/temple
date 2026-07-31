@@ -1,96 +1,42 @@
-"use client";
-
 import Link from "next/link";
-import { useState } from "react";
 
-const PHONE_RE = /^01[0-9]-?\d{3,4}-?\d{4}$/;
-
-export default function FindAccountForm({ initialTab }) {
-  const [tab, setTab] = useState(initialTab === "pw" ? "pw" : "id");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [codeSent, setCodeSent] = useState(false);
-  const [sentCode, setSentCode] = useState("");
-  const [codeInput, setCodeInput] = useState("");
-  const [verified, setVerified] = useState(false);
-
-  const reset = () => {
-    setCodeSent(false);
-    setSentCode("");
-    setCodeInput("");
-    setVerified(false);
-  };
-  const switchTab = (t) => { setTab(t); reset(); };
-
-  const sendCode = () => {
-    if (!name.trim()) { alert("성명을 입력하세요."); return; }
-    if (!PHONE_RE.test(phone)) { alert("휴대폰 번호를 정확히 입력하세요."); return; }
-    const code = String(Math.floor(100000 + Math.random() * 900000));
-    setSentCode(code); setCodeSent(true); setVerified(false); setCodeInput("");
-  };
-  const verify = () => {
-    if (sentCode && codeInput.trim() === sentCode) setVerified(true);
-    else alert("인증번호가 일치하지 않습니다.");
-  };
-
+// 아이디·비밀번호를 잊으셨을 때의 안내.
+//
+// 예전에는 여기에 '휴대폰 본인인증' 절차가 있었다. 그런데 그것이 실물이 아니었다 —
+// 6자리 인증번호를 브라우저에서 난수로 만들어 화면에 그대로 띄우고(데모 인증번호: …),
+// 브라우저에서 대조해 '✓ 본인인증 완료' 를 찍었다. 누구나 통과할 수 있었고, 통과해도
+// "문자 발송이 연동되지 않았습니다" 라는 안내만 나와 실제로 아무 일도 일어나지 않았다.
+//
+// 아무 일도 안 하는 절차라면 없느니만 못하다. 본인인증을 흉내 내는 화면은 이용자에게
+// 이 사이트의 본인확인이 그렇게 동작한다고 가르치고, 실제로는 아무것도 지키지 않는다.
+// 문자 발송(§4-2 사용자 결정 대기)이 붙기 전까지는 지금 실제로 되는 길만 안내한다.
+export default function FindAccountForm() {
   return (
     <div className="auth-card">
-      <div className="find-tabs">
-        <button type="button" className={`find-tab${tab === "id" ? " on" : ""}`} onClick={() => switchTab("id")}>
-          아이디 찾기
-        </button>
-        <button type="button" className={`find-tab${tab === "pw" ? " on" : ""}`} onClick={() => switchTab("pw")}>
-          비밀번호 찾기
-        </button>
-      </div>
-
+      <h2 className="find-heading">아이디를 잊으셨나요</h2>
       <p className="find-desc">
-        {tab === "id"
-          ? "가입 시 등록한 성명과 휴대폰으로 본인인증하면 아이디를 안내해 드립니다."
-          : "가입 시 등록한 성명과 휴대폰으로 본인인증하면 비밀번호 재설정을 안내해 드립니다."}
+        종무소로 문의해 주시면 가입하실 때 적으신 성명과 휴대폰 번호를 확인한 뒤
+        아이디를 알려 드립니다.
       </p>
 
-      {!verified ? (
-        <>
-          <label className="auth-field">
-            <span>성명</span>
-            <input value={name} onChange={(e) => setName(e.target.value)} maxLength={50} placeholder="가입 시 등록한 성명" />
-          </label>
-          <div className="auth-field">
-            <span>휴대폰 본인인증</span>
-            <div className="phone-row">
-              <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="010-1234-5678" maxLength={13} />
-              <button type="button" className="btn btn-ghost btn-sm" onClick={sendCode}>인증번호 발송</button>
-            </div>
-            {codeSent && (
-              <>
-                <div className="phone-row" style={{ marginTop: "8px" }}>
-                  <input value={codeInput} onChange={(e) => setCodeInput(e.target.value)} placeholder="인증번호 6자리" maxLength={6} inputMode="numeric" />
-                  <button type="button" className="btn btn-ghost btn-sm" onClick={verify}>확인</button>
-                </div>
-                <p className="demo-note">데모 인증번호: <b>{sentCode}</b> (실서비스에서는 문자로 발송됩니다)</p>
-              </>
-            )}
-          </div>
-        </>
-      ) : (
-        <div className="find-result">
-          <p className="verified-note">✓ 본인인증 완료</p>
-          {tab === "id" ? (
-            <p className="demo-note">
-              회원님의 <b>아이디</b>는 등록된 휴대폰(문자)으로 안내됩니다.<br />
-              리뷰 초안 단계에서는 문자 발송이 연동되지 않았습니다.
-            </p>
-          ) : (
-            <p className="demo-note">
-              <b>비밀번호 재설정</b> 링크가 등록된 휴대폰(문자)으로 발송됩니다.<br />
-              리뷰 초안 단계에서는 문자 발송이 연동되지 않았습니다.
-            </p>
-          )}
-        </div>
-      )}
+      <h2 className="find-heading">비밀번호를 잊으셨나요</h2>
+      <p className="find-desc">
+        종무소에 비밀번호 초기화를 요청해 주세요. 종무소가 초기화하면 아래 화면에서
+        가입하실 때 적으신 <b>휴대폰 번호와 생년월일</b>을 확인한 뒤 새 비밀번호를
+        직접 정하실 수 있습니다. 종무소도 회원님의 비밀번호를 알 수 없습니다.
+      </p>
+      <div className="auth-actions">
+        <Link href="/member-login/reset" className="btn btn-primary">
+          새 비밀번호 설정하기 →
+        </Link>
+      </div>
 
-      <div className="auth-actions" style={{ marginTop: "18px" }}>
+      <p className="find-note">
+        가입하실 때 적으신 휴대폰 번호나 생년월일이 지금과 다르면 위 확인을 통과하지
+        못합니다. 그때도 종무소로 알려 주시면 확인 후 바로잡아 드립니다.
+      </p>
+
+      <div className="auth-actions">
         <Link href="/member-login" className="btn btn-ghost">로그인으로</Link>
       </div>
     </div>

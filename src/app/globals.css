@@ -751,6 +751,9 @@ footer.site{position:fixed;left:0;right:0;bottom:0;z-index:40;
 .find-tab{flex:1;padding:var(--sp-m);border:var(--st-thin) solid var(--n-stroke-2);background:var(--n-bg-2);border-radius:var(--r-ctl);font-size:var(--fs-400);font-weight:var(--fw-bold);color:var(--n-fg-3);cursor:pointer;transition:var(--t-state);}
 .find-tab.on{background:var(--brand);color:var(--n-fg-on-brand);border-color:var(--brand);}
 .find-desc{font-size:var(--fs-300);color:var(--n-fg-3);line-height:var(--lh-ko-300);margin-bottom:var(--sp-l);}
+.find-heading{font-family:var(--font-title);font-size:var(--fs-400);line-height:var(--lh-400);font-weight:var(--fw-bold);margin-bottom:var(--sp-xs);}
+.find-heading + .find-desc{margin-bottom:var(--sp-m);}
+.find-note{font-size:var(--fs-300);line-height:var(--lh-ko-300);color:var(--n-fg-3);background:var(--n-bg-2);border-radius:var(--r-md);padding:var(--sp-m);margin-top:var(--sp-l);}
 .find-result{background:var(--n-bg-2);border:var(--st-thin) solid var(--n-stroke-2);border-radius:var(--r-drop);padding:var(--sp-xl) var(--sp-xl);}
 .sns-row{display:flex;gap:var(--sp-mnudge);margin:var(--sp-snudge) 0 var(--sp-l);flex-wrap:wrap;}
 .sns-btn{flex:1;min-width:160px;padding:var(--sp-s);border-radius:var(--r-ctl);border:0;font-size:var(--fs-300);font-weight:var(--fw-bold);cursor:not-allowed;opacity:.7;}
