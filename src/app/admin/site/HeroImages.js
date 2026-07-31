@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 
 const MAX = 10;
+// 서버(lib/upload.js 의 ALLOWED · MAX_BYTES)와 같은 값이어야 한다.
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const MAX_BYTES = 8 * 1024 * 1024;
 
 // 히어로 배경 이미지 관리.
 //
@@ -25,14 +28,29 @@ export default function HeroImages({ initial = [] }) {
   const total = kept.length + picked.length;
 
   const addFiles = (fileList) => {
-    const files = Array.from(fileList || []).filter((f) => f.type.startsWith("image/"));
-    if (files.length === 0) return;
+    // 안내문에 적은 것(jpg·png·webp·gif / 8MB)을 여기서도 실제로 막는다.
+    // image/* 로만 거르면 bmp·svg·avif 가 통과해 서버(lib/upload.js ALLOWED)에서
+    // 터지는데, 그때는 이미 폼을 제출한 뒤라 되돌리는 비용이 크다.
+    // 끌어다 놓기는 accept 속성을 아예 거치지 않으므로 이 검사가 유일한 방어선이다.
+    const all = Array.from(fileList || []);
+    const files = all.filter((f) => ALLOWED_TYPES.includes(f.type) && f.size <= MAX_BYTES);
+    const rejected = all.length - files.length;
+    if (files.length === 0) {
+      setNotice(rejected ? "jpg · png · webp · gif 형식의 8MB 이하 파일만 올릴 수 있습니다." : "");
+      return;
+    }
     const room = MAX - total;
     if (room <= 0) {
       setNotice(`배경 이미지는 최대 ${MAX}장까지 등록할 수 있습니다.`);
       return;
     }
-    setNotice(files.length > room ? `${MAX}장까지만 담았습니다.` : "");
+    setNotice(
+      rejected
+        ? `${rejected}개는 형식·용량이 맞지 않아 제외했습니다. (jpg · png · webp · gif / 8MB 이하)`
+        : files.length > room
+          ? `${MAX}장까지만 담았습니다.`
+          : ""
+    );
     setPicked((prev) => [
       ...prev,
       ...files.slice(0, room).map((f) => ({ file: f, url: URL.createObjectURL(f) })),

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireSession } from "@/lib/session";
 import { setSection } from "@/lib/site-content";
-import { saveImage } from "@/lib/upload";
+import { saveImage, deleteUpload } from "@/lib/upload";
 
 // 화면 쪽 제한(SectionForm 의 maxLength, HeroImages 의 MAX)과 같은 값.
 // 브라우저 제한은 우회할 수 있으므로 서버에서도 자른다.
@@ -25,15 +25,35 @@ export async function saveSectionAction(key, prevState, formData) {
       // 남길 기존 이미지(순서대로) + 이번에 새로 올린 파일.
       // 목록과 문구를 한 번의 저장으로 묶는다 — 업로드를 따로 실행하면 중간에
       // 폼을 벗어났을 때 이미지와 문구가 서로 다른 시점의 상태로 남는다.
-      const kept = formData.getAll("images").map(str).filter((u) => u.startsWith("/uploads/") || u.startsWith("/"));
+      // `u.startsWith("/uploads/") || u.startsWith("/")` 는 뒤쪽이 앞쪽을 삼켜
+      // 사실상 "/로 시작하면 통과" 였다. 그러면 "//evil.com/x.png"(프로토콜 상대 URL)
+      // 나 "/../.." 가 그대로 저장돼 히어로 배경으로 렌더된다. 업로드 경로 모양만 받는다.
+      const kept = formData.getAll("images").map(str).filter((u) => /^\/uploads\/[A-Za-z0-9._-]+$/.test(u));
       const files = formData
         .getAll("newImages")
         .filter((f) => f && typeof f.arrayBuffer === "function" && f.size > 0);
       if (kept.length + files.length > HERO_MAX_IMAGES) {
         return { error: `배경 이미지는 최대 ${HERO_MAX_IMAGES}장까지 등록할 수 있습니다.` };
       }
+      // 업로드가 통째로 실패하면 안 되는 이유가 두 가지다.
+      //  · 이미지·문구가 한 폼이라, 파일 한 장 때문에 예외가 나면 setSection 에
+      //    도달하지 못해 같은 제출의 문구 수정까지 함께 사라진다.
+      //  · 실패 앞에서 이미 디스크에 쓴 파일은 아무도 참조하지 않는 고아로 남는다.
+      // 그래서 파일마다 받아 사유를 모으고, 하나라도 실패하면 그때까지 쓴 것을 지운다.
+      // 갤러리 일괄 업로드(admin/gallery/actions.js)가 이미 같은 방식이다.
       const added = [];
-      for (const f of files) added.push(await saveImage(f));
+      const failed = [];
+      for (const f of files) {
+        try {
+          added.push(await saveImage(f));
+        } catch (err) {
+          failed.push(`${f.name || "이름없음"}: ${err?.message ?? "실패"}`);
+        }
+      }
+      if (failed.length) {
+        await Promise.all(added.map((u) => deleteUpload(u).catch(() => {})));
+        return { error: `이미지를 저장하지 못했습니다. ${failed.join(" / ")}` };
+      }
       value = {
         eyebrow: str(formData.get("eyebrow")).slice(0, HERO_EYEBROW_MAX),
         title: str(formData.get("title")).slice(0, 80),

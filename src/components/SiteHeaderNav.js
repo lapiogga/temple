@@ -6,21 +6,20 @@ import { SITE } from "@/content/site";
 import { memberLogout } from "@/app/auth-actions";
 
 // 대메뉴(그룹) + 하위 항목. 스크롤해도 상단 고정.
+//
+// '응선사 소개' 의 게시판 항목(법문·휴심선원)은 여기 적지 않는다. 이름과 순서가
+// DB(board_categories, group_key='intro')에 있고 관리자가 /admin/intro 에서 고친다.
+// SiteHeader(서버)가 읽어 introItems 로 넘겨준다 — 아래 buildMenu 참고.
+const ABOUT_FIXED = [
+  { href: "/about/greeting", label: "주지스님 인삿말" },
+  { href: "/about/history", label: "연혁" },
+  { href: "/about/sansindo", label: "산신도" },
+  { href: "/about/guide", label: "안내도" },
+];
+// 길 안내는 소개 성격이 아니라 실무 정보라 소메뉴 맨 아래에 둔다
+const ABOUT_TAIL = [{ href: "/visit", label: "오시는 길" }];
+
 const MENU = [
-  {
-    label: "응선사 소개",
-    items: [
-      { href: "/about/greeting", label: "주지스님 인삿말" },
-      { href: "/about/history", label: "연혁" },
-      { href: "/about/sansindo", label: "산신도" },
-      { href: "/about/guide", label: "안내도" },
-      { href: "/about/teaching", label: "법문-살며 생각하며" },
-      { href: "/about/pagoda", label: "휴심선원(탑전)" },
-      { href: "/about/hyusim-jirisan", label: "휴심선원(지리산 휴심)" },
-      // 길 안내는 소개 성격이 아니라 실무 정보라 소메뉴 맨 아래에 둔다
-      { href: "/visit", label: "오시는 길" },
-    ],
-  },
   {
     label: "안내/정보",
     items: [
@@ -38,7 +37,18 @@ const MENU = [
   },
 ];
 
-export default function SiteHeaderNav({ auth: initialAuth }) {
+// DB 에서 온 소개 게시판 항목을 '응선사 소개' 안에 끼워 넣는다.
+// 조회가 실패하면 introItems 가 비고, 고정 항목만으로 메뉴가 선다(끊기지 않는다).
+function buildMenu(introItems) {
+  return [
+    { label: "응선사 소개", items: [...ABOUT_FIXED, ...introItems, ...ABOUT_TAIL] },
+    ...MENU,
+  ];
+}
+
+export default function SiteHeaderNav({ auth: initialAuth, introItems = [] }) {
+  const menu = buildMenu(introItems);
+
   // 서버가 준 값은 첫 페인트용 초기값으로만 쓴다.
   //
   // Next 의 Router Cache 때문에 <Link> 이동은 30초, 브라우저 뒤로가기는 만료
@@ -138,7 +148,7 @@ export default function SiteHeaderNav({ auth: initialAuth }) {
             <span />
           </button>
           <nav className={`gnb${menuOpen ? " open" : ""}`} aria-label="주 메뉴">
-            {MENU.map((g, i) => (
+            {menu.map((g, i) => (
               <div
                 key={g.label}
                 className={`gnb-group${openGroup === i ? " open" : ""}`}
