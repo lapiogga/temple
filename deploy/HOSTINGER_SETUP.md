@@ -1,5 +1,19 @@
 # 응선사 홈페이지 — Hostinger VPS 배포 가이드
 
+> # ⚠ §1·§2 는 **최초 1회용**이다. 다시 실행하지 말 것
+>
+> `bootstrap-hostinger.sh` 는 처음 서버를 세울 때 쓰는 것이다. 이미 돌아가고 있는
+> 서버에서 다시 실행하면 아래가 일어난다.
+>
+> - **DB 비밀번호와 `SESSION_SECRET` 을 새로 만들어 `.env` 를 덮어쓴다.**
+>   시크릿이 바뀌면 로그인 세션이 전부 무효가 되고, DB 비밀번호가 바뀌면 앱이 DB 에
+>   붙지 못한다.
+> - `:140` 의 `ufw allow 22/tcp` 가 **2026-07-29 에 좁혀 둔 SSH 잠금을 원래대로 되돌린다.**
+> - systemd 유닛을 인라인으로 다시 만든다.
+>
+> **재배포는 §"재배포(코드 수정 후)" 를 보라.** 서버를 처음부터 다시 세우는 것이 아니라면
+> §1·§2 로 돌아갈 일은 없다.
+
 > 결정(2026-07-28): kis_quant와 완전 분리된 독립 운영환경을 **Hostinger VPS**에 구축.
 > 스택은 현재 devbox와 동일(로컬 PostgreSQL + 로컬 디스크 이미지) → **S3 리팩터 불필요**, 기존 `deploy/` 자산 재사용.
 
@@ -50,7 +64,7 @@ sudo ./deploy/bootstrap-hostinger.sh
 
 ### 배포 직후 운영자 계정 시드
 ```bash
-sudo -u ubuntu bash -lc "cd /home/ubuntu/projects/temple && npm run db:seed -- 아이디 비밀번호 표시이름"
+sudo -u ubuntu bash -lc "cd /var/www/temple && npm run db:seed -- 아이디 비밀번호 표시이름"
 ```
 
 ### 검증
@@ -62,8 +76,24 @@ systemctl status temple                 # active (running)
 
 ---
 
-## 3. hPanel 방화벽
-Hostinger hPanel의 VPS 방화벽에서도 **80/443/22 인바운드 허용**을 확인하세요(스크립트는 서버 내부 ufw만 엽니다).
+## 3. 접속 경로와 방화벽 (2026-07-29 잠금 이후 현행)
+
+**이 절은 최초 구축 시점 기준이 아니다.** 2026-07-29 에 SSH 를 좁혔고, 그 뒤로 상시
+접속 경로는 Tailscale 하나다. 이것이 어느 운영 문서에도 없어 2026-07-31 에 추가한다.
+
+| 경로 | 상태 |
+|---|---|
+| **Tailscale** `temple-vps` (100.118.164.100) | **상시 접속 경로. Tailscale SSH 활성이라 비밀번호가 필요 없다** |
+| 공인 IP 22/tcp | 구 devbox IP 한정으로 좁혀져 있다. 아무 데서나 들어올 수 없다 |
+| 80 · 443 | 열려 있다(웹) |
+| 3000 · 3001 | **ufw 규칙 없음 + 기본 deny(in)** → 인터넷에서 닿지 않는다.
+  다만 앱이 `0.0.0.0` 에 바인딩돼 있어 ufw 가 유일한 방어선이다(로드맵 §3-A 3) |
+
+`bootstrap-hostinger.sh:140` 의 `ufw allow 22/tcp` 는 **이 잠금을 되돌린다.**
+위 재실행 금지 배너를 다시 볼 것.
+
+Hostinger hPanel 의 VPS 방화벽에서도 80/443 인바운드 허용을 확인한다
+(스크립트는 서버 내부 ufw 만 연다).
 
 ---
 
@@ -74,7 +104,7 @@ Hostinger hPanel의 VPS 방화벽에서도 **80/443/22 인바운드 허용**을 
 sudo certbot --nginx -d 도메인 -d www.도메인      # Let's Encrypt 무료·자동갱신
 # 3) NEXT_PUBLIC_SITE_URL 은 빌드타임 baked → 재빌드 필수
 #    .env: NEXT_PUBLIC_SITE_URL=https://도메인
-sudo -u ubuntu bash -lc "cd /home/ubuntu/projects/temple && npm run build"
+sudo -u ubuntu bash -lc "cd /var/www/temple && npm run build"
 sudo systemctl restart temple
 # 4) 카카오 개발자콘솔에 도메인 등록(지도 자동 전환)
 ```
@@ -98,7 +128,11 @@ PATH=/usr/local/bin:/usr/bin:/bin
 | `backup-uploads.sh` | `public/uploads` | 매월 1일 전체 + 매일 증분(tar `--listed-incremental`) | 현재 주기 + 직전 주기 |
 
 산출물: `/home/ubuntu/backups/` (DB), `/home/ubuntu/backups/uploads/{current,prev}/` (이미지), 로그 `backup.log`.
-두 스크립트 모두 **자기가 놓인 체크아웃의 `.env` 를 읽으므로** prod/dev 양쪽에서 그대로 동작한다.
+**정정(2026-07-31): 위 문장은 사실이 아니다.**
+`backup-db.sh` 는 자기 체크아웃의 `.env` 를 읽지만, `backup-uploads.sh` 는 `.env` 를 읽지
+않고 `BACKUP_ROOT` 가 prod/dev 공용이다. 그래서 **dev 에서 실행하면 prod 의
+`uploads.snar` 과 `CYCLE` 을 전진시켜 증분 체인에 dev 이미지가 섞인다.**
+백업은 cron(운영 체크아웃)에서만 돌리고 손으로 부르지 말 것.
 
 ### 실패에 대한 설계 (2026-07-28 적대적 감사 반영)
 `backup-uploads.sh` 는 아래 원칙 위에 있다. 셋 다 실패 재현으로 확인된 것이며 **개별로 떼어내 고치면 안 된다**.

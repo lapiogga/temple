@@ -106,3 +106,10 @@ print('미정의:',sorted(u-d) or '없음')"
 - 원격 인증은 VS Code 의 `GIT_ASKPASS` 에 붙어 있다. 세션이 없으면 무인 푸시가 막힐 수 있으므로,
   예약 푸시 전에는 `git push --dry-run` 으로 먼저 확인할 것.
 - 커밋 메시지는 한국어. 무엇을 바꿨는지보다 **왜 그렇게 했는지**와 판단 근거를 적는다.
+- **이 서버에는 같은 저장소의 체크아웃이 둘이다.** 운영(`/var/www/temple`)은 `git pull` 만
+  받는 쪽이고, 작업·커밋·태그·푸시는 전부 개발(`/home/ubuntu/temple-dev`)에서 한다.
+  **운영에서 `git push` 를 치면 "Everything up-to-date" 가 나온다** — 그 저장소 기준으로는
+  정말 올릴 것이 없기 때문이다. 거짓말은 아니지만 성공한 것처럼 읽힌다
+  (2026-07-31 에 태그 `Ver2.1` 이 이렇게 안 올라갔다).
+  푸시한 뒤에는 `git ls-remote --tags origin` 이나 `git log --oneline origin/main -1` 로
+  원격이 실제로 바뀌었는지 확인할 것.

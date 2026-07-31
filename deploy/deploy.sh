@@ -64,14 +64,35 @@ if [ "$BEFORE" = "$AFTER" ]; then
 fi
 
 # ── 의존성 ─────────────────────────────────────────────────────
+#
 # npm ci 는 node_modules 를 통째로 지우고 다시 깐다. 돌아가는 서버 밑에서 매번 할 일이
-# 아니다(dev 는 그 사이 모듈을 못 찾아 깨진다). 잠금 파일이 바뀐 배포에서만 돌린다.
-if [ "$BEFORE" != "$AFTER" ] && \
-   ! git diff --quiet "$BEFORE" "$AFTER" -- package.json package-lock.json; then
-  echo "의존성 변경 감지 → npm ci"
+# 아니라 필요할 때만 돌린다. 그런데 "필요한가" 를 판정하는 방법을 처음에 잘못 골랐다.
+#
+# 예전 판은 '이번 pull 에서 잠금 파일이 바뀌었는가' 만 봤다. 그러면 누가 먼저 pull 해 둔
+# 뒤에 이 스크립트를 돌릴 때 BEFORE == AFTER 가 되어 건너뛴다. 2026-07-31 배포에서 실제로
+# 그랬다 — sharp 가 새로 들어온 배포였는데 npm ci 를 건너뛸 뻔했고 손으로 넣어야 했다.
+#
+# git 이력이 아니라 **지금 깔려 있는 것**을 봐야 한다. npm ls 는 package.json/잠금이
+# 요구하는 트리와 실제 node_modules 가 맞는지 npm 자신의 기준으로 확인한다
+# (격리 사본에서 sharp 하나를 지우고 재 보니 종료코드가 0 → 1 로 바뀌었다).
+#
+# 두 신호를 OR 로 묶는다. 불필요하게 한 번 더 도는 비용은 십여 초지만, 안 돌았을 때는
+# 빌드가 옛 모듈로 돌거나 실패한다. 비대칭이 크므로 도는 쪽으로 기운다.
+NEED_INSTALL=0
+if [ ! -d node_modules ]; then
+  NEED_INSTALL=1; WHY="node_modules 없음"
+elif ! npm ls --silent >/dev/null 2>&1; then
+  NEED_INSTALL=1; WHY="설치된 트리가 잠금과 어긋남(npm ls)"
+elif [ "$BEFORE" != "$AFTER" ] && \
+     ! git diff --quiet "$BEFORE" "$AFTER" -- package.json package-lock.json; then
+  NEED_INSTALL=1; WHY="이번 pull 에 의존성 변경"
+fi
+
+if [ "$NEED_INSTALL" = 1 ]; then
+  echo "의존성 설치 필요($WHY) → npm ci"
   npm ci
 else
-  echo "의존성 변경 없음 → npm ci 건너뜀"
+  echo "의존성 이상 없음 → npm ci 건너뜀"
 fi
 
 # ── 빌드 ───────────────────────────────────────────────────────
