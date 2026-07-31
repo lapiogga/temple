@@ -82,6 +82,32 @@ export default function SiteHeaderNav({ auth: initialAuth }) {
     setOpenGroup(null);
   };
 
+  // 상단바와 모바일 드로어가 같은 항목을 쓴다. 좁은 화면에서는 상단바 쪽이 숨고
+  // 드로어 안의 것만 보인다(globals.css) — 브랜드명과 같은 줄에 두면 줄바꿈이 났다.
+  const actions = (
+    <>
+      <a className="top-link" href="/" onClick={closeAll}>홈</a>
+      {auth?.admin ? (
+        <a className="top-admin" href="/admin" onClick={closeAll}>관리자 화면</a>
+      ) : auth?.member ? (
+        <>
+          <span className="top-who">{auth.memberName}</span>
+          <a className="top-link" href="/mypage" onClick={closeAll}>내 정보</a>
+          {/* 로그아웃은 어느 화면에서든 바로 되게 둔다.
+              예전에는 /mypage 안에만 있어 거기까지 들어가야 했다. */}
+          <form action={memberLogout}>
+            <button type="submit" className="top-admin">로그아웃</button>
+          </form>
+        </>
+      ) : (
+        <>
+          <a className="top-login" href="/member-login" onClick={closeAll}>로그인</a>
+          <a className="top-admin" href="/login" onClick={closeAll}>관리자</a>
+        </>
+      )}
+    </>
+  );
+
   return (
     <header className="nav">
       {/* 최상단: 타이틀 · 홈 · 로그인 */}
@@ -94,27 +120,7 @@ export default function SiteHeaderNav({ auth: initialAuth }) {
           {/* 로그인 상태를 그대로 비춘다. 예전에는 세션과 무관하게 늘 '로그인/관리자'
               였고, 그래서 운영자로 로그인한 채 공개 화면으로 나오면 관리자 모드가
               풀린 것처럼 보이고 관리 화면으로 돌아갈 길도 없었다. */}
-          <div className="top-actions">
-            <a className="top-link" href="/" onClick={closeAll}>홈</a>
-            {auth?.admin ? (
-              <a className="top-admin" href="/admin" onClick={closeAll}>관리자 화면</a>
-            ) : auth?.member ? (
-              <>
-                <span className="top-who">{auth.memberName}</span>
-                <a className="top-link" href="/mypage" onClick={closeAll}>내 정보</a>
-                {/* 로그아웃은 어느 화면에서든 상단바에서 바로 되게 둔다.
-                    예전에는 /mypage 안에만 있어 거기까지 들어가야 했다. */}
-                <form action={memberLogout}>
-                  <button type="submit" className="top-admin">로그아웃</button>
-                </form>
-              </>
-            ) : (
-              <>
-                <a className="top-login" href="/member-login" onClick={closeAll}>로그인</a>
-                <a className="top-admin" href="/login" onClick={closeAll}>관리자</a>
-              </>
-            )}
-          </div>
+          <div className="top-actions">{actions}</div>
         </div>
       </div>
 
@@ -162,6 +168,8 @@ export default function SiteHeaderNav({ auth: initialAuth }) {
                 </div>
               </div>
             ))}
+            {/* 좁은 화면에서는 상단바 대신 여기서 보인다 */}
+            <div className="gnb-actions">{actions}</div>
           </nav>
         </div>
       </div>

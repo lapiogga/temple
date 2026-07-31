@@ -95,6 +95,14 @@ export default async function EventsPage({ searchParams }) {
   }
 
   const weeks = monthMatrix(y, m);
+  // 좁은 화면용 — 그 달의 일정을 날짜순 한 줄 목록으로 편다.
+  // 캘린더 표는 min-width 760px 이라 360px 화면에서 446px 을 넘쳐 가로 스크롤이
+  // 생기고, 그 때문에 모바일 브라우저가 축소(데스크톱) 모드로 고착됐다.
+  // 자료는 캘린더와 같은 것을 쓴다(추가 조회 없음).
+  const monthList = weeks
+    .flat()
+    .filter((d) => d != null)
+    .flatMap((day) => dayItems(day).map((it) => ({ ...it, day })));
   const { prev, next } = ymNav(y, m);
   const isThisMonth = y === now.getFullYear() && m === now.getMonth() + 1;
   const today = now.getDate();
@@ -130,6 +138,7 @@ export default async function EventsPage({ searchParams }) {
           <div className="ev-layout">
             <div className="ev-main">
           {view === "calendar" ? (
+            <>
             <div className="cal-scroll">
               <table className="cal-grid">
                 <thead>
@@ -171,6 +180,28 @@ export default async function EventsPage({ searchParams }) {
                 <span style={{ color: "var(--n-fg-3)" }}>· 날짜 아래 작은 숫자는 음력</span>
               </p>
             </div>
+            {/* 좁은 화면에서는 위 캘린더가 숨고 이 목록만 보인다(globals.css). */}
+            <ul className="cal-mobile-list">
+              {monthList.length === 0 ? (
+                <li className="cal-ml-empty">이 달에 등록된 일정이 없습니다.</li>
+              ) : (
+                monthList.map((it) => (
+                  <li key={`${it.day}-${it.key}`}>
+                    <Link href={it.href}>
+                      <span className="cal-ml-day">{it.day}일</span>
+                      <span className="cal-ml-title">
+                        {it.time && <b className="ev-time">{it.time}</b>}
+                        {it.title}
+                      </span>
+                      <span className={`cal-ml-kind${it.reg ? " reg" : ""}`}>
+                        {it.reg ? "정기법회" : "행사"}
+                      </span>
+                    </Link>
+                  </li>
+                ))
+              )}
+            </ul>
+            </>
           ) : (
             <ul className="ev-list">
               {allEvents.length === 0 ? (

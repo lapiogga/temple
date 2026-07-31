@@ -504,13 +504,14 @@ footer.site{margin-top:var(--sp-xl);}
 .detail-table th,.detail-table td{border-bottom:var(--st-thin) solid var(--n-stroke-2);padding:var(--sp-l) var(--sp-l);text-align:left;vertical-align:top;}
 .detail-table th{width:120px;background:var(--n-bg-4);font-weight:var(--fw-bold);color:var(--n-fg-1);white-space:nowrap;font-family:var(--font-title);}
 .detail-table td{color:var(--n-fg-1);}
-.detail-table .detail-title{font-weight:var(--fw-bold);font-size:var(--fs-500);font-family:var(--font-title);vertical-align:middle;line-height:var(--lh-500);}
+/* 제목만 20px(fs-500)이라 같은 표의 다른 칸(16px)보다 눈에 띄게 컸다.
+   같은 표 안에서는 크기를 맞추고 굵기와 서체로만 구분한다. */
+.detail-table .detail-title{font-weight:var(--fw-bold);font-size:var(--fs-400);font-family:var(--font-title);vertical-align:middle;line-height:var(--lh-400);}
 .detail-table .detail-body{white-space:pre-line;line-height:var(--lh-ko-400);min-height:120px;}
 .detail-table .attach-list{margin-top:0;}
 @media(max-width:620px){
   .detail-table th{width:82px;padding:var(--sp-m) var(--sp-mnudge);font-size:var(--fs-300);line-height:var(--lh-300);}
   .detail-table td{padding:var(--sp-m) var(--sp-m);}
-  .detail-table .detail-title{font-size:var(--fs-400);line-height:var(--lh-400);}
 }
 
 /* 소개(About) */
@@ -702,6 +703,58 @@ footer.site{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--n
 .adm-qna-item{background:var(--n-bg-1);border:var(--st-thin) solid var(--n-stroke-2);border-radius:var(--r-card);padding:var(--sp-xl) var(--sp-xl);}
 .adm-qna-head{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--sp-m);margin-bottom:var(--sp-s);}
 .adm-qna-body{white-space:pre-line;color:var(--n-fg-1);font-size:var(--fs-400);line-height:var(--lh-ko-400);padding:var(--sp-mnudge) 0;border-top:var(--st-thin) dashed var(--n-stroke-2);border-bottom:var(--st-thin) dashed var(--n-stroke-2);margin-bottom:var(--sp-m);}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   반응형 보완 — 2026-07-31 모바일 실측 후
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 법회·행사: 좁은 화면에서는 캘린더 대신 목록 ──
+   .cal-grid 는 min-width 760px 이라 360px 화면에서 446px 을 넘쳐 가로 스크롤이
+   생겼고, 그 때문에 모바일 브라우저가 축소(데스크톱) 모드로 고착됐다.
+   달력 자체를 감추고 같은 달 자료를 한 줄 목록으로 보여 준다. */
+.cal-mobile-list{display:none;list-style:none;}
+@media(max-width:820px){
+  .cal-scroll{display:none;}
+  /* 캘린더/목록 전환도 의미가 없어지므로 감춘다 */
+  .cal-head .view-toggle{display:none;}
+  .cal-mobile-list{display:block;}
+}
+.cal-mobile-list li{border-bottom:var(--st-thin) dashed var(--n-stroke-2);}
+.cal-mobile-list li:last-child{border-bottom:0;}
+.cal-mobile-list li a{display:flex;align-items:baseline;gap:var(--sp-s);
+  padding:var(--sp-m) var(--sp-xxs);color:var(--n-fg-1);}
+.cal-ml-day{flex:0 0 auto;min-width:3.2em;font-weight:var(--fw-bold);color:var(--brand);
+  font-size:var(--fs-300);font-variant-numeric:tabular-nums;}
+.cal-ml-title{flex:1 1 auto;min-width:0;font-size:var(--fs-400);line-height:var(--lh-400);}
+.cal-ml-kind{flex:0 0 auto;font-size:var(--fs-200);color:var(--brand);
+  background:var(--brand-tint);border-radius:var(--r-circular);padding:var(--sp-xxs) var(--sp-s);}
+.cal-ml-kind.reg{color:var(--sec);background:var(--sec-tint);}
+.cal-ml-empty{padding:var(--sp-xxl) 0;text-align:center;color:var(--n-fg-3);}
+
+/* ── 고정 푸터를 좁은 화면에서는 흐름 안으로 ──
+   fixed 푸터가 본문 끝을 가려 "스크롤이 덜 되는" 현상이 있었다. body 의
+   padding-bottom 으로 비켜 주고 있었지만 실제 푸터 높이는 줄바꿈에 따라 변해
+   맞출 수가 없다. 세로가 귀한 화면에서 굳이 고정할 이유도 없다.
+   (.screen 은 820px 이하에서 이미 min-height:auto 라 계산이 어긋나지 않는다) */
+@media(max-width:720px){
+  footer.site{position:static;}
+  body{padding-bottom:0;}
+  /* 제일 위로 버튼도 이제 푸터를 피할 필요가 없다 */
+  .scroll-top{bottom:var(--sp-l);}
+}
+
+/* ── 상단바: 좁은 화면에서는 타이틀만 남기고 나머지는 햄버거 안으로 ──
+   홈·로그인·관리자 버튼이 브랜드명과 같은 줄에 있어 줄바꿈이 일어났다. */
+/* 기본값을 먼저 두고 미디어쿼리로 켠다. 순서가 반대면 같은 특이도라
+   뒤에 온 display:none 이 이겨 드로어에서도 안 보인다(실제로 그랬다). */
+.gnb-actions{display:none;flex-wrap:wrap;gap:var(--sp-s);align-items:center;
+  padding:var(--sp-m) var(--sp-xl);border-top:var(--st-thin) solid var(--n-stroke-2);}
+.gnb-actions .top-who{width:100%;}
+@media(max-width:720px){
+  .topbar-in > .top-actions{display:none;}
+  .gnb-actions{display:flex;}
+}
 
 /* ══════════════════════════════════════════════════════════════════════════
    상호작용 상태 — Fluent 2 의 6상태 규약
