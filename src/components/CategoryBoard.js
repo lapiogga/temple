@@ -1,5 +1,5 @@
 import Link from "next/link";
-import BackLink from "@/components/BackLink";
+import PageHead from "@/components/PageHead";
 import { notFound } from "next/navigation";
 import { listPosts, listPostsWithThumb } from "@/lib/posts";
 import { getCategoryBySlug, canWrite } from "@/lib/board-categories";
@@ -40,18 +40,13 @@ export default async function CategoryBoard({ slug, kicker, basePath, page = 1 }
   return (
     <section className="screen top">
       <div className="wrap wide">
-        <BackLink href="/" label="홈으로" />
-        <div className="sec-head">
-          <div>
-            <div className="ki">{kicker}</div>
-            <h2>{category.label}</h2>
-          </div>
+        <PageHead title={category.label} ki={kicker} back={{ href: "/", label: "홈으로" }}>
           {writable ? (
             <Link className="btn btn-primary btn-sm" href={`/board/write?board=${encodeURIComponent(slug)}`}>
               글쓰기
             </Link>
           ) : null}
-        </div>
+        </PageHead>
 
         {paged.length === 0 ? (
           <p className="adm-empty">등록된 글이 없습니다.</p>

@@ -72,8 +72,7 @@ export default async function EventDetail({ params }) {
 
       <article className="screen top">
         <div className="wrap wide">
-          <BackLink href="/events" label="법회·행사" />
-
+          <div className="head-back"><BackLink href="/events" label="법회·행사" /></div>
           {/* 정해진 틀(표): 타이틀·일시·내용·작성자·작성일·첨부자료 */}
           <table className="detail-table">
             <tbody>

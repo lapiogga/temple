@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import BackLink from "@/components/BackLink";
+import PageHead from "@/components/PageHead";
 import { formatPhone } from "@/lib/phone";
 import { requireMember } from "@/lib/member-session";
 import { getMemberById } from "@/lib/members";
@@ -34,10 +34,7 @@ export default async function MyPage() {
       <SiteHeader />
       <section className="screen top">
         <div className="wrap" style={{ maxWidth: "560px" }}>
-          <BackLink href="/" label="홈으로" />
-          <div className="sec-head">
-            <div><div className="ki">My</div><h2>내 정보</h2></div>
-          </div>
+          <PageHead title="내 정보" ki="My" back={{ href: "/", label: "홈으로" }} />
           {m ? (
             <div className="mypage-info">
               <dl>

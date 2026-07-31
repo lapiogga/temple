@@ -47,8 +47,7 @@ export default async function NoticeDetail({ params }) {
 
       <article className="screen top">
         <div className="wrap wide">
-          <BackLink href="/notices" label="공지사항" />
-
+          <div className="head-back"><BackLink href="/notices" label="공지사항" /></div>
           {/* 게시판과 동일한 표 틀: 타이틀·게시자·게시일시·게시내용·첨부자료 */}
           <table className="detail-table">
             <tbody>

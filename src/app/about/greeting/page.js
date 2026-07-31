@@ -1,5 +1,5 @@
 import SiteHeader from "@/components/SiteHeader";
-import BackLink from "@/components/BackLink";
+import PageHead from "@/components/PageHead";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
 import { SITE } from "@/content/site";
@@ -16,10 +16,7 @@ export default async function GreetingPage() {
       <SiteHeader />
       <section className="screen top">
         <div className="wrap">
-          <BackLink href="/" label="홈으로" />
-          <div className="sec-head">
-            <div><div className="ki">Greeting</div><h2>주지 스님 인사말</h2></div>
-          </div>
+          <PageHead title="주지 스님 인사말" ki="Greeting" back={{ href: "/", label: "홈으로" }} />
           <div className="about-greeting">
             {g.isDraft && (
               <p className="draft-badge">※ 초안입니다 — 주지 스님 인사말 원문으로 교체 예정입니다.</p>

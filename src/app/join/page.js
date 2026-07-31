@@ -1,5 +1,5 @@
 import SiteHeader from "@/components/SiteHeader";
-import BackLink from "@/components/BackLink";
+import PageHead from "@/components/PageHead";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
 import { SITE } from "@/content/site";
@@ -16,13 +16,11 @@ export default function JoinPage() {
       <SiteHeader />
       <section className="screen top tight">
         <div className="wrap wide">
-          <BackLink href="/" label="홈으로" />
-          <div className="sec-head" style={{ marginBottom: "6px" }}>
-            <div><div className="ki">Join</div><h2>회원가입</h2></div>
+          <PageHead title="회원가입" ki="Join" back={{ href: "/", label: "홈으로" }}>
             <span style={{ color: "var(--n-fg-3)", fontSize: "var(--fs-300)" }}>
               가입 신청 후 <b>종무소 승인</b>을 거쳐 이용하실 수 있습니다.
             </span>
-          </div>
+          </PageHead>
           <JoinForm action={joinAction} terms={TERMS} privacy={PRIVACY} />
         </div>
       </section>

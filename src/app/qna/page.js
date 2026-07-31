@@ -1,5 +1,5 @@
 import Link from "next/link";
-import BackLink from "@/components/BackLink";
+import PageHead from "@/components/PageHead";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import Reveal from "@/components/Reveal";
@@ -38,11 +38,9 @@ export default async function QnaPage({ searchParams }) {
       <SiteHeader />
       <section className="screen top">
         <div className="wrap wide">
-          <BackLink href="/" label="홈으로" />
-          <div className="sec-head reveal">
-            <div><div className="ki">Q&amp;A</div><h2>묻고답하기</h2></div>
+          <PageHead title="묻고답하기" ki="Q&amp;A" className="reveal" back={{ href: "/", label: "홈으로" }}>
             <Link className="btn btn-primary btn-sm" href="/qna/write">질문하기</Link>
-          </div>
+          </PageHead>
 
           <table className="list-table">
             <thead>

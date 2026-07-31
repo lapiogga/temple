@@ -1,5 +1,5 @@
 import Link from "next/link";
-import BackLink from "@/components/BackLink";
+import PageHead from "@/components/PageHead";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import Reveal from "@/components/Reveal";
@@ -71,9 +71,7 @@ export default async function BoardPage({ searchParams }) {
       <SiteHeader />
       <section className="screen top">
         <div className="wrap wide">
-          <BackLink href="/" label="홈으로" />
-          <div className="sec-head reveal">
-            <div><div className="ki">Community</div><h2>게시판</h2></div>
+          <PageHead title="게시판" ki="Community" className="reveal" back={{ href: "/", label: "홈으로" }}>
             {canWriteHere ? (
               <Link className="btn btn-primary btn-sm" href={`/board/write${board ? `?board=${board}` : ""}`}>글쓰기</Link>
             ) : viewer.memberNeedsReset ? (
@@ -81,7 +79,7 @@ export default async function BoardPage({ searchParams }) {
             ) : anonymous ? (
               <Link className="more" href="/member-login">로그인 후 글쓰기 →</Link>
             ) : null}
-          </div>
+          </PageHead>
 
           <div className="post-tabs">
             <Link className={board === null ? "on" : ""} href="/board">전체</Link>

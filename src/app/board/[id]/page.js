@@ -47,8 +47,7 @@ export default async function PostDetail({ params }) {
       <SiteHeader />
       <article className="screen top">
         <div className="wrap wide">
-          <BackLink href={backHref} label={backLabel} />
-
+          <div className="head-back"><BackLink href={backHref} label={backLabel} /></div>
           {/* 정해진 틀(표): 타이틀·게시자·게시일시·게시내용·첨부자료 */}
           <table className="detail-table">
             <tbody>

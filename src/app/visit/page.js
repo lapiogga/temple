@@ -1,5 +1,5 @@
 import SiteHeader from "@/components/SiteHeader";
-import BackLink from "@/components/BackLink";
+import PageHead from "@/components/PageHead";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
 import MapView from "@/components/MapView";
@@ -17,10 +17,10 @@ export default async function VisitPage() {
       <SiteHeader />
       <section className="screen top">
         <div className="wrap">
-          <BackLink href="/" label="홈으로" />
+
           <div className="foot-grid">
             <div>
-              <div className="sec-head"><div><div className="ki">Visit</div><h2>오시는 길</h2></div></div>
+              <PageHead title="오시는 길" ki="Visit" back={{ href: "/", label: "홈으로" }} />
               <MapView />
               <div className="info-lines">
                 <div><b>주소</b>　{v.addressFull}</div>
@@ -34,7 +34,7 @@ export default async function VisitPage() {
               </div>
             </div>
             <div className="donate">
-              <div className="sec-head"><div><div className="ki">Donation</div><h2 style={{ fontSize: "var(--fs-600)", lineHeight: "var(--lh-600)" }}>후원 안내</h2></div></div>
+              <PageHead title="후원 안내" ki="Donation" className="sec-head-sub" />
               <p style={{ fontSize: "var(--fs-300)", color: "var(--n-fg-3)" }}>
                 여러분의 정성은 도량을 가꾸고 이웃과 나누는 데 쓰입니다.
               </p>

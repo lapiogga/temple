@@ -1,5 +1,5 @@
 import Link from "next/link";
-import BackLink from "@/components/BackLink";
+import PageHead from "@/components/PageHead";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
@@ -16,10 +16,7 @@ export default function PrivacyPage() {
 
       <section className="screen top">
         <div className="wrap" style={{ maxWidth: "820px" }}>
-          <BackLink href="/" label="홈으로" />
-          <div className="sec-head">
-            <div><div className="ki">Privacy</div><h2>개인정보 보호정책</h2></div>
-          </div>
+          <PageHead title="개인정보 보호정책" ki="Privacy" back={{ href: "/", label: "홈으로" }} />
           <div className="legal-doc" style={{ whiteSpace: "pre-line" }}>{PRIVACY}</div>
         </div>
       </section>

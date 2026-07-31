@@ -32,7 +32,7 @@ export default async function QnaDetail({ params }) {
       <SiteHeader />
       <article className="screen top">
         <div className="wrap wide">
-          <BackLink href="/qna" label="묻고답하기" />
+          <div className="head-back"><BackLink href="/qna" label="묻고답하기" /></div>
           {q.is_secret ? (
             <div style={{ marginTop: "20px" }}>
               <SecretGate action={revealSecretAction.bind(null, id)} />

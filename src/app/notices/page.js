@@ -1,5 +1,5 @@
 import Link from "next/link";
-import BackLink from "@/components/BackLink";
+import PageHead from "@/components/PageHead";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import Reveal from "@/components/Reveal";
@@ -41,13 +41,7 @@ export default async function NoticesList({ searchParams }) {
 
       <section className="screen top">
         <div className="wrap wide">
-          <BackLink href="/" label="홈으로" />
-          <div className="sec-head reveal">
-            <div>
-              <div className="ki">Notice</div>
-              <h2>공지사항</h2>
-            </div>
-          </div>
+          <PageHead title="공지사항" ki="Notice" className="reveal" back={{ href: "/", label: "홈으로" }} />
 
           <table className="list-table">
             <thead>

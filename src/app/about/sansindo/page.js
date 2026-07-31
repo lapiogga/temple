@@ -1,5 +1,5 @@
 import SiteHeader from "@/components/SiteHeader";
-import BackLink from "@/components/BackLink";
+import PageHead from "@/components/PageHead";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
 import { SITE } from "@/content/site";
@@ -17,10 +17,7 @@ export default async function SansindoPage() {
       <SiteHeader />
       <section className="screen top tight">
         <div className="wrap">
-          <BackLink href="/" label="홈으로" />
-          <div className="sec-head">
-            <div><div className="ki">Treasure</div><h2>대웅전 산신도</h2></div>
-          </div>
+          <PageHead title="대웅전 산신도" ki="Treasure" back={{ href: "/", label: "홈으로" }} />
           <div className="about-treasure">
             <figure className="treasure-fig">
               {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -1,5 +1,5 @@
 import SiteHeader from "@/components/SiteHeader";
-import BackLink from "@/components/BackLink";
+import PageHead from "@/components/PageHead";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
 import { SITE } from "@/content/site";
@@ -16,10 +16,7 @@ export default async function HistoryPage() {
       <SiteHeader />
       <section className="screen top">
         <div className="wrap">
-          <BackLink href="/" label="홈으로" />
-          <div className="sec-head">
-            <div><div className="ki">History</div><h2>응선사 연혁</h2></div>
-          </div>
+          <PageHead title="응선사 연혁" ki="History" back={{ href: "/", label: "홈으로" }} />
           <div className="timeline screen-scroll">
             {(Array.isArray(history) ? history : []).map((h, i) => (
               <div className="tnode" key={`${h.yr}-${i}`}>

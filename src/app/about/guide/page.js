@@ -1,5 +1,5 @@
 import Link from "next/link";
-import BackLink from "@/components/BackLink";
+import PageHead from "@/components/PageHead";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
@@ -15,11 +15,9 @@ export default function GuidePage() {
       <SiteHeader />
       <section className="screen top">
         <div className="wrap">
-          <BackLink href="/" label="홈으로" />
-          <div className="sec-head">
-            <div><div className="ki">Guide</div><h2>사찰 안내도</h2></div>
+          <PageHead title="사찰 안내도" ki="Guide" back={{ href: "/", label: "홈으로" }}>
             <Link className="more" href="/visit">오시는 길 →</Link>
-          </div>
+          </PageHead>
           <figure className="guide-map">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={GUIDE_MAP.image} alt={GUIDE_MAP.caption} />

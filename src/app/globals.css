@@ -398,9 +398,28 @@ header.nav{position:sticky;top:0;z-index:50;background:rgba(var(--n-bg-2-rgb),.9
 .dancheong-rule{width:100%;display:block;}
 
 /* 섹션 머리 */
-.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--sp-l);margin-bottom:var(--sp-m);}
+/* 화면 머리 — 제목 · 영문명 · 돌아가기가 한 줄에 온다.
+   영문 키커와 돌아가기가 각각 한 줄을 차지하던 것을 합쳤다(components/PageHead.js). */
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-l);
+  margin-bottom:var(--sp-m);flex-wrap:wrap;}
 .sec-head h2{font-family:var(--font-title);font-weight:var(--fw-bold);font-size:clamp(var(--fs-600),3.4vw,var(--fs-800));letter-spacing:var(--ls-tight);}
-.sec-head .ki{font-size:var(--fs-200);font-weight:var(--fw-bold);letter-spacing:var(--ls-kicker);color:var(--sec);text-transform:uppercase;margin-bottom:var(--sp-xxs);}
+/* 영문명 — 제목 옆 괄호. 제목보다 작고 다른 색이라 이름의 일부로 읽히지 않는다. */
+.sec-head h2 .ki{margin-left:var(--sp-xs);font-family:var(--font-body);
+  font-size:var(--fs-300);line-height:var(--lh-300);font-weight:var(--fw-semibold);
+  letter-spacing:var(--ls-kicker);color:var(--sec);white-space:nowrap;}
+.sec-head-aside{display:flex;align-items:center;gap:var(--sp-m);flex-shrink:0;margin-left:auto;}
+/* 제목 줄 안에서는 44px 목표 크기를 가로 여백으로 확보한다 —
+   세로로 벌리면 제목 줄이 그만큼 두꺼워져 줄인 의미가 없다. */
+.sec-head-aside .back-link{min-height:0;margin-bottom:0;padding:var(--sp-xs) 0;}
+/* 돌아가기만 있는 화면(상세) — 오른쪽 정렬로 목록 화면과 자리를 맞춘다. */
+.head-back{display:flex;justify-content:flex-end;margin-bottom:var(--sp-xs);}
+/* 본문 안 소제목 — 화면 제목보다 한 단계 작게. */
+.sec-head-sub h2{font-size:var(--fs-600);line-height:var(--lh-600);}
+@media(max-width:560px){
+  /* 좁으면 제목과 오른쪽 묶음이 두 줄로 갈라진다. 그때 돌아가기는 왼쪽으로
+     붙여 제목과 세로로 정렬되게 한다 — 오른쪽에 홀로 떠 있으면 어색하다. */
+  .sec-head-aside{margin-left:0;width:100%;justify-content:space-between;}
+}
 .more{font-size:var(--fs-400);font-weight:var(--fw-semibold);color:var(--brand);white-space:nowrap;}
 .more:hover{text-decoration:underline;}
 

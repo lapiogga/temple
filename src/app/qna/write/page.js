@@ -1,5 +1,5 @@
 import SiteHeader from "@/components/SiteHeader";
-import BackLink from "@/components/BackLink";
+import PageHead from "@/components/PageHead";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
 import { SITE } from "@/content/site";
@@ -16,10 +16,7 @@ export default function QnaWrite() {
       <SiteHeader />
       <section className="screen top">
         <div className="wrap" style={{ maxWidth: "620px" }}>
-          <BackLink href="/qna" label="묻고답하기" />
-          <div className="sec-head">
-            <div><div className="ki">Q&amp;A</div><h2>묻고답하기</h2></div>
-          </div>
+          <PageHead title="묻고답하기" ki="Q&amp;A" back={{ href: "/qna", label: "묻고답하기" }} />
           <p style={{ color: "var(--n-fg-3)", marginBottom: "18px", fontSize: "var(--fs-400)" }}>
             휴대폰 본인인증 후 누구나 질문을 남길 수 있습니다. 비밀글은 작성자와 관리자만 열람합니다.
           </p>
