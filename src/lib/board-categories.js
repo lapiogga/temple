@@ -46,6 +46,16 @@ export async function listBoardTabCategories() {
   return rows;
 }
 
+// 이 게시판의 목록 주소. 글 상세에서 "돌아가기" 를 걸 때 쓴다.
+//   intro = 소개 메뉴에 자기 주소가 있다 → /about/<slug>
+//   board = /board 의 구분 탭            → /board?board=<slug>
+// 카테고리를 못 찾으면(지워졌거나 값이 어긋났으면) 게시판 첫 화면으로 보낸다.
+export function boardHref(category) {
+  if (!category) return "/board";
+  if (category.group_key === "intro") return `/about/${category.slug}`;
+  return `/board?board=${encodeURIComponent(category.slug)}`;
+}
+
 // 이 카테고리에 글을 쓸 수 있는가. write_role 이 'admin' 이면 운영자만.
 export function canWrite(category, { isAdmin, isApprovedMember }) {
   if (!category || category.is_hidden) return false;

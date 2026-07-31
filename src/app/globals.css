@@ -552,6 +552,33 @@ footer.site{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--n
 .foot-links a{font-size:var(--fs-200);color:var(--n-fg-3);text-decoration:underline;}
 .foot-links a:hover{color:var(--brand);}
 .foot-copy{font-size:var(--fs-200);color:var(--n-fg-3);}
+/* ── 제일 위로 가기 ──
+   고정 푸터 위에 띄운다. 안 보일 때는 클릭이 통과하도록 pointer-events 를 끈다
+   (visibility 만 숨기면 자리를 계속 차지해 아래 요소를 가린다).
+   최소 크기 44×44 — 손가락 목표 크기(WCAG 2.5.8). */
+.scroll-top{
+  position:fixed; right:var(--sp-l); bottom:calc(var(--foot-h) + var(--sp-l)); z-index:45;
+  display:inline-flex; flex-direction:column; align-items:center; justify-content:center;
+  min-width:44px; min-height:44px; gap:0;
+  padding:var(--sp-snudge) var(--sp-s);
+  border:0; border-radius:var(--r-circular); cursor:pointer;
+  background:var(--brand); color:var(--n-fg-on-brand);
+  box-shadow:var(--sh-8);
+  font-size:var(--fs-200); font-weight:var(--fw-bold); line-height:1;
+  opacity:0; transform:translateY(var(--sp-s)); pointer-events:none;
+  transition:opacity var(--t-state), transform var(--t-state);
+}
+.scroll-top.on{ opacity:1; transform:none; pointer-events:auto; }
+.scroll-top:hover{ background:var(--brand-hover); }
+.scroll-top:active{ background:var(--brand-pressed); }
+.scroll-top span[aria-hidden]{ font-size:var(--fs-400); }
+.scroll-top-label{ margin-top:2px; }
+@media(max-width:720px){
+  /* 좁은 화면에서는 푸터가 두 줄로 접혀 실높이가 84px 이 된다(아래 body 규칙 참고). */
+  .scroll-top{ bottom:calc(84px + var(--sp-s)); right:var(--sp-m); }
+}
+@media(prefers-reduced-motion:reduce){ .scroll-top{ transition:none; } }
+
 /* 좁은 화면에서는 고정 푸터가 두 줄로 접혀 실높이가 --foot-h(44px)를 넘는다.
    84px 은 그 접힌 높이를 비켜 주는 레이아웃 상수라 간격 램프에 얹지 않는다. */
 @media(max-width:720px){.foot-slim{justify-content:center;text-align:center;gap:var(--sp-xxs) var(--sp-m);}body{padding-bottom:84px;}}

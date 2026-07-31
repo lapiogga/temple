@@ -4,7 +4,7 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs } from "@/components/Icons";
 import { getPost } from "@/lib/posts";
-import { getLabelMap } from "@/lib/board-categories";
+import { getCategoryBySlug, boardHref } from "@/lib/board-categories";
 import { SITE } from "@/content/site";
 
 export const dynamic = "force-dynamic";
@@ -33,9 +33,12 @@ export default async function PostDetail({ params }) {
   let p = null;
   try { p = await getPost(id); } catch (err) { console.error("글 조회 실패:", err); }
   if (!p || !p.published) notFound();
-  // 숨긴 카테고리의 글도 이름표가 보여야 하므로 전체 맵을 쓴다.
-  let labelMap = {};
-  try { labelMap = await getLabelMap(); } catch (err) { console.error("카테고리 조회 실패:", err); }
+  // 이 글이 속한 게시판. 이름표와 "돌아가기" 주소를 여기서 얻는다.
+  // 숨긴 카테고리의 글도 이름표는 보여야 하므로 숨김 여부로 거르지 않는다.
+  let category = null;
+  try { category = await getCategoryBySlug(p.board); } catch (err) { console.error("카테고리 조회 실패:", err); }
+  const backHref = boardHref(category);
+  const backLabel = category ? category.label : "게시판";
 
   return (
     <>
@@ -43,7 +46,7 @@ export default async function PostDetail({ params }) {
       <SiteHeader />
       <article className="screen top">
         <div className="wrap wide">
-          <Link className="more" href="/board">← 게시판</Link>
+          <Link className="more" href={backHref}>← {backLabel}</Link>
 
           {/* 정해진 틀(표): 타이틀·게시자·게시일시·게시내용·첨부자료 */}
           <table className="detail-table">
@@ -51,7 +54,7 @@ export default async function PostDetail({ params }) {
               <tr>
                 <th scope="row">타이틀</th>
                 <td>
-                  {labelMap[p.board] && <span className="post-badge">{labelMap[p.board]}</span>}
+                  {category && <span className="post-badge">{category.label}</span>}
                   <span className="detail-title">{p.title}</span>
                 </td>
               </tr>

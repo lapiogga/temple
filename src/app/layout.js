@@ -1,4 +1,5 @@
 import "./globals.css";
+import ScrollTop from "@/components/ScrollTop";
 
 export const metadata = {
   title: "응선사(應禪寺) | 서울 부암동 도심 속 산사",
@@ -16,7 +17,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        {children}
+        {/* 모든 화면에 따라다니는 '제일 위로' 버튼 */}
+        <ScrollTop />
+      </body>
     </html>
   );
 }
