@@ -183,7 +183,7 @@
   --font-body:'Pretendard',system-ui,-apple-system,sans-serif;
   --font-title:'Noto Serif KR',serif;
   --maxw:1080px;
-  --nav-h:103px; --foot-h:44px;
+  --nav-h:91px; --foot-h:44px;
   /* 헤더 실높이 = topbar 46 + mainbar 경계 1 + mainbar-in 42(.gnb-top 행간 26 + 패딩 16)
      + 단청 띠 12(.mainbar 아래 패딩) + header 경계 1 = 102px. 1px 여유를 둔다.
      단청 띠를 넣기 전에는 90px 이라 91 이었다. 타입 이전 전에는 .gnb-top 이 body 의
@@ -211,6 +211,12 @@ a{color:inherit;text-decoration:none;}
 /* Nav — 상단바 + 대메뉴 바 (스크롤해도 상단 고정) */
 header.nav{position:sticky;top:0;z-index:50;background:rgba(var(--n-bg-2-rgb),.92);
   backdrop-filter:blur(10px);border-bottom:var(--st-thin) solid var(--n-stroke-2);}
+/* 최상단 — 뇌문(雷紋). 글자 뒤라 알파 10% 짜리 타일을 쓴다.
+   본문 글자 대비가 15.42:1 → 14.30:1 로만 내려간다(실측).
+   최상단·대메뉴·푸터는 서로 다른 문양을 쓴다. 같은 타일을 세 곳에 깔면
+   경계가 끊긴 한 장처럼 보여 어색하다.
+   높이를 100% 로 맞춰 어느 화면폭에서도 잘리지 않게 한다. */
+.topbar{background:url("/patterns/dan-band-faint.png") repeat-x center / auto 100%;}
 .topbar-in{display:flex;align-items:center;justify-content:space-between;height:46px;}
 .brand{display:flex;align-items:center;gap:var(--sp-s);}
 .brand .name{font-family:var(--font-title);font-weight:var(--fw-bold);font-size:var(--fs-500);letter-spacing:var(--ls-tight);line-height:var(--lh-500);}
@@ -223,18 +229,14 @@ header.nav{position:sticky;top:0;z-index:50;background:rgba(var(--n-bg-2-rgb),.9
 .top-admin:hover{border-color:var(--sec);color:var(--sec);}
 
 /* 대메뉴 바 */
-/* 대메뉴 바에 단청 뇌문 띠를 아주 옅게 깐다.
-   단청은 원래 처마 밑을 두르는 띠 장식이라 상단바 바로 아래가 제자리다.
-   타일은 public/patterns/dan-band-soft.png — 원본에서 반복 주기(270px)를
-   계산해 한 단위만 잘라낸 것이라 이음매가 없다(출처·제작 방법은 그 폴더의 README).
-   반드시 repeat-x 다. 세로로도 반복하면 가로 줄무늬가 되어 읽기를 방해한다.
-   높이는 대메뉴 바에 맞춰 늘린다(alpha 18% 라 약간의 흐림은 보이지 않는다). */
+/* 대메뉴 — 태극격자. 바로 위 최상단(뇌문)과 문양이 달라 경계가 읽힌다.
+   타일은 원본에서 반복 주기(271px)를 계산해 한 단위만 잘라낸 것이라
+   이음매가 없다(출처·제작 방법은 public/patterns/README.md).
+   반드시 repeat-x 다. 세로로도 반복하면 가로 줄무늬가 되어 읽기를 방해한다. */
 .mainbar{background:
-    url("/patterns/dan-band.png") repeat-x left bottom / auto 12px,
+    url("/patterns/dan-taegeuk-faint.png") repeat-x center / auto 100%,
     linear-gradient(90deg,var(--n-bg-2),var(--n-bg-4));
-  border-top:var(--st-thin) solid var(--n-stroke-2);
-  /* 띠가 아래 가장자리에 앉으므로 메뉴 글자와 겹치지 않게 그만큼 띄운다 */
-  padding-bottom:12px;}
+  border-top:var(--st-thin) solid var(--n-stroke-2);}
 .mainbar-in{display:flex;align-items:center;min-height:38px;}
 .gnb{display:flex;gap:var(--sp-xs);}
 .gnb-group{position:relative;}
@@ -559,7 +561,12 @@ footer.site{margin-top:var(--sp-xl);}
 
 /* 밝은 얇은 푸터 */
 /* 슬림 푸터 — 화면 하단 고정(fixed), 스크롤해도 항상 노출 */
-footer.site{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--n-bg-1);border-top:var(--st-thin) solid var(--n-stroke-2);}
+/* 푸터 — 반원 연꽃 띠. 최상단(뇌문)·대메뉴(태극격자)와 다른 문양이다. */
+footer.site{position:fixed;left:0;right:0;bottom:0;z-index:40;
+  background:
+    url("/patterns/dan-arc-faint.png") repeat-x center / auto 100%,
+    var(--n-bg-1);
+  border-top:var(--st-thin) solid var(--n-stroke-2);}
 .foot-slim{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-xs) var(--sp-xl);flex-wrap:wrap;padding:var(--sp-s) var(--sp-xl);}
 .foot-slim-l{display:flex;align-items:center;gap:var(--sp-s) var(--sp-l);flex-wrap:wrap;}
 .foot-name{font-family:var(--font-title);font-weight:var(--fw-bold);font-size:var(--fs-300);color:var(--n-fg-1);line-height:var(--lh-300);}
@@ -600,6 +607,12 @@ footer.site{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--n
 
 /* 섹션 제목 장식(단청 금선) */
 .sec-head h2::after{content:"";display:block;width:46px;height:3px;margin-top:var(--sp-snudge);border-radius:var(--r-circular);background:linear-gradient(90deg,var(--brand),var(--gold-80) 70%,transparent);}
+
+/* 정기법회 패널 — 구름 문양을 오른쪽 위 모서리에 배경으로 깐다.
+   원색(남색)이라 큰 면적에는 못 쓰고, 모서리 워터마크 정도가 한계다. */
+.reg-panel{background:
+    url("/patterns/icon-cloud-faint.png") no-repeat right -10px top -6px / 96px auto,
+    var(--n-bg-1);}
 
 /* 인증(회원) 폼 */
 .auth-card{background:var(--n-bg-1);border:var(--st-thin) solid var(--n-stroke-2);border-radius:var(--r-card);padding:var(--sp-xxxl) var(--sp-xxxl) var(--sp-xxxl);max-width:460px;}
