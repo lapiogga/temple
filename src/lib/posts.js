@@ -137,6 +137,37 @@ async function isUploadReferencedElsewhere(url) {
   return rows.length > 0;
 }
 
+// 글 수정. 제목·본문만 바꾼다 — board(소속 게시판)와 작성자는 건드리지 않는다.
+// 게시판을 옮기면 카드형/목록형의 사진 요건이 달라지고 /about 주소도 바뀌므로
+// 그건 별개의 일로 둔다.
+//
+// 이미지 처리가 생성보다 까다롭다. 본문에서 지워진 사진은 post_images 에서 빠지는
+// 것으로 끝나지 않고 디스크의 파일이 아무도 참조하지 않는 고아로 남는다.
+// removePost 와 같은 기준(isUploadReferencedElsewhere)으로 정리한다.
+export async function updatePost(id, { title, body }) {
+  // 바꾸기 전 목록을 먼저 잡는다 — syncPostImages 가 post_images 를 통째로
+  // 갈아치우므로 그 뒤에는 무엇이 빠졌는지 알 수 없다.
+  const before = await listPostImages(id);
+
+  const { rows } = await query(
+    "UPDATE posts SET title = $2, body = $3 WHERE id = $1 RETURNING id",
+    [id, title, body]
+  );
+  if (!rows[0]) return null;
+
+  await syncPostImages(id, body);
+
+  // 남아 있는 것과 대조해 빠진 것만 지운다. 위 sync 가 이미 끝났으므로
+  // isUploadReferencedElsewhere 는 '다른 글·갤러리·행사·공지·홈 콘텐츠가
+  // 쓰고 있는가' 만 답한다.
+  const still = new Set(bodyImageUrls(body));
+  for (const img of before) {
+    if (still.has(img.url)) continue;
+    if (!(await isUploadReferencedElsewhere(img.url))) await deleteUpload(img.url);
+  }
+  return rows[0];
+}
+
 // 글을 지우면 딸린 이미지 파일도 지운다. post_images 행은 FK 의 ON DELETE CASCADE
 // 로 사라지지만 디스크의 파일은 남기 때문이다(고아 파일).
 export async function removePost(id) {

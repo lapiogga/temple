@@ -64,6 +64,7 @@ export default async function IntroBoardAdmin({ params }) {
                   <td>{imgCounts[p.id] ?? 0}장</td>
                   <td>{fmt(p.created_at)}</td>
                   <td className="adm-actions">
+                    <Link className="adm-link-btn" href={`/board/${p.id}/edit`}>수정</Link>
                     <form action={deleteIntroPostAction}>
                       <input type="hidden" name="id" value={p.id} />
                       <input type="hidden" name="slug" value={cat.slug} />
