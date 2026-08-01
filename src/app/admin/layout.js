@@ -17,7 +17,9 @@ const NAV = [
   { href: "/admin/gallery", label: "갤러리" },
   { href: "/admin/members", label: "회원" },
   { href: "/admin/board", label: "게시판" },
-  { href: "/admin/intro", label: "소개 게시판" },
+  // '소개 게시판' 은 여기서 뺐다 — 공개 화면의 '응선사 소개' 소메뉴를 이루는 것이
+  // 인삿말·연혁·산신도(홈페이지)와 법문·휴심선원(소개 게시판)으로 갈라져 있어
+  // 한쪽만 고치고 나머지를 못 찾는 일이 있었다. 지금은 '홈페이지' 한 화면에 모은다.
   { href: "/admin/qna", label: "Q&A" },
 ];
 

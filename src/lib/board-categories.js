@@ -8,7 +8,7 @@ const COLS =
 
 // 관리자용 — 숨김 포함. group 을 주면 그 묶음만.
 //   board = /board 의 구분 탭      intro = 응선사 소개 메뉴의 독립 화면
-// 두 묶음은 서로 다른 관리 화면에서 다룬다(/admin/board/categories · /admin/intro).
+// 두 묶음은 서로 다른 관리 화면에서 다룬다(/admin/board/categories · /admin/site).
 export async function listCategories(group) {
   if (group) {
     const { rows } = await query(

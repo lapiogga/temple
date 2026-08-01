@@ -14,7 +14,8 @@ const settingsSchema = z.object({
 });
 
 function revalidate(slug) {
-  revalidatePath("/admin/intro");
+  // 목록(글 건수·이름)은 이제 홈페이지 허브가 들고 있다.
+  revalidatePath("/admin/site");
   revalidatePath(`/admin/intro/${slug}`);
   revalidatePath(`/about/${slug}`);
 }

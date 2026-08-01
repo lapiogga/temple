@@ -8,7 +8,7 @@ import { memberLogout } from "@/app/auth-actions";
 // 대메뉴(그룹) + 하위 항목. 스크롤해도 상단 고정.
 //
 // '응선사 소개' 의 게시판 항목(법문·휴심선원)은 여기 적지 않는다. 이름과 순서가
-// DB(board_categories, group_key='intro')에 있고 관리자가 /admin/intro 에서 고친다.
+// DB(board_categories, group_key='intro')에 있고 관리자가 /admin/site 에서 고친다.
 // SiteHeader(서버)가 읽어 introItems 로 넘겨준다 — 아래 buildMenu 참고.
 const ABOUT_FIXED = [
   { href: "/about/greeting", label: "주지스님 인삿말" },

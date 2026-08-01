@@ -31,7 +31,7 @@ export default async function IntroBoardAdmin({ params }) {
           <Link href={`/about/${cat.slug}`} target="_blank" className="btn btn-ghost btn-sm">
             화면 보기 ↗
           </Link>
-          <Link href="/admin/intro" className="btn btn-ghost btn-sm">목록</Link>
+          <Link href="/admin/site" className="btn btn-ghost btn-sm">목록</Link>
         </div>
       </div>
 

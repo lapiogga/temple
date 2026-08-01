@@ -14,7 +14,7 @@ import SiteHeaderNav from "./SiteHeaderNav";
 // 화면과 결과가 어긋나지 않는다.
 // 소개 메뉴의 게시판 항목 이름은 DB(board_categories.label)에서 읽는다.
 // 예전에는 SiteHeaderNav 의 MENU 상수에 이름이 박혀 있어서, 관리자가
-// /admin/intro 에서 이름을 바꿔도 대메뉴는 그대로였다 — 그 입력칸이
+// /admin/intro/<slug> 에서 이름을 바꿔도 대메뉴는 그대로였다 — 그 입력칸이
 // "대메뉴에 나오는 이름" 이라고 약속하고 있는데도 그랬다.
 // 대메뉴는 클라이언트 컴포넌트라 DB 를 직접 못 읽으므로 여기서 읽어 넘긴다.
 export default async function SiteHeader() {

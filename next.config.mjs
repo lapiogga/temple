@@ -26,7 +26,14 @@ const nextConfig = {
   // 4개 다 붙고 /about 에는 0개). 본문 없는 307 이라 실질 손실은 없다고 판단했다.
   // 근본 해법은 이 헤더들을 nginx 서버 블록으로 올리는 것이다(로드맵 §3-A 4 하드닝).
   async redirects() {
-    return [{ source: "/about", destination: "/about/greeting", permanent: false }];
+    return [
+      { source: "/about", destination: "/about/greeting", permanent: false },
+      // 소개 게시판 허브가 홈페이지 허브(/admin/site)로 흡수됐다. 대메뉴에서는 뺐지만
+      // 운영자가 갈피(북마크)를 걸어 뒀을 수 있어 주소는 살려 둔다.
+      // 여기(라우팅 계층)에 두는 이유는 위 /about 과 같다 — redirect() 만 하는 페이지는
+      // 정적 프리렌더에서 Location 을 잃는다.
+      { source: "/admin/intro", destination: "/admin/site", permanent: false },
+    ];
   },
   // 공통 보안 헤더. 초안 기간 X-Robots-Tag noindex 포함(8월 정식 오픈 시 제거).
   async headers() {

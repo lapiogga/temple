@@ -176,7 +176,7 @@ ON CONFLICT (slug) DO NOTHING;
 INSERT INTO board_categories (slug, label, sort_order, write_role, layout, show_in_board, group_key) VALUES
   ('teaching',       '법문-살며 생각하며',    10, 'admin', 'list', false, 'intro'),
   ('pagoda',         '휴심선원(탑전)',        11, 'admin', 'card', false, 'intro'),
-  ('hyusim-jirisan', '휴심선원(지리산 휴심)',  12, 'admin', 'card', false, 'intro')
+  ('hyusim-jirisan', '휴심선원(지리산)',      12, 'admin', 'card', false, 'intro')
 ON CONFLICT (slug) DO NOTHING;
 
 -- 게시판 글

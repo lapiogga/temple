@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 // 박혀 있어서 관리자가 이름을 바꾸면 둘이 서로 달라졌다 — 같은 값을 보게 한다.
 export async function generateMetadata() {
   const cat = await getCategoryBySlug("hyusim-jirisan").catch(() => null);
-  return { title: `${cat?.label ?? "휴심선원(지리산 휴심)"} | ${SITE.name}` };
+  return { title: `${cat?.label ?? "휴심선원(지리산)"} | ${SITE.name}` };
 }
 
 export default function HyusimJirisanPage({ searchParams }) {
