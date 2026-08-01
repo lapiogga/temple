@@ -12,12 +12,18 @@ import { query } from "@/lib/db";
 // 예전에는 publicOnly 하나뿐이라 'member' 앨범을 **아무도** 볼 수 없었다. 관리자
 // 화면에는 '회원 전용' 선택지가 있어 실제로 3개가 그렇게 설정돼 있었는데, 목록에서
 // 빠지고 상세는 404 였다. 관리자가 회원에게 보이라고 지정한 것이 아무에게도 안 보인 것이다.
+//
+// 공개 목록에서는 **사진이 한 장도 없는 앨범을 뺀다.**
+// 앨범은 먼저 만들고 사진을 나중에 넣는 흐름이라, 만들어 놓고 아직 안 채운 앨범이
+// 공개 화면에 빈 카드로 뜬다. 방문자에게는 눌러도 "등록된 사진이 없습니다" 만 나오는
+// 앨범이다. 관리자 목록(publicOnly=false)에는 그대로 보여야 채워 넣을 수 있다.
 export async function listAlbums({ publicOnly = false, includeMember = false } = {}) {
   const where = publicOnly
     ? includeMember
       ? "WHERE a.visibility IN ('public','member')"
       : "WHERE a.visibility = 'public'"
     : "";
+  const having = publicOnly ? "HAVING count(p.id) > 0" : "";
   const { rows } = await query(
     `SELECT a.id, a.title, a.visibility, a.created_at,
             count(p.id)::int AS photo_count,
@@ -27,6 +33,7 @@ export async function listAlbums({ publicOnly = false, includeMember = false } =
        LEFT JOIN gallery_photos p ON p.album_id = a.id
        ${where}
       GROUP BY a.id
+      ${having}
       ORDER BY a.created_at DESC`
   );
   return rows;

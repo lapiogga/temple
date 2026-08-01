@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { getViewer } from "@/lib/viewer";
 import { createPost } from "@/lib/posts";
 import { getCategoryBySlug, canWrite } from "@/lib/board-categories";
+import { bodyImageUrls } from "@/lib/posts";
 import { sanitizeHtml, stripTags } from "@/lib/sanitize";
 
 // board 는 board_categories 에서 오므로 z.enum 으로 고정할 수 없다. 아래에서 조회로 검증한다.
@@ -59,6 +60,14 @@ export async function createPostAction(prevState, formData) {
 
   const body = sanitizeHtml(parsed.data.body);
   if (stripTags(body).length < 1) return { error: "본문을 입력하세요." };
+
+  // 카드형 게시판(휴심선원 탑전·지리산)은 목록이 사진 격자다. 사진이 없는 글은
+  // '이미지 없음' 자리표시로 나와 격자가 비어 보인다. 그래서 한 장 이상을 요구한다.
+  // 글 목록이 사진으로 읽히는 곳이라 이건 취향이 아니라 그 화면의 전제다.
+  // 검사 기준은 저장 때 쓰는 것과 같다(bodyImageUrls) — 따로 세면 어긋난다.
+  if (category.layout === "card" && bodyImageUrls(body).length === 0) {
+    return { error: `'${category.label}' 은 사진을 한 장 이상 넣어야 합니다. 본문에 이미지를 올려 주세요.` };
+  }
 
   let post;
   try {

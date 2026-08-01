@@ -81,16 +81,23 @@ export async function createPost(d) {
   return post;
 }
 
-// 본문에 실제로 남아 있는 /uploads/ 이미지를 post_images 에 맞춘다.
-// 정화(sanitizeHtml) 를 거친 뒤의 본문을 넘겨야 한다 — 그래야 제거된 태그의
-// 경로가 딸려 들어오지 않는다.
-export async function syncPostImages(postId, sanitizedBody) {
+// 정화된 본문에 남아 있는 업로드 이미지 주소. 저장(syncPostImages)과 저장 전 검사가
+// 같은 기준을 봐야 한다 — 따로 세면 "검사는 통과했는데 이미지가 0장" 이 생긴다.
+export function bodyImageUrls(sanitizedBody) {
   const urls = [];
   const re = /<img[^>]+src="(\/uploads\/[^"?#]+)"/gi;
   let m;
   while ((m = re.exec(sanitizedBody ?? "")) !== null) {
     if (!urls.includes(m[1])) urls.push(m[1]);
   }
+  return urls;
+}
+
+// 본문에 실제로 남아 있는 /uploads/ 이미지를 post_images 에 맞춘다.
+// 정화(sanitizeHtml) 를 거친 뒤의 본문을 넘겨야 한다 — 그래야 제거된 태그의
+// 경로가 딸려 들어오지 않는다.
+export async function syncPostImages(postId, sanitizedBody) {
+  const urls = bodyImageUrls(sanitizedBody);
   await query("DELETE FROM post_images WHERE post_id = $1", [postId]);
   for (let i = 0; i < urls.length; i++) {
     await query(

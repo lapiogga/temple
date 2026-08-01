@@ -32,7 +32,19 @@ export default async function GalleryAdmin() {
                   <td className="adm-title-cell">
                     <Link href={`/admin/gallery/${a.id}`}>{a.title}</Link>
                   </td>
-                  <td>{a.photo_count}장</td>
+                  {/* 사진이 없는 앨범은 공개 화면에 아예 나오지 않는다(lib/gallery.js).
+                      관리자가 그 사실을 모르면 "올렸는데 안 보인다" 가 된다. */}
+                  <td>
+                    {a.photo_count}장
+                    {a.photo_count === 0 && (
+                      <>
+                        {" "}
+                        <span className="adm-badge off" title="사진을 넣어야 공개 갤러리에 나옵니다">
+                          공개 안 됨
+                        </span>
+                      </>
+                    )}
+                  </td>
                   <td>
                     <span className={a.visibility === "public" ? "adm-badge on" : "adm-badge off"}>
                       {a.visibility === "public" ? "공개" : "회원"}
