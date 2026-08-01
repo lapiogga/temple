@@ -125,6 +125,15 @@ CREATE TABLE IF NOT EXISTS members (
   last_login_at  TIMESTAMPTZ,
   created_at     TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+-- 닉네임은 게시판 표시명이라 같은 이름이 둘이면 글쓴이를 구별할 수 없다.
+-- 응용 계층에서도 검사하지만(lib/members.js nicknameExists) 그것만으로는 두 사람이
+-- 동시에 같은 이름을 넣는 경합을 막지 못한다. 마지막 방어선은 여기다.
+--   · lower() — 대소문자만 다른 사칭을 막는다
+--   · WHERE nickname IS NOT NULL — 탈퇴 익명화가 NULL 로 만들기 때문에 그것들끼리는
+--     충돌하지 않아야 한다(부분 인덱스)
+CREATE UNIQUE INDEX IF NOT EXISTS idx_members_nickname_ci
+  ON members (lower(nickname)) WHERE nickname IS NOT NULL;
+
 -- 관리자가 비밀번호를 초기화하면 true. 이 값이 true 면 로그인이 막히고
 -- 회원은 가입정보(휴대폰·생년월일) 확인 후 새 비밀번호를 설정해야 한다.
 ALTER TABLE members ADD COLUMN IF NOT EXISTS must_reset_password BOOLEAN NOT NULL DEFAULT false;

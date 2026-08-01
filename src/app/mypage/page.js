@@ -33,9 +33,12 @@ export default async function MyPage() {
       <DancheongDefs />
       <SiteHeader />
       <section className="screen top">
-        <div className="wrap" style={{ maxWidth: "560px" }}>
+        {/* 폭을 좁혀 두었더니 카드 다섯 개가 세로로만 쌓여 스크롤이 길었다.
+            넓은 화면에서는 왼쪽에 내 정보, 오른쪽에 고치는 자리를 나란히 둔다. */}
+        <div className="wrap">
           <PageHead title="내 정보" ki="My" back={{ href: "/", label: "홈으로" }} />
           {m ? (
+            <div className="mypage-layout">
             <div className="mypage-info">
               <dl>
                 <dt>아이디</dt><dd>{m.login_id}</dd>
@@ -54,10 +57,11 @@ export default async function MyPage() {
                 정정이 필요하시면 종무소로 알려 주세요.
               </p>
             </div>
+              <ProfileForms nickname={m.nickname} phone={m.phone} />
+            </div>
           ) : (
             <p className="adm-empty">회원 정보를 찾을 수 없습니다.</p>
           )}
-          {m ? <ProfileForms nickname={m.nickname} phone={m.phone} /> : null}
         </div>
       </section>
       <SiteFooter />

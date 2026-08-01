@@ -3,7 +3,7 @@
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
-import { createMember, loginIdExists } from "@/lib/members";
+import { createMember, loginIdExists, nicknameExists } from "@/lib/members";
 import { digitsOnly, isValidPhone } from "@/lib/phone";
 
 const schema = z.object({
@@ -54,6 +54,11 @@ export async function joinAction(prevState, formData) {
   try {
     if (await loginIdExists(parsed.data.loginId)) {
       return { error: "이미 사용 중인 아이디입니다." };
+    }
+    if (await nicknameExists(parsed.data.nickname)) {
+      // 닉네임은 게시판에 보이는 이름이라 같은 이름이 둘이면 글쓴이를 구별할 수 없다.
+      // 화면의 '중복 확인' 은 안내일 뿐이고 누르지 않아도 제출된다 — 여기가 실제 방어선이다.
+      return { error: "이미 쓰이는 닉네임입니다. 다른 이름을 정해 주세요." };
     }
     const passwordHash = await bcrypt.hash(parsed.data.password, 12);
     await createMember({

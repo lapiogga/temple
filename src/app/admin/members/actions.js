@@ -11,6 +11,7 @@ import {
   flagPasswordReset,
   getMemberById,
   updateMemberByAdmin,
+  nicknameExists,
 } from "@/lib/members";
 import { digitsOnly, isValidPhone } from "@/lib/phone";
 
@@ -75,6 +76,10 @@ export async function updateMemberAction(id, prevState, formData) {
     phone: formData.get("phone") ?? "",
   });
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "입력값을 확인하세요." };
+
+  if (await nicknameExists(parsed.data.nickname, id)) {
+    return { error: "이미 쓰이는 닉네임입니다. 다른 이름을 정해 주세요." };
+  }
 
   try {
     await updateMemberByAdmin(id, parsed.data);

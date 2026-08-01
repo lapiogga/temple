@@ -56,6 +56,24 @@ export async function loginIdExists(loginId) {
   return rows.length > 0;
 }
 
+// 닉네임 중복.
+//
+// 닉네임은 게시판에 보이는 이름이다. 같은 이름이 둘이면 글쓴이를 구별할 수 없다.
+// 대소문자만 다른 것도 같은 것으로 본다 — '보리'와 '보리' 처럼 눈으로 구별되지 않는
+// 이름이 나란히 있으면 사칭에 쓰인다.
+//
+// exceptId 는 '지금 고치는 사람 자신' 을 빼기 위한 것이다. 없으면 자기 닉네임을
+// 그대로 두고 저장할 때도 중복이라고 거절당한다.
+export async function nicknameExists(nickname, exceptId = null) {
+  const { rows } = await query(
+    `SELECT 1 FROM members
+      WHERE nickname IS NOT NULL AND lower(nickname) = lower($1)
+        AND ($2::bigint IS NULL OR id <> $2)`,
+    [nickname, exceptId]
+  );
+  return rows.length > 0;
+}
+
 export async function createMember(d) {
   const { loginId, passwordHash, name, nickname, birthDate, gender, phone } = d;
   const { rows } = await query(

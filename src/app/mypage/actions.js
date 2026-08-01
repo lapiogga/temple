@@ -10,6 +10,7 @@ import {
   getMemberById,
   getMemberPasswordHash,
   updateMemberNickname,
+  nicknameExists,
   updateMemberPhone,
   setMemberPassword,
   withdrawMember,
@@ -51,6 +52,10 @@ export async function updateNicknameAction(prevState, formData) {
   const parsed = nicknameSchema.safeParse(formData.get("nickname") ?? "");
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "닉네임을 확인하세요." };
   if (parsed.data === m.nickname) return { ok: true, message: "바뀐 내용이 없습니다." };
+  // 남이 쓰고 있는 이름으로는 못 바꾼다. 가입 때만 막으면 나중에 남의 이름을 가져갈 수 있다.
+  if (await nicknameExists(parsed.data, m.id)) {
+    return { error: "이미 쓰이는 닉네임입니다. 다른 이름을 정해 주세요." };
+  }
 
   try {
     await updateMemberNickname(m.id, parsed.data);

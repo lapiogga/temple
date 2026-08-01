@@ -5,6 +5,55 @@ import { useState, useRef, useEffect } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import PhoneInput from "@/components/PhoneInput";
 import { isValidPhone } from "@/lib/phone";
+import { checkAvailabilityAction } from "./check-actions";
+
+// 아이디·닉네임 중복 확인 칸.
+//
+// 예전에는 다 채워 제출한 뒤에야 "이미 쓰이는 아이디" 를 알았다. 되돌아와 다시 채우는
+// 것이 사용자 몫이었다. 옆에서 미리 확인하게 한다.
+//
+// 확인한 뒤에 값을 고치면 결과를 지운다 — "확인됨" 표시를 켜 둔 채 다른 값을 넣으면
+// 확인하지 않은 값이 확인된 것처럼 보인다.
+function CheckField({ kind, name, label, hint, children, ...inputProps }) {
+  const [value, setValue] = useState("");
+  const [result, setResult] = useState(null);
+  const [busy, setBusy] = useState(false);
+
+  const check = async () => {
+    setBusy(true);
+    try {
+      setResult(await checkAvailabilityAction(kind, value));
+    } catch {
+      setResult({ ok: false, message: "확인 중 오류가 발생했습니다." });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="auth-field">
+      <span>{label}</span>
+      <div className="check-row">
+        <input
+          name={name}
+          value={value}
+          onChange={(e) => { setValue(e.target.value); setResult(null); }}
+          {...inputProps}
+        />
+        <button type="button" className="btn btn-ghost btn-sm" onClick={check} disabled={busy || !value.trim()}>
+          {busy ? "확인 중…" : "중복 확인"}
+        </button>
+      </div>
+      {hint && <em className="check-hint">{hint}</em>}
+      {result && (
+        <p className={result.ok ? "check-ok" : "check-no"} role="status">
+          {result.ok ? "✓ " : "✗ "}{result.message}
+        </p>
+      )}
+      {children}
+    </div>
+  );
+}
 
 function SubmitButton({ disabled }) {
   const { pending } = useFormStatus();
@@ -89,18 +138,30 @@ export default function JoinForm({ action, terms, privacy }) {
       <div className="join-cols">
         <div className="join-left">
           <div className="join-fields2">
-            <label className="auth-field"><span>아이디</span>
-              <input name="loginId" minLength={4} maxLength={30} required placeholder="영문·숫자·_ 4자 이상" />
-            </label>
+            <CheckField
+              kind="loginId"
+              name="loginId"
+              label="아이디"
+              minLength={4}
+              maxLength={30}
+              required
+              placeholder="영문·숫자·_ 4자 이상"
+            />
             <label className="auth-field"><span>비밀번호</span>
               <input name="password" type="password" minLength={8} maxLength={72} required placeholder="8자 이상" />
             </label>
             <label className="auth-field"><span>성명 (실명 · 비공개)</span>
               <input name="name" maxLength={50} required />
             </label>
-            <label className="auth-field"><span>닉네임 (게시판 표시명)</span>
-              <input name="nickname" maxLength={30} required placeholder="게시판 표시명" />
-            </label>
+            <CheckField
+              kind="nickname"
+              name="nickname"
+              label="닉네임 (게시판 표시명)"
+              hint="법명(法名)을 쓰셔도 됩니다. 실명은 공개되지 않습니다."
+              maxLength={30}
+              required
+              placeholder="게시판 표시명"
+            />
             <label className="auth-field"><span>생년월일</span>
               <input name="birthDate" type="date" required min="1900-01-01" max={new Date().toISOString().slice(0, 10)} />
             </label>

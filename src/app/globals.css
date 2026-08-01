@@ -815,7 +815,10 @@ footer.site{position:fixed;left:0;right:0;bottom:0;z-index:40;
 .sns-btn{flex:1;min-width:160px;padding:var(--sp-s);border-radius:var(--r-ctl);border:0;font-size:var(--fs-300);font-weight:var(--fw-bold);cursor:not-allowed;opacity:.7;}
 .sns-btn.kakao{background:var(--kakao-bg);color:var(--kakao-fg);}
 .sns-btn.naver{background:var(--naver-bg);color:var(--n-fg-on-brand);}
-.mypage-info{background:var(--n-bg-1);border:var(--st-thin) solid var(--n-stroke-2);border-radius:var(--r-card);padding:var(--sp-xxl) var(--sp-xxl);max-width:520px;}
+/* 내 정보 — 좁은 화면은 한 줄, 넓은 화면은 왼쪽 고정 칸.
+   예전에는 화면 폭을 560px 로 묶어 두어 카드 다섯 개가 세로로만 쌓였다. */
+.mypage-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--sp-l);align-items:start;}
+.mypage-info{background:var(--n-bg-1);border:var(--st-thin) solid var(--n-stroke-2);border-radius:var(--r-card);padding:var(--sp-xxl);}
 .mypage-info dl{display:grid;grid-template-columns:120px 1fr;gap:var(--sp-m) var(--sp-l);font-size:var(--fs-400);margin-bottom:var(--sp-snudge);line-height:var(--lh-400);}
 .mypage-info dt{color:var(--n-fg-3);font-weight:var(--fw-semibold);}
 .status-badge{display:inline-block;font-size:var(--fs-200);font-weight:var(--fw-bold);padding:var(--sp-xxs) var(--sp-mnudge);border-radius:var(--r-circular);}
@@ -841,7 +844,17 @@ footer.site{position:fixed;left:0;right:0;bottom:0;z-index:40;
 .adm-form-ok{background:var(--sec-tint);border:var(--st-thin) solid var(--sec-tint-2);color:var(--sec);}
 
 /* ── 내 정보 — 본인이 고치는 자리 ── */
-.mypage-edit{display:flex;flex-direction:column;gap:var(--sp-l);margin-top:var(--sp-l);max-width:520px;}
+.mypage-edit{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--sp-l);}
+/* 넓은 화면: 내 정보를 왼쪽에 세우고 고치는 자리를 오른쪽 두 칸으로 편다.
+   탈퇴는 되돌릴 수 없는 자리라 두 칸을 걸쳐 맨 아래에 따로 둔다. */
+@media(min-width:900px){
+  .mypage-layout{grid-template-columns:320px minmax(0,1fr);}
+  .mypage-info{position:sticky;top:calc(var(--sp-xxxl) * 3);}
+}
+@media(min-width:1180px){
+  .mypage-edit{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .mypage-card.danger{grid-column:1 / -1;}
+}
 .mypage-card{background:var(--n-bg-1);border:var(--st-thin) solid var(--n-stroke-2);border-radius:var(--r-card);padding:var(--sp-xxl);}
 .mypage-card h2{font-family:var(--font-title);font-size:var(--fs-400);line-height:var(--lh-400);font-weight:var(--fw-bold);margin-bottom:var(--sp-xs);}
 /* 되돌릴 수 없는 자리라 테두리로 구분한다. 색만으로 구분하지 않도록 제목도 함께 물들인다. */
@@ -1137,3 +1150,14 @@ input:disabled::placeholder,textarea:disabled::placeholder{color:var(--n-fg-disa
 /* 앨범 상세의 "사진 N장 중 x–y" 안내. 쪽이 나뉜 것을 숫자로 알린다. */
 .gal-count{font-size:var(--fs-300);line-height:var(--lh-300);color:var(--n-fg-3);
   margin-top:var(--sp-l);text-align:center;}
+
+/* 가입 화면의 중복 확인. 입력칸과 버튼을 한 줄에 둔다. */
+.check-row{display:flex;gap:var(--sp-s);align-items:stretch;}
+.check-row input{flex:1;min-width:0;}
+.check-hint{display:block;font-size:var(--fs-200);line-height:var(--lh-200);
+  color:var(--n-fg-3);margin-top:var(--sp-xs);font-style:normal;}
+/* 결과는 색만으로 알리지 않는다 — 앞에 ✓/✗ 기호를 함께 찍는다(WCAG 1.4.1). */
+.check-ok,.check-no{font-size:var(--fs-200);line-height:var(--lh-200);
+  font-weight:var(--fw-bold);margin-top:var(--sp-xs);}
+.check-ok{color:var(--sec);}
+.check-no{color:var(--danger);}
