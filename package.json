@@ -10,7 +10,8 @@
     "lint": "eslint src --ext .js",
     "db:init": "psql \"$DATABASE_URL\" -f db/schema.sql",
     "db:seed": "node --env-file=.env scripts/seed-admin.mjs",
-    "member:passwd": "node --env-file=.env scripts/reset-member-password.mjs"
+    "member:passwd": "node --env-file=.env scripts/reset-member-password.mjs",
+    "db:mock": "node --env-file=.env scripts/seed-mock.mjs"
   },
   "dependencies": {
     "bcryptjs": "3.0.3",
