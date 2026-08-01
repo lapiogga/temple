@@ -3,7 +3,7 @@ import PageHead from "@/components/PageHead";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { DancheongDefs, LanternIcon } from "@/components/Icons";
-import { listEventsInMonth, listRegular, listRecurring, listAllEvents } from "@/lib/events";
+import { listEventsInMonth, listRegular, listRecurring } from "@/lib/events";
 import { WEEK, parseRec, recMatches, inRecurrenceWindow, toMin } from "@/lib/recurrence";
 import { monthMatrix, ymNav, parseYm, ymString } from "@/lib/calendar";
 import { formatWallDateTime, wallDayOfMonth, wallTime, kstToday } from "@/lib/format";
@@ -27,16 +27,17 @@ export default async function EventsPage({ searchParams }) {
   const { y, m } = parsed;
   const view = searchParams?.view === "list" ? "list" : "calendar";
 
+  // 캘린더와 목록이 **같은 자료**를 본다.
+  //
+  // 예전에는 목록 뷰만 listAllEvents() 로 전체를 뽑았다. 그래서 월 화살표를 눌러 주소가
+  // ?ym=2026-09 로 바뀌어도 목록 내용이 그대로였다 — 눌러도 아무 일이 안 일어나는 것처럼
+  // 보였다(2026-08-01 사용자 신고). 목록도 그 달의 일정을 보여야 한다.
   const regular = await listRegular();
   let monthEvents = [];
-  let allEvents = [];
   let recurring = [];
   try {
-    if (view === "list") allEvents = await listAllEvents();
-    else {
-      monthEvents = await listEventsInMonth(y, m);
-      recurring = await listRecurring();
-    }
+    monthEvents = await listEventsInMonth(y, m);
+    recurring = await listRecurring();
   } catch (err) {
     console.error("행사 조회 실패:", err);
   }
@@ -90,6 +91,22 @@ export default async function EventsPage({ searchParams }) {
   const today = today0.d;
   const linkYm = (ny, nm, v = view) => `/events?ym=${ymString(ny, nm)}&view=${v}`;
 
+  // '오늘' 바로가기. 이번 달을 보고 있으면 오늘 자리로 스크롤하고, 다른 달을 보고
+  // 있으면 이번 달로 돌아온다. 달을 여러 번 넘긴 뒤 제자리로 오는 길이 없었다.
+  const todayHref = `${linkYm(today0.y, today0.m)}#today`;
+
+  // 목록 뷰는 그 달의 일정을 '행사'와 '법회'로 나눠 보여 준다.
+  // 섞어 놓으면 정기법회가 행사 사이에 흩어져 무엇이 되풀이되는 것인지 읽히지 않는다.
+  const monthEventsOnly = monthList.filter((it) => !it.reg);
+  const monthRegularOnly = monthList.filter((it) => it.reg);
+
+  // #today 는 문서에 하나여야 한다. 오늘 일정이 행사·법회 양쪽에 있으면 id 가 둘이 되어
+  // 유효하지 않은 HTML 이 되고, 브라우저가 어디로 갈지도 정해져 있지 않다.
+  // 렌더 순서(행사 먼저)에서 처음 오는 오늘 항목 하나에만 단다.
+  const todayAnchorKey = isThisMonth
+    ? [...monthEventsOnly, ...monthRegularOnly].find((it) => it.day === today)?.key ?? null
+    : null;
+
   return (
     <>
       <DancheongDefs />
@@ -104,6 +121,9 @@ export default async function EventsPage({ searchParams }) {
               <Link href={linkYm(prev.y, prev.m)} aria-label="이전 달">‹</Link>
               <span className="cal-title">{y}년 {m}월</span>
               <Link href={linkYm(next.y, next.m)} aria-label="다음 달">›</Link>
+              {/* 달을 여러 번 넘긴 뒤 제자리로 오는 길이 없었다.
+                  이번 달을 보고 있을 때는 오늘 자리로 스크롤한다(#today). */}
+              <Link className="cal-today" href={todayHref}>오늘</Link>
             </div>
             <div className="view-toggle">
               <Link href={linkYm(y, m, "calendar")} className={view === "calendar" ? "on" : ""}>캘린더</Link>
@@ -132,7 +152,10 @@ export default async function EventsPage({ searchParams }) {
                           {day != null && (
                             <>
                               <div className="cal-daynum">
-                                <span className={`cal-day${isThisMonth && day === today ? " today" : ""}${di === 0 ? " sun" : di === 6 ? " sat" : ""}`}>
+                                <span
+                                  id={isThisMonth && day === today ? "today" : undefined}
+                                  className={`cal-day${isThisMonth && day === today ? " today" : ""}${di === 0 ? " sun" : di === 6 ? " sat" : ""}`}
+                                >
                                   {day}
                                 </span>
                                 <span className="cal-lunar">{lunarLabel(y, m, day)}</span>
@@ -180,29 +203,47 @@ export default async function EventsPage({ searchParams }) {
             </ul>
             </>
           ) : (
-            <ul className="ev-list">
-              {allEvents.length === 0 ? (
-                <li>등록된 행사가 없습니다.</li>
+            /* 목록 뷰 — 캘린더와 같은 달, 같은 자료를 본다.
+               '행사'와 '법회'를 나눠 놓는다. 섞으면 매주 되풀이되는 법회가 행사 사이에
+               흩어져 무엇이 정기적인 것인지 읽히지 않는다. */
+            <div className="ev-list-wrap">
+              {monthList.length === 0 ? (
+                <p className="cal-ml-empty">{y}년 {m}월에 등록된 일정이 없습니다.</p>
               ) : (
-                allEvents.map((e) => (
-                  <li key={e.id}>
-                    <Link href={`/events/${e.id}`}>
-                      <span className="ev-t">
-                        <span className="ev-kind">{KIND_LABEL[e.kind] ?? ""}</span>
-                        {e.title}
-                      </span>
-                      {/* 반복 일정은 starts_at 이 '첫 회' 날짜다. 그대로 찍으면 매주 하는
-                          법회가 그 하루짜리 행사처럼 보이므로, 반복이면 규칙을 담은
-                          when_text("매주 일요일 오전 10:00")를 먼저 쓴다.
-                          관리자 목록(admin/events/page.js:54)은 처음부터 이 순서였다. */}
-                      <span className="ev-w">
-                        {e.recurrence ? e.when_text ?? "" : e.starts_at ? formatWallDateTime(e.starts_at) : e.when_text}
-                      </span>
-                    </Link>
-                  </li>
+                [
+                  ["행사", monthEventsOnly, "ev"],
+                  ["법회", monthRegularOnly, "reg"],
+                ].map(([label, items, cls]) => (
+                  <section key={label} className="ev-group">
+                    <h3 className="ev-group-h">
+                      <span className={`lg-dot ${cls}`} /> {label}
+                      <span className="ev-group-n">{items.length}</span>
+                    </h3>
+                    {items.length === 0 ? (
+                      <p className="cal-ml-empty">이 달에는 없습니다.</p>
+                    ) : (
+                      <ul className="ev-list">
+                        {items.map((it) => (
+                          <li
+                            key={`${it.day}-${it.key}`}
+                            id={it.key === todayAnchorKey ? "today" : undefined}
+                            className={isThisMonth && it.day === today ? "is-today" : undefined}
+                          >
+                            <Link href={it.href}>
+                              <span className="ev-t">
+                                <span className="ev-kind">{it.day}일</span>
+                                {it.title}
+                              </span>
+                              <span className="ev-w">{it.time ?? "시각 미정"}</span>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </section>
                 ))
               )}
-            </ul>
+            </div>
           )}
             </div>
 

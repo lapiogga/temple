@@ -568,6 +568,23 @@ footer.site{margin-top:var(--sp-xl);}
 .lg-dot{display:inline-block;width:16px;height:12px;border-radius:var(--r-md);margin-left:var(--sp-mnudge);}
 .lg-dot.ev{background:var(--brand-tint);}
 .lg-dot.reg{background:var(--sec-tint);}
+/* 오늘로 돌아오기. 달을 여러 번 넘긴 뒤 제자리를 찾는 길이 없었다. */
+.cal-today{margin-left:var(--sp-m);font-size:var(--fs-300);font-weight:var(--fw-bold);
+  color:var(--brand);background:var(--brand-tint);border-radius:var(--r-circular);
+  padding:var(--sp-xs) var(--sp-m);white-space:nowrap;}
+.cal-today:hover{background:var(--brand);color:var(--n-fg-on-brand);}
+
+/* 목록 뷰 — 행사와 법회를 나눠 놓는다. */
+.ev-list-wrap{display:flex;flex-direction:column;gap:var(--sp-xl);margin-top:var(--sp-xs);}
+.ev-group-h{display:flex;align-items:center;gap:var(--sp-s);
+  font-family:var(--font-title);font-size:var(--fs-400);line-height:var(--lh-400);
+  font-weight:var(--fw-bold);margin-bottom:var(--sp-s);}
+.ev-group-n{font-size:var(--fs-200);line-height:var(--lh-200);font-weight:var(--fw-bold);
+  color:var(--n-fg-3);background:var(--n-bg-3);border-radius:var(--r-circular);
+  padding:0 var(--sp-s);}
+/* 오늘 자리는 테두리로도 구분한다 — 색만으로 알리지 않는다(WCAG 1.4.1). */
+.ev-list li.is-today{border-color:var(--brand);box-shadow:var(--sh-2);}
+
 .ev-list{list-style:none;margin-top:var(--sp-xs);}
 .ev-list li{background:var(--n-bg-1);border:var(--st-thin) solid var(--n-stroke-2);border-radius:var(--r-card);padding:var(--sp-m) var(--sp-l);margin-bottom:var(--sp-mnudge);}
 .ev-list a{display:flex;justify-content:space-between;gap:var(--sp-m);align-items:baseline;flex-wrap:wrap;}
