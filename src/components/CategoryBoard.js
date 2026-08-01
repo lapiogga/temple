@@ -5,6 +5,7 @@ import { listPosts, listPostsWithThumb } from "@/lib/posts";
 import { getCategoryBySlug, canWrite } from "@/lib/board-categories";
 import { getViewer } from "@/lib/viewer";
 import { formatDate } from "@/lib/format";
+import { thumbSrc } from "@/lib/thumb";
 import Pager from "@/components/Pager";
 
 // 소개 메뉴에 딸린 게시판(법문·휴심선원)을 자기 주소에서 보여 준다.
@@ -52,7 +53,7 @@ export default async function CategoryBoard({ slug, kicker, basePath, page = 1 }
                 <div className="cover">
                   {p.thumb_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.thumb_url} alt="" />
+                    <img src={thumbSrc(p.thumb_url)} alt="" loading="lazy" />
                   ) : (
                     <span className="cover-empty">이미지 없음</span>
                   )}

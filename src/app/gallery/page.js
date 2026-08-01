@@ -6,6 +6,7 @@ import Reveal from "@/components/Reveal";
 import { DancheongDefs, PhotoIcon } from "@/components/Icons";
 import { listAlbums } from "@/lib/gallery";
 import { getViewer } from "@/lib/viewer";
+import { thumbSrc } from "@/lib/thumb";
 import { SITE } from "@/content/site";
 import Pager from "@/components/Pager";
 
@@ -51,7 +52,7 @@ export default async function GalleryPage({ searchParams }) {
                   <div className="cover">
                     {a.cover ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={a.cover} alt={a.title} />
+                      <img src={thumbSrc(a.cover)} alt={a.title} loading="lazy" />
                     ) : (
                       <PhotoIcon />
                     )}

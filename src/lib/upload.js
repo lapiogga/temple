@@ -33,6 +33,45 @@ const FORMAT_EXT = { jpeg: "jpg", png: "png", webp: "webp", gif: "gif" };
 const MAX_EDGE = 1600;
 const JPEG_QUALITY = 82;
 
+// ── 썸네일 ────────────────────────────────────────────────────
+//
+// 목록·격자는 작은 그림만 필요한데 원본을 그대로 내려받고 있었다. 실측(2026-08-01,
+// 운영): 갤러리 목록 1.97MB · **35장짜리 앨범 상세 13.84MB** · 휴심선원(탑전) 0.82MB.
+// 격자에서는 어차피 300~400px 로 줄여 그린다.
+//
+// 원본 옆 thumb/ 에 같은 이름으로 둔다. nginx 가 /uploads/ 를 디스크에서 직접 서빙하므로
+// 하위 디렉터리도 그대로 나간다(별도 설정 불필요).
+const THUMB_DIR = path.join(UPLOAD_DIR, "thumb");
+const THUMB_EDGE = 480;
+const THUMB_QUALITY = 72;
+
+// /uploads/x.jpg → /uploads/thumb/x.jpg
+export function thumbPathFor(url) {
+  if (typeof url !== "string" || !url.startsWith("/uploads/")) return null;
+  const base = path.basename(url);
+  if (!base || base === "." || base === ".." || base.includes("/")) return null;
+  return `/uploads/thumb/${base}`;
+}
+
+// 썸네일을 만든다. 실패해도 업로드를 막지 않는다 — 원본은 이미 저장돼 있고,
+// 화면은 썸네일이 없으면 원본으로 떨어지게 되어 있다(lib/thumb.js).
+async function writeThumb(buf, name, format) {
+  try {
+    await mkdir(THUMB_DIR, { recursive: true });
+    let t = sharp(buf).rotate().resize(THUMB_EDGE, THUMB_EDGE, {
+      fit: "inside",
+      withoutEnlargement: true,
+    });
+    if (format === "jpeg") t = t.jpeg({ quality: THUMB_QUALITY, mozjpeg: true });
+    else if (format === "png") t = t.png({ compressionLevel: 9, palette: true });
+    else if (format === "webp") t = t.webp({ quality: THUMB_QUALITY });
+    // gif 는 sharp 가 첫 프레임만 쓴다. 썸네일로는 그것으로 충분하다.
+    await writeFile(path.join(THUMB_DIR, name), await t.toBuffer());
+  } catch (err) {
+    console.error("썸네일 생성 실패(원본은 저장됨):", name, err?.message);
+  }
+}
+
 // File(web) → 리사이즈·재압축 후 저장, 공개 URL 반환. 실패 시 throw.
 export async function saveImage(file) {
   if (!file || typeof file.arrayBuffer !== "function" || file.size === 0) {
@@ -59,6 +98,8 @@ export async function saveImage(file) {
   await mkdir(UPLOAD_DIR, { recursive: true });
   const name = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}.${ext}`;
   await writeFile(path.join(UPLOAD_DIR, name), out);
+  // 썸네일은 줄인 결과(out)에서 뜬다. 원본에서 뜨면 같은 회전·보정을 두 번 계산한다.
+  await writeThumb(out, name, meta.format);
   return `/uploads/${name}`;
 }
 
@@ -142,6 +183,9 @@ export async function deleteUpload(url) {
   const target = path.join(UPLOAD_DIR, base);
   // 정규화 후에도 UPLOAD_DIR 안인지 확인한다.
   if (path.dirname(path.resolve(target)) !== path.resolve(UPLOAD_DIR)) return false;
+  // 썸네일도 함께 지운다. 안 지우면 원본만 사라지고 thumb/ 에 고아가 쌓인다.
+  // 원본 삭제가 실패하더라도 썸네일 정리는 시도한다(둘은 독립이다).
+  await unlink(path.join(THUMB_DIR, base)).catch(() => {});
   try {
     await unlink(target);
     return true;
