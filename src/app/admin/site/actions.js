@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireSession } from "@/lib/session";
 import { setSection } from "@/lib/site-content";
 import { saveImage, deleteUpload } from "@/lib/upload";
+import { sanitizeHtml, stripTags } from "@/lib/sanitize";
 
 // 화면 쪽 제한(SectionForm 의 maxLength, HeroImages 의 MAX)과 같은 값.
 // 브라우저 제한은 우회할 수 있으므로 서버에서도 자른다.
@@ -61,9 +62,15 @@ export async function saveSectionAction(key, prevState, formData) {
         images: [...kept, ...added],
       };
     } else if (key === "greeting") {
+      // 리치 에디터가 보낸 HTML. 공개 화면이 dangerouslySetInnerHTML 로 그리므로
+      // 게시판 본문과 똑같이 allowlist 정화를 거친 것만 저장한다.
+      const bodyHtml = sanitizeHtml(str(formData.get("bodyHtml")));
+      if (stripTags(bodyHtml).length < 1) return { error: "인삿말을 입력하세요." };
+      // paragraphs 는 더 넘기지 않는다 — 두 벌을 남기면 어느 쪽이 참인지 알 수 없다.
+      // 공개 화면은 bodyHtml 이 없을 때만 옛 paragraphs 를 그린다(하위호환).
       value = {
         isDraft: formData.get("isDraft") === "on",
-        paragraphs: paras(formData.get("paragraphs")),
+        bodyHtml,
         sign: str(formData.get("sign")),
       };
     } else if (key === "history") {

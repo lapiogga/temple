@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useFormState, useFormStatus } from "react-dom";
 import HeroImages from "./HeroImages";
+import RichEditor from "@/components/RichEditor";
 
 function SubmitBtn() {
   const { pending } = useFormStatus();
@@ -13,7 +14,7 @@ function SubmitBtn() {
   );
 }
 
-export default function SectionForm({ section, initial = {}, action }) {
+export default function SectionForm({ section, initial = {}, action, uploadAction }) {
   const [state, formAction] = useFormState(action, {});
 
   return (
@@ -43,9 +44,13 @@ export default function SectionForm({ section, initial = {}, action }) {
             <input type="checkbox" name="isDraft" defaultChecked={!!initial.isDraft} />
             <span>초안 표시 (“※ 초안입니다” 문구 노출)</span>
           </label>
-          <label className="adm-field"><span>인삿말 (문단은 빈 줄로 구분)</span>
-            <textarea name="paragraphs" rows={9} defaultValue={(initial.paragraphs || []).join("\n\n")} />
-          </label>
+          {/* 게시판 글쓰기와 같은 본문 에디터. 예전에는 빈 줄로 문단을 나누는
+              textarea 라 굵게·목록·사진을 넣을 수 없었다. 값은 HTML(bodyHtml)로
+              저장되고, 저장 때 서버가 정화한다(sanitizeHtml). */}
+          <div className="adm-field">
+            <span>인삿말</span>
+            <RichEditor name="bodyHtml" initialValue={initial.bodyHtml || ""} uploadAction={uploadAction} />
+          </div>
           <label className="adm-field"><span>서명</span>
             <input name="sign" defaultValue={initial.sign || ""} maxLength={120} />
           </label>

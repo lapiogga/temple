@@ -879,6 +879,11 @@ footer.site{position:fixed;left:0;right:0;bottom:0;z-index:40;
 .rich-content h3{font-size:var(--fs-500);font-weight:var(--fw-bold);margin:var(--sp-l) 0 var(--sp-s);line-height:var(--lh-500);}
 .rich-content p{margin-bottom:var(--sp-m);}
 .rich-content ul,.rich-content ol{margin:0 0 var(--sp-m) var(--sp-xxl);}
+/* @tailwind base(preflight)가 ul·ol 의 list-style 을 none 으로 지운다. 위 규칙은
+   여백만 되돌려 놓아서, 에디터에서 만든 목록이 글머리 기호 없이 그냥 여러 줄로
+   보였다. 본문은 쓴 대로 보여야 하므로 여기서 표식을 되살린다. */
+.rich-content ul{list-style:disc;}
+.rich-content ol{list-style:decimal;}
 .rich-content li{margin-bottom:var(--sp-xs);}
 .rich-content a{color:var(--brand);text-decoration:underline;}
 .rich-content img{max-width:100%;height:auto;border-radius:var(--r-drop);margin:var(--sp-m) 0;}
