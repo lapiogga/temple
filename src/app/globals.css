@@ -614,6 +614,18 @@ footer.site{margin-top:var(--sp-xl);}
 .gal-card .cover-empty{font-size:var(--fs-200);color:var(--n-fg-4);}
 .gal-card .meta{padding:var(--sp-m) var(--sp-l);}
 .gal-card .meta h3{font-size:var(--fs-400);font-weight:var(--fw-bold);line-height:var(--lh-400);}
+/* 앨범 구분 가름막(전체 / 일반 / 회원 전용). 회원·운영자에게만 보인다. */
+.gal-tabs{display:flex;gap:var(--sp-s);flex-wrap:wrap;margin-bottom:var(--sp-l);}
+.gal-tab{display:inline-flex;align-items:center;gap:var(--sp-xs);
+  padding:var(--sp-s) var(--sp-l);border-radius:var(--r-circular);
+  border:var(--st-thin) solid var(--n-stroke-2);background:var(--n-bg-1);
+  font-size:var(--fs-300);line-height:var(--lh-300);font-weight:var(--fw-bold);
+  color:var(--n-fg-1);transition:var(--t-state);}
+.gal-tab:hover{border-color:var(--brand);}
+/* 고른 것을 색만으로 알리지 않는다 — 굵기와 테두리도 함께 바뀐다(WCAG 1.4.1). */
+.gal-tab.on{background:var(--brand);color:var(--n-fg-on-brand);border-color:var(--brand);}
+.gal-tab-n{font-size:var(--fs-200);line-height:var(--lh-200);opacity:.85;}
+
 /* '회원 전용' 표시. 이 앨범이 왜 남에게는 안 보이는지 관리자·회원이 알 수 있어야 한다. */
 .gal-badge{display:inline-block;margin-left:var(--sp-s);vertical-align:middle;
   font-size:var(--fs-200);line-height:var(--lh-200);font-weight:var(--fw-bold);
@@ -1121,3 +1133,7 @@ input:disabled::placeholder,textarea:disabled::placeholder{color:var(--n-fg-disa
   .btn-primary:hover,.btn-ghost:hover{transform:none;}
   .hcx-dots button,.hcx-dots button.on{transition:none;}
 }
+
+/* 앨범 상세의 "사진 N장 중 x–y" 안내. 쪽이 나뉜 것을 숫자로 알린다. */
+.gal-count{font-size:var(--fs-300);line-height:var(--lh-300);color:var(--n-fg-3);
+  margin-top:var(--sp-l);text-align:center;}

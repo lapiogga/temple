@@ -20,12 +20,25 @@ export default async function GalleryPage({ searchParams }) {
   const { isAdmin, isApprovedMember } = await getViewer();
   const canSeeMember = isAdmin || isApprovedMember;
 
-  let albums = [];
+  let all = [];
   try {
-    albums = await listAlbums({ publicOnly: true, includeMember: canSeeMember });
+    all = await listAlbums({ publicOnly: true, includeMember: canSeeMember });
   } catch (err) {
     console.error("갤러리 조회 실패:", err);
   }
+
+  // 회원·운영자에게는 '전체 / 일반 / 회원 전용' 가름막을 준다.
+  // 회원 전용 앨범이 일반 앨범 사이에 섞여 있으면 무엇이 회원에게만 보이는 것인지
+  // 한눈에 안 잡힌다. 비로그인에게는 볼 것이 하나뿐이라 가름막 자체를 두지 않는다.
+  const tab = canSeeMember && ["public", "member"].includes(searchParams?.tab)
+    ? searchParams.tab
+    : "all";
+  const albums = tab === "all" ? all : all.filter((a) => a.visibility === tab);
+  const counts = {
+    all: all.length,
+    public: all.filter((a) => a.visibility === "public").length,
+    member: all.filter((a) => a.visibility === "member").length,
+  };
 
   const totalPages = Math.max(1, Math.ceil(albums.length / PER_PAGE));
   const page = Math.min(totalPages, Math.max(1, Number(searchParams?.page) || 1));
@@ -40,6 +53,25 @@ export default async function GalleryPage({ searchParams }) {
       <section className="screen top">
         <div className="wrap">
           <PageHead title="갤러리" ki="Gallery" className="reveal" back={{ href: "/", label: "홈으로" }} />
+
+          {canSeeMember && (
+            <div className="gal-tabs reveal" role="group" aria-label="앨범 구분">
+              {[
+                ["all", "전체"],
+                ["public", "일반"],
+                ["member", "회원 전용"],
+              ].map(([v, label]) => (
+                <Link
+                  key={v}
+                  className={`gal-tab${tab === v ? " on" : ""}`}
+                  href={v === "all" ? "/gallery" : `/gallery?tab=${v}`}
+                  aria-current={tab === v ? "true" : undefined}
+                >
+                  {label} <span className="gal-tab-n">{counts[v]}</span>
+                </Link>
+              ))}
+            </div>
+          )}
 
           {albums.length === 0 ? (
             <p className="reveal" style={{ color: "var(--n-fg-3)" }}>
@@ -72,7 +104,13 @@ export default async function GalleryPage({ searchParams }) {
               ))}
             </div>
           )}
-          <Pager basePath="/gallery" page={page} totalPages={totalPages} />
+          {/* tab 을 함께 넘긴다. 안 넘기면 2쪽으로 가는 순간 가름막이 '전체' 로 풀린다. */}
+          <Pager
+            basePath="/gallery"
+            query={tab === "all" ? {} : { tab }}
+            page={page}
+            totalPages={totalPages}
+          />
         </div>
       </section>
 
