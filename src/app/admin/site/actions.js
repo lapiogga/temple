@@ -5,12 +5,14 @@ import { requireSession } from "@/lib/session";
 import { setSection } from "@/lib/site-content";
 import { saveImage, deleteUpload } from "@/lib/upload";
 import { sanitizeHtml, stripTags } from "@/lib/sanitize";
+import { GIVING_PROVIDERS } from "@/content/giving";
 
 // 화면 쪽 제한(SectionForm 의 maxLength, HeroImages 의 MAX)과 같은 값.
 // 브라우저 제한은 우회할 수 있으므로 서버에서도 자른다.
 const HERO_EYEBROW_MAX = 50;
 const HERO_LEDE_MAX = 250;
 const HERO_MAX_IMAGES = 10;
+const GIVING_URL_MAX = 400;
 
 const str = (v) => (v ?? "").toString().trim();
 // 줄 단위(빈 줄 제외)
@@ -89,12 +91,38 @@ export async function saveSectionAction(key, prevState, formData) {
       const bank = str(formData.get("bank"));
       const account = str(formData.get("account"));
       const holder = str(formData.get("holder"));
+      // 디지털 시주 주소. 이 값은 공개 화면에서 QR 로 그려지고 그대로 href 가 되므로
+      // 아무 문자열이나 받으면 안 된다 — `javascript:` 하나가 들어가면 그 자체로 구멍이다.
+      // https 만 받는다. 간편송금 주소는 모두 https 이고, http 를 허용하면 QR 이
+      // 가로챌 수 있는 주소를 실어 나르는 꼴이 된다. 후원 도관이라 더욱 그렇다.
+      // 틀린 것을 조용히 버리지 않고 어느 창구인지 짚어 돌려준다 — 오타 한 글자 때문에
+      // 저장은 됐는데 화면에 안 나오면 관리자가 원인을 찾을 길이 없다.
+      const giving = {};
+      const badGiving = [];
+      for (const p of GIVING_PROVIDERS) {
+        const raw = str(formData.get(`giving_${p.key}`)).slice(0, GIVING_URL_MAX);
+        if (!raw) continue;
+        let ok = false;
+        try {
+          ok = new URL(raw).protocol === "https:";
+        } catch {
+          ok = false;
+        }
+        if (ok) giving[p.key] = raw;
+        else badGiving.push(p.label);
+      }
+      if (badGiving.length) {
+        return {
+          error: `${badGiving.join(" · ")} 송금 주소가 올바르지 않습니다. https:// 로 시작하는 주소를 넣어 주세요.`,
+        };
+      }
       value = {
         addressFull: str(formData.get("addressFull")),
         transit: str(formData.get("transit")) || null,
         parking: str(formData.get("parking")) || null,
         mapUrl: str(formData.get("mapUrl")),
         donation: bank || account || holder ? { bank, account, holder } : null,
+        giving,
       };
     } else {
       return { error: "알 수 없는 섹션입니다." };

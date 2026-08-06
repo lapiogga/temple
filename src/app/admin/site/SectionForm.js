@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useFormState, useFormStatus } from "react-dom";
 import HeroImages from "./HeroImages";
 import RichEditor from "@/components/RichEditor";
+import { GIVING_PROVIDERS } from "@/content/giving";
 
 function SubmitBtn() {
   const { pending } = useFormStatus();
@@ -106,6 +107,26 @@ export default function SectionForm({ section, initial = {}, action, uploadActio
               <input name="holder" defaultValue={initial.donation?.holder || ""} maxLength={40} />
             </label>
           </div>
+
+          {/* 디지털 시주. 창구 목록은 content/giving.js 한 곳에서 온다 — 공개 화면의
+              카드도 같은 목록을 보고 그리므로 여기에 따로 적어 두지 않는다. */}
+          <p className="adm-hint">
+            디지털 시주 — 간편송금 주소를 넣으면 후원 안내에 QR 이 자동으로 만들어집니다.
+            각 앱이 발급한 주소를 그대로 붙여 넣으세요. 비워 두면 그 창구는 화면에 나오지 않습니다.
+          </p>
+          {GIVING_PROVIDERS.map((p) => (
+            <label className="adm-field" key={p.key}>
+              <span>{p.label} 송금 주소</span>
+              <input
+                name={`giving_${p.key}`}
+                type="url"
+                inputMode="url"
+                placeholder={p.placeholder}
+                maxLength={400}
+                defaultValue={initial.giving?.[p.key] || ""}
+              />
+            </label>
+          ))}
         </>
       )}
 

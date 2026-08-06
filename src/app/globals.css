@@ -502,6 +502,26 @@ header.nav{position:sticky;top:0;z-index:50;background:rgba(var(--n-bg-2-rgb),.9
 .donate .acct{margin-top:var(--sp-m);font-size:var(--fs-300);background:var(--n-bg-2);border:var(--st-thin) dashed var(--n-stroke-2);border-radius:var(--r-drop);padding:var(--sp-m) var(--sp-l);}
 .note-small{font-size:var(--fs-200);color:var(--n-fg-3);margin-top:var(--sp-m);}
 
+/* 디지털 시주 — 후원 블록 안의 간편송금 QR 묶음 */
+.giving{margin-top:var(--sp-l);}
+.giving-head{font-size:var(--fs-200);line-height:var(--lh-200);color:var(--n-fg-3);margin-bottom:var(--sp-s);}
+/* 창구 수는 관리자가 정한다(1~3개). auto-fit 이라 한 개면 한 칸, 셋이면 세 칸으로
+   스스로 나뉜다 — 개수마다 규칙을 따로 두지 않는다. */
+.giving-list{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:var(--sp-m);}
+.giving-card{display:flex;flex-direction:column;align-items:center;gap:var(--sp-s);
+  padding:var(--sp-m);background:var(--n-bg-2);border:var(--st-thin) solid var(--n-stroke-2);
+  border-radius:var(--r-card);color:var(--n-fg-1);
+  transition:border-color var(--t-state),transform var(--t-state),box-shadow var(--t-state);}
+.giving-card:hover{border-color:var(--brand);transform:translateY(-2px);box-shadow:var(--sh-card-hover);}
+.giving-name{font-size:var(--fs-200);line-height:var(--lh-200);font-weight:var(--fw-semibold);text-align:center;}
+/* QR 은 밝은 바탕 위 어두운 격자여야 읽힌다. 단청색을 입히고 싶어지는 자리지만
+   대비를 낮추면 인식률이 떨어진다 — 대비가 가장 큰 토큰 짝을 고정으로 쓴다
+   (--n-bg-1 #ffffff 위 --n-fg-1 16.06:1). 리터럴이 아니라 토큰인 이유도 이것이다. */
+.qr{display:block;width:100%;max-width:132px;height:auto;}
+.qr-bg{fill:var(--n-bg-1);}
+.qr-fg{fill:var(--n-fg-1);}
+@media(prefers-reduced-motion:reduce){.giving-card,.giving-card:hover{transition:none;transform:none;}}
+
 /* Footer */
 footer.site{margin-top:var(--sp-xl);}
 

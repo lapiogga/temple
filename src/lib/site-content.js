@@ -34,6 +34,9 @@ export const CONTENT_DEFAULTS = {
     parking: SITE.parking,
     mapUrl: SITE.mapUrl,
     donation: SITE.donation, // { bank, account, holder } | null
+    // 디지털 시주 — { [창구key]: 송금주소 }. 창구 목록은 content/giving.js.
+    // 예전에 저장된 visit 값에는 이 키가 아예 없다. 읽는 쪽에서 ?? {} 로 받는다.
+    giving: {},
   },
 };
 
