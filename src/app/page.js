@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { DancheongDefs } from "@/components/Icons";
+import SiteJsonLd from "@/components/SiteJsonLd";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import HeroCarousel from "@/components/HeroCarousel";
@@ -40,6 +41,8 @@ export default async function Home() {
 
   return (
     <>
+      {/* 검색엔진용 구조화 데이터 — 화면에는 아무것도 그리지 않는다. */}
+      <SiteJsonLd />
       <DancheongDefs />
       <SiteHeader />
 

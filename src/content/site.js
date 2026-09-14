@@ -5,6 +5,16 @@
 export const SITE = {
   name: "응선사",
   hanja: "應禪寺",
+  // 정규 주소(canonical). 색인·사이트맵·OG 가 모두 이 값을 기준으로 한다.
+  //
+  // 환경변수(NEXT_PUBLIC_SITE_URL)를 쓰지 않는 이유: 그 값은 빌드타임에 박히는데
+  // 운영 .env 에는 아직 IP(`https://187.127.213.114`)가 들어 있다. canonical 이 IP 를
+  // 가리키면 검색엔진이 도메인과 IP 를 서로 다른 사이트로 보고 평가가 갈린다.
+  // 도메인은 이제 확정된 사실이므로 여기 적는다.
+  //
+  // apex(eungsunsa.kr)가 아니라 www 로 통일한다 — 둘 다 같은 서버를 가리키므로
+  // 한쪽을 정하지 않으면 같은 내용이 두 주소로 색인된다(nginx 에서 apex → www 301).
+  url: "https://www.eungsunsa.kr",
   order: "대한불교조계종",
   abbot: "수암스님",
   regionLabel: "서울 부암동",

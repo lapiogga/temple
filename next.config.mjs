@@ -35,7 +35,15 @@ const nextConfig = {
       { source: "/admin/intro", destination: "/admin/site", permanent: false },
     ];
   },
-  // 공통 보안 헤더. 초안 기간 X-Robots-Tag noindex 포함(8월 정식 오픈 시 제거).
+  // 공통 보안 헤더.
+  //
+  // 초안 기간에는 여기에 `X-Robots-Tag: noindex, nofollow` 도 있었다. 도메인을 붙이고
+  // 검색 노출을 시작하면서 뺐다 — 이 헤더 하나만 남아도 layout.js 의 메타 태그나
+  // robots.txt 를 아무리 고쳐도 색인되지 않는다(응답 헤더가 더 강하다).
+  //
+  // 관리자·개인 화면을 검색에서 빼는 것은 robots.js 의 disallow 가 맡는다. 헤더로
+  // 경로를 가르려면 source 를 나눠 써야 하는데, 그러면 위 redirects() 처럼 일부 응답에
+  // 헤더가 안 붙는 경우를 또 만든다.
   async headers() {
     return [
       {
@@ -44,7 +52,6 @@ const nextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          { key: "X-Robots-Tag", value: "noindex, nofollow" },
         ],
       },
     ];
