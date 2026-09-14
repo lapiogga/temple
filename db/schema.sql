@@ -43,7 +43,11 @@ CREATE TABLE IF NOT EXISTS events (
   title       TEXT NOT NULL,
   when_text   TEXT,                                -- "일요일 10:00" / "음력 7.15" 등 표시용
   starts_at   TIMESTAMPTZ,                         -- 실제 일시(있을 때)
-  recurrence  TEXT,                                -- 반복 규칙(선택)
+  -- 반복 규칙(선택). 형식과 판정은 src/lib/recurrence.js 가 정의한다.
+  --   daily:HH:MM · weekly:N:HH:MM · monthly:D:HH:MM · yearly:M:D:HH:MM
+  --   lunar:D:HH:MM(음력 매월) · lunaryear:M:D:HH:MM(음력 매년)
+  --   lunar:D 는 시각 자리가 없던 구형 — 읽기만 한다.
+  recurrence  TEXT,
   description TEXT,
   sort_order  INT NOT NULL DEFAULT 0,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()

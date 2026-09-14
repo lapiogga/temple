@@ -7,6 +7,7 @@ import { requireSession } from "@/lib/session";
 import {
   createEvent, updateEvent, removeEvent, addAttachment, removeAttachment,
 } from "@/lib/events";
+import { recIsValid } from "@/lib/recurrence";
 import { saveAttachment } from "@/lib/upload";
 
 const eventSchema = z.object({
@@ -85,6 +86,10 @@ function validUntil(d) {
   return { ok: true };
 }
 
+// 반복 규칙 형식 검사. 규칙도 화면이 숨은 필드로 조립해 보내므로 종료일 상한과 같은
+// 이유로 서버가 한 번 더 본다. 판정은 형식을 정의한 곳에 둔다(lib/recurrence recIsValid).
+const REC_BAD = "반복 주기가 올바르지 않습니다.";
+
 // 언제 하는 일정인지가 있어야 한다.
 //
 // 반복도 아니고 날짜도 없으면 그 행은 뜻이 없다. 달력은 starts_at 범위로 뽑으므로
@@ -122,6 +127,7 @@ export async function createEventAction(prevState, formData) {
     return { error: "행사 일시 형식이 올바르지 않습니다." };
   }
   if (!hasWhen(parsed.data)) return { error: NO_WHEN };
+  if (!recIsValid(parsed.data.recurrence)) return { error: REC_BAD };
   const until = validUntil(parsed.data);
   if (!until.ok) return { error: until.msg };
   try {
@@ -146,6 +152,7 @@ export async function updateEventAction(id, prevState, formData) {
     return { error: "행사 일시 형식이 올바르지 않습니다." };
   }
   if (!hasWhen(parsed.data)) return { error: NO_WHEN };
+  if (!recIsValid(parsed.data.recurrence)) return { error: REC_BAD };
   const until = validUntil(parsed.data);
   if (!until.ok) return { error: until.msg };
   try {

@@ -67,9 +67,15 @@ export default async function EventsPage({ searchParams }) {
         sort: toMin(time),
       };
     });
+    // 음력 매년(lunaryear)은 음력 '월' 과 윤달 여부까지 봐야 해서 판정에 그 날의 음력
+    // 환산 결과를 통째로 넘긴다(lib/recurrence recMatches 주석).
     const recs = recurring
       .map((e) => ({ e, p: parseRec(e.recurrence) }))
-      .filter(({ e, p }) => recMatches(p, weekday, lun?.lDay, day) && inRecurrenceWindow(e, y, m, day))
+      .filter(
+        ({ e, p }) =>
+          recMatches(p, { weekday, month: m, day, lunar: lun }) &&
+          inRecurrenceWindow(e, y, m, day)
+      )
       .map(({ e, p }) => ({
         key: `r${e.id}`, href: `/events/${e.id}`, title: e.title, time: p.time,
         reg: e.kind === "regular", sort: toMin(p.time),
